@@ -26,22 +26,27 @@ export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, on
 
   const PRESET_THEMES = [
     {
-      name: "Glass Dark",
-      css: `.notion-card { background: rgba(0,0,0,0.6) !important; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1) !important; }
-body { background: #0a0a0a !important; color: #fff !important; }
-.notion-sidebar { background: #111 !important; border-right: 1px solid #222 !important; }`
+      name: "Darcula",
+      css: `body { background: #2b2b2b !important; color: #a9b7c6 !important; }
+.notion-sidebar { background: #3c3f41 !important; border-right: 1px solid #2b2b2b !important; }
+.notion-card { background: #313335 !important; border: 1px solid #4e5052 !important; box-shadow: none !important; color: #a9b7c6 !important; }
+.notion-text-subtle { color: #808080 !important; }
+.accent-text { color: #cc7832 !important; }`
     },
     {
-      name: "Midnight Purple",
-      css: `body { background: #0f172a !important; color: #f1f5f9 !important; }
-.notion-sidebar { background: #1e293b !important; }
-.notion-card { border: 1px solid #334155 !important; shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2) !important; }`
+      name: "Solarized Dark",
+      css: `body { background: #002b36 !important; color: #839496 !important; }
+.notion-sidebar { background: #073642 !important; border-right: 1px solid #586e75 !important; }
+.notion-card { background: #073642 !important; border: 1px solid #586e75 !important; color: #93a1a1 !important; }
+.notion-text-subtle { color: #586e75 !important; }
+.accent-text { color: #268bd2 !important; }`
     },
     {
-      name: "Warm Sepia",
-      css: `body { background: #fdf6e3 !important; color: #586e75 !important; }
-.notion-sidebar { background: #eee8d5 !important; }
-.notion-card { background: #fdf6e3 !important; border: 1px solid #dcd3b6 !important; }`
+      name: "Nord",
+      css: `body { background: #2e3440 !important; color: #d8dee9 !important; }
+.notion-sidebar { background: #3b4252 !important; }
+.notion-card { background: #434c5e !important; border: 1px solid #4c566a !important; color: #eceff4 !important; }
+.accent-text { color: #88c0d0 !important; }`
     }
   ];
 
