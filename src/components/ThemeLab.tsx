@@ -31,8 +31,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, on
 .notion-sidebar { background: #3c3f41 !important; border-right: 1px solid #2b2b2b !important; }
 .notion-card { background: #313335 !important; border: 1px solid #4e5052 !important; box-shadow: none !important; color: #a9b7c6 !important; }
 .notion-item:hover, .notion-item.active { background: #4e5254 !important; color: #cc7832 !important; }
-.accent-text { color: #cc7832 !important; }
-button:not(.bg-purple-600) { background: #4e5052 !important; color: #a9b7c6 !important; border: 1px solid #5e6062 !important; }`
+.accent-text { color: #cc7832 !important; }`
     },
     {
       name: "Monokai",
@@ -59,12 +58,12 @@ button:not(.bg-purple-600) { background: #4e5052 !important; color: #a9b7c6 !imp
 .accent-text { color: #268bd2 !important; }`
     },
     {
-      name: "Solarized Light",
-      css: `body { background: #fdf6e3 !important; color: #586e75 !important; }
-.notion-sidebar { background: #eee8d5 !important; border-right: 1px solid #93a1a1 !important; }
-.notion-card { background: #fdf6e3 !important; border: 1px solid #dcd3b6 !important; color: #657b83 !important; }
-.notion-item:hover, .notion-item.active { background: #eee8d5 !important; color: #cb4b16 !important; }
-.accent-text { color: #cb4b16 !important; }`
+      name: "Nord",
+      css: `body { background: #2e3440 !important; color: #d8dee9 !important; }
+.notion-sidebar { background: #3b4252 !important; }
+.notion-card { background: #434c5e !important; border: 1px solid #4c566a !important; color: #eceff4 !important; }
+.notion-item:hover, .notion-item.active { background: #4c566a !important; color: #88c0d0 !important; }
+.accent-text { color: #88c0d0 !important; }`
     }
   ];
 
