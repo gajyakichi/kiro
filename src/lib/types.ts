@@ -30,6 +30,13 @@ export interface Project {
   metadata?: string;
 }
 
+export interface Theme {
+  id: number;
+  name: string;
+  css: string;
+  active: boolean;
+}
+
 export interface Progress {
   task: string;
   walkthrough: string;

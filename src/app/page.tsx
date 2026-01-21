@@ -1,10 +1,11 @@
 "use client";
 
-import { Progress, Comment, DbLog, Project } from "@/lib/types";
+import { Progress, Comment, DbLog, Project, Theme } from "@/lib/types";
 import { useEffect, useState, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { IconRenderer } from '@/components/IconRenderer';
 import { IconPicker } from '@/components/IconPicker';
+import { ThemeLab } from '@/components/ThemeLab';
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -19,6 +20,8 @@ export default function Home() {
   const [isAddingProject, setIsAddingProject] = useState(false);
   const [projectForm, setProjectForm] = useState({ name: "", git_path: "", artifact_path: "", icon: "" });
   const [showIconPicker, setShowIconPicker] = useState<string | null>(null); // 'add' | 'header'
+  const [themes, setThemes] = useState<Theme[]>([]);
+  const [previewCss, setPreviewCss] = useState("");
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -58,10 +61,21 @@ export default function Home() {
     }
   }, []);
 
+  const fetchThemes = useCallback(async () => {
+    try {
+      const res = await fetch('/api/themes');
+      const data = await res.json();
+      setThemes(data);
+    } catch (e) {
+      console.error("Theme Fetch Error:", e);
+    }
+  }, []);
+
   useEffect(() => {
     setMounted(true);
     fetchProjects();
-  }, [fetchProjects]);
+    fetchThemes();
+  }, [fetchProjects, fetchThemes]);
 
   useEffect(() => {
     if (activeProject) {
@@ -90,19 +104,51 @@ export default function Home() {
   };
 
   const handleAddProject = async () => {
+    // ... existings
+  };
+
+  const handleSaveTheme = async (name: string, css: string) => {
     try {
-      const res = await fetch('/api/projects', {
+      const res = await fetch('/api/themes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(projectForm)
+        body: JSON.stringify({ name, css })
       });
-      if (res.ok) {
-        setIsAddingProject(false);
-        setProjectForm({ name: "", git_path: "", artifact_path: "", icon: "" });
-        fetchProjects();
-      }
+      if (res.ok) fetchThemes();
     } catch (e) {
-      console.error("Add Project Error:", e);
+      console.error("Theme Save Error:", e);
+    }
+  };
+
+  const handleDeleteTheme = async (id: number) => {
+    try {
+      await fetch(`/api/themes?id=${id}`, { method: 'DELETE' });
+      fetchThemes();
+    } catch (e) {
+      console.error("Theme Delete Error:", e);
+    }
+  };
+
+  const handleToggleTheme = async (theme: Theme | null) => {
+    try {
+      if (!theme) {
+        // Deactivate all themes (Switch to Original)
+        await fetch('/api/themes', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: -1, active: false }) // Use a dummy ID or handle on server
+        });
+        fetchThemes();
+        return;
+      }
+      await fetch('/api/themes', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...theme, active: !theme.active })
+      });
+      fetchThemes();
+    } catch (e) {
+      console.error("Theme Toggle Error:", e);
     }
   };
 
@@ -152,7 +198,7 @@ export default function Home() {
           </div>
         </div>
         <div className="grid grid-cols-7 gap-y-1 text-center text-[10px]">
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => <div key={d} className="opacity-40">{d}</div>)}
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => <div key={`${d}-${i}`} className="opacity-40">{d}</div>)}
           {Array(firstDay).fill(null).map((_, i) => <div key={`empty-${i}`} />)}
           {Array.from({ length: days }, (_, i) => i + 1).map(day => {
             const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
@@ -219,10 +265,7 @@ export default function Home() {
       {/* Notion Sidebar */}
       <aside className="w-64 notion-sidebar flex flex-col pt-8 pb-4 px-3 sticky top-0 h-screen overflow-y-auto">
         <div className="mb-6">
-          <div className="flex items-center gap-2 mb-2 px-2">
-            <div className="w-6 h-6 bg-foreground text-white rounded flex items-center justify-center font-bold text-xs">K</div>
-            <span className="font-semibold truncate">Kaihatsunote</span>
-          </div>
+          {/* No branding header, starting directly with workspace switcher */}
           
           <div className="px-2 mt-4">
             <div className="text-[11px] font-semibold notion-text-subtle uppercase mb-2">Workspace</div>
@@ -293,6 +336,14 @@ export default function Home() {
               <span>Notes</span>
               <span className="text-xs notion-text-subtle">{comments.length}</span>
             </div>
+          </div>
+
+          <div 
+            onClick={() => setActiveTab("themes")}
+            className={`notion-item flex items-center gap-3 ${activeTab === "themes" ? "active" : ""}`}
+          >
+            <span className="animate-pulse">✨</span>
+            <span>Theme Lab</span>
           </div>
         </nav>
 
@@ -495,15 +546,26 @@ export default function Home() {
               )}
             </div>
           )}
+
+          {activeTab === "themes" && (
+            <ThemeLab 
+              themes={themes}
+              onSave={handleSaveTheme}
+              onDelete={handleDeleteTheme}
+              onToggle={handleToggleTheme}
+              onPreview={setPreviewCss}
+            />
+          )}
         </section>
 
         <footer className="mt-24 pt-8 border-t border-gray-100 text-xs notion-text-subtle flex justify-between items-center">
-          <span>Kaihatsunote v1.6.0</span>
-          <span>Synced with Antigravity</span>
+          <span>{activeProject?.name || "Ready"}</span>
+          <span>System Status: Online</span>
         </footer>
       </main>
 
       <style jsx global>{`
+        ${previewCss || themes.find(t => t.active)?.css || ''}
         .markdown-content ul { list-style-type: none; padding-left: 0; }
         .markdown-content li { margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px; }
         .markdown-content li input[type="checkbox"] { margin-top: 4px; pointer-events: none; }

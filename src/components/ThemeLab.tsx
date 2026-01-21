@@ -1,0 +1,185 @@
+import React, { useState } from 'react';
+import { Theme } from '@/lib/types';
+import { MagicWand, Trash, Palette, Play, CheckCircle, Circle } from '@phosphor-icons/react';
+
+interface ThemeLabProps {
+  themes: Theme[];
+  onSave: (name: string, css: string) => Promise<void>;
+  onDelete: (id: number) => Promise<void>;
+  onToggle: (theme: Theme | null) => Promise<void>;
+  onPreview: (css: string) => void;
+}
+
+export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, onToggle, onPreview }) => {
+  const [newName, setNewName] = useState("");
+  const [newCss, setNewCss] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
+  const activeTheme = themes.find(t => t.active) || null;
+
+  const handleSave = async () => {
+    if (!newName || !newCss) return;
+    await onSave(newName, newCss);
+    setNewName("");
+    setNewCss("");
+    setIsAdding(false);
+  };
+
+  const PRESET_THEMES = [
+    {
+      name: "Glass Dark",
+      css: `.notion-card { background: rgba(0,0,0,0.6) !important; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1) !important; }
+body { background: #0a0a0a !important; color: #fff !important; }
+.notion-sidebar { background: #111 !important; border-right: 1px solid #222 !important; }`
+    },
+    {
+      name: "Midnight Purple",
+      css: `body { background: #0f172a !important; color: #f1f5f9 !important; }
+.notion-sidebar { background: #1e293b !important; }
+.notion-card { border: 1px solid #334155 !important; shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.2) !important; }`
+    },
+    {
+      name: "Warm Sepia",
+      css: `body { background: #fdf6e3 !important; color: #586e75 !important; }
+.notion-sidebar { background: #eee8d5 !important; }
+.notion-card { background: #fdf6e3 !important; border: 1px solid #dcd3b6 !important; }`
+    }
+  ];
+
+  return (
+    <div className="space-y-10 animate-fade-in pb-20">
+      {/* Theme Selector Section */}
+      <section>
+        <div className="flex items-center gap-3 mb-6">
+          <Palette size={24} className="text-gray-400" weight="bold" />
+          <h2 className="text-xl font-bold tracking-tight text-gray-800 uppercase">Theme Selector</h2>
+        </div>
+        
+        <div className="flex flex-wrap gap-4">
+          {/* Original Theme */}
+          <button 
+            onClick={() => onToggle(null)}
+            onMouseEnter={() => onPreview("")}
+            className={`group flex items-center gap-4 px-6 py-4 rounded-xl border-2 transition-all duration-300 bg-white ${!activeTheme ? 'border-black shadow-lg shadow-gray-100' : 'border-gray-100 hover:border-gray-200 opacity-60 hover:opacity-100'}`}
+          >
+            <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform">
+              {!activeTheme ? <CheckCircle size={20} weight="fill" className="text-black" /> : <Circle size={20} />}
+            </div>
+            <div className="text-left">
+              <div className="font-bold text-sm">Original</div>
+              <div className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Default System</div>
+            </div>
+          </button>
+
+          {themes.map(theme => (
+            <button 
+              key={theme.id}
+              onClick={() => onToggle(theme)}
+              onMouseEnter={() => onPreview(theme.css)}
+              onMouseLeave={() => onPreview("")}
+              className={`group flex items-center gap-4 px-6 py-4 rounded-xl border-2 transition-all duration-300 bg-white ${theme.active ? 'border-purple-500 shadow-lg shadow-purple-50' : 'border-gray-100 hover:border-gray-200 opacity-60 hover:opacity-100'}`}
+            >
+              <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+                {theme.active ? <CheckCircle size={20} weight="fill" className="text-purple-500" /> : <Circle size={20} />}
+              </div>
+              <div className="text-left relative">
+                 <div className="font-bold text-sm flex items-center gap-2">
+                   {theme.name}
+                   <span onClick={(e) => { e.stopPropagation(); onDelete(theme.id); }} className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 transition-opacity">
+                     <Trash size={14} />
+                   </span>
+                 </div>
+                 <div className="text-[10px] text-purple-400 uppercase tracking-widest font-bold">Custom Style</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Editor Section */}
+      <section>
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            <MagicWand size={24} className="text-purple-500 animate-pulse" weight="fill" />
+            <h2 className="text-xl font-bold tracking-tight text-gray-800 uppercase">Editor & Preview</h2>
+          </div>
+          <button 
+            onClick={() => setIsAdding(!isAdding)}
+            className={`notion-item px-4 py-2 rounded-md font-medium text-sm transition-all ${isAdding ? 'bg-gray-100 text-gray-600' : 'bg-black text-white'}`}
+          >
+            {isAdding ? "Close Editor" : "Open CSS Editor"}
+          </button>
+        </div>
+
+        {isAdding && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in slide-in-from-top-4 duration-500">
+            {/* Left: Editor */}
+            <div className="bg-white notion-card p-6 border-2 border-purple-100">
+              <div className="flex items-center gap-3 mb-4">
+                 <Palette size={20} className="text-purple-500" />
+                 <span className="font-bold">Laboratory</span>
+              </div>
+              <div className="space-y-4">
+                <input 
+                  className="w-full border border-gray-200 rounded p-2 text-sm focus:ring-2 ring-purple-500 outline-none transition-all"
+                  placeholder="Theme Name (e.g. Cyberpunk)"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                />
+                <textarea 
+                  className="w-full h-80 border border-gray-200 rounded p-4 text-xs font-mono bg-gray-50 focus:bg-white transition-all focus:ring-2 ring-purple-500 outline-none leading-relaxed"
+                  placeholder="/* Add your custom CSS here */\n.notion-card { border-radius: 20px !important; }"
+                  value={newCss}
+                  onChange={(e) => {
+                    setNewCss(e.target.value);
+                    onPreview(e.target.value);
+                  }}
+                />
+                <div className="flex gap-2">
+                  {PRESET_THEMES.map(preset => (
+                    <button 
+                      key={preset.name}
+                      onClick={() => { setNewName(preset.name); setNewCss(preset.css); onPreview(preset.css); }}
+                      className="text-[10px] bg-purple-50 text-purple-600 px-3 py-1.5 rounded-full hover:bg-purple-100 font-bold transition-colors"
+                    >
+                      {preset.name}
+                    </button>
+                  ))}
+                </div>
+                <button 
+                  onClick={handleSave}
+                  className="w-full bg-purple-600 text-white font-black py-4 rounded-xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 active:scale-[0.98]"
+                >
+                  SAVE & REGISTER VIBE
+                </button>
+              </div>
+            </div>
+
+            {/* Right: Preview Console */}
+            <div className="bg-gray-900 rounded-3xl p-8 relative overflow-hidden shadow-2xl flex flex-col justify-center items-center text-center space-y-6">
+              <div className="absolute inset-0 bg-linear-to-br from-purple-500/20 to-blue-500/20 pointer-events-none"></div>
+              
+              <div className="relative w-full max-w-sm bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/20 animate-pulse"></div>
+                  <div className="h-4 w-32 bg-white/20 rounded animate-pulse"></div>
+                </div>
+                <div className="h-24 w-full bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
+                   <Play size={32} className="text-white opacity-40" weight="fill" />
+                </div>
+                <div className="flex justify-between items-center">
+                  <div className="h-4 w-20 bg-white/20 rounded"></div>
+                  <div className="h-8 w-8 rounded-lg bg-purple-500 shadow-lg shadow-purple-500/50"></div>
+                </div>
+              </div>
+
+              <div className="z-10 text-white flex flex-col items-center">
+                <p className="text-xs uppercase tracking-[0.3em] font-black text-purple-400 mb-2">Live Preview Zone</p>
+                <p className="text-sm opacity-60">CSS changes are automatically reflected in the entire dashboard while editing.</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+};
