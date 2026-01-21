@@ -30,25 +30,32 @@ export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, on
       css: `body { background: #2b2b2b !important; color: #a9b7c6 !important; }
 .notion-sidebar { background: #3c3f41 !important; border-right: 1px solid #2b2b2b !important; }
 .notion-card { background: #313335 !important; border: 1px solid #4e5052 !important; box-shadow: none !important; color: #a9b7c6 !important; }
-.notion-item:hover { background: #4e5254 !important; }
-.notion-item.active { background: #4e5254 !important; color: #cc7832 !important; }
-.notion-text-subtle { color: #808080 !important; }
-.accent-text { color: #cc7832 !important; }`
+.notion-item:hover, .notion-item.active { background: #4e5254 !important; color: #cc7832 !important; }
+.accent-text { color: #cc7832 !important; }
+button:not(.bg-purple-600) { background: #4e5052 !important; color: #a9b7c6 !important; border: 1px solid #5e6062 !important; }`
     },
     {
       name: "Monokai",
       css: `body { background: #272822 !important; color: #f8f8f2 !important; }
 .notion-sidebar { background: #1e1f1c !important; }
-.notion-card { background: #272822 !important; border: 1px solid #49483e !important; }
-.notion-item:hover { background: #3e3d32 !important; }
+.notion-card { background: #23241f !important; border: 1px solid #49483e !important; }
+.notion-item:hover, .notion-item.active { background: #3e3d32 !important; color: #f92672 !important; }
 .accent-text { color: #a6e22e !important; }`
+    },
+    {
+      name: "Catppuccin",
+      css: `body { background: #1e1e2e !important; color: #cdd6f4 !important; }
+.notion-sidebar { background: #181825 !important; }
+.notion-card { background: #313244 !important; border: 1px solid #45475a !important; color: #cdd6f4 !important; }
+.notion-item:hover, .notion-item.active { background: #45475a !important; color: #cba6f7 !important; }
+.accent-text { color: #f5c2e7 !important; }`
     },
     {
       name: "Solarized Dark",
       css: `body { background: #002b36 !important; color: #839496 !important; }
 .notion-sidebar { background: #073642 !important; border-right: 1px solid #586e75 !important; }
 .notion-card { background: #073642 !important; border: 1px solid #586e75 !important; color: #93a1a1 !important; }
-.notion-item:hover { background: #586e75 !important; color: #eee8d5 !important; }
+.notion-item:hover, .notion-item.active { background: #586e75 !important; color: #eee8d5 !important; }
 .accent-text { color: #268bd2 !important; }`
     },
     {
@@ -56,15 +63,8 @@ export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, on
       css: `body { background: #fdf6e3 !important; color: #586e75 !important; }
 .notion-sidebar { background: #eee8d5 !important; border-right: 1px solid #93a1a1 !important; }
 .notion-card { background: #fdf6e3 !important; border: 1px solid #dcd3b6 !important; color: #657b83 !important; }
-.notion-item:hover { background: #eee8d5 !important; }
+.notion-item:hover, .notion-item.active { background: #eee8d5 !important; color: #cb4b16 !important; }
 .accent-text { color: #cb4b16 !important; }`
-    },
-    {
-      name: "Nord",
-      css: `body { background: #2e3440 !important; color: #d8dee9 !important; }
-.notion-sidebar { background: #3b4252 !important; }
-.notion-card { background: #434c5e !important; border: 1px solid #4c566a !important; color: #eceff4 !important; }
-.accent-text { color: #88c0d0 !important; }`
     }
   ];
 
