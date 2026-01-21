@@ -1,11 +1,14 @@
 "use client";
 
-import { Progress, Comment, DbLog, Project, Theme } from "@/lib/types";
+import { Progress, Comment, DbLog, Project, Theme, DailyNote, SuggestedTask } from "@/lib/types";
 import { useEffect, useState, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { IconRenderer } from '@/components/IconRenderer';
 import { IconPicker } from '@/components/IconPicker';
 import { ThemeLab } from '@/components/ThemeLab';
+import { Sparkles } from 'lucide-react';
+import DailyNotes from '@/components/DailyNotes';
+import SuggestedTasks from '@/components/SuggestedTasks';
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -19,9 +22,12 @@ export default function Home() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isAddingProject, setIsAddingProject] = useState(false);
   const [projectForm, setProjectForm] = useState({ name: "", git_path: "", artifact_path: "", icon: "" });
-  const [showIconPicker, setShowIconPicker] = useState<string | null>(null); // 'add' | 'header'
+  const [iconPickerTarget, setIconPickerTarget] = useState<string | null>(null); // 'add' | 'header'
   const [themes, setThemes] = useState<Theme[]>([]);
   const [previewCss, setPreviewCss] = useState("");
+  const [dailyNotes, setDailyNotes] = useState<DailyNote[]>([]);
+  const [suggestedTasks, setSuggestedTasks] = useState<SuggestedTask[]>([]);
+  const [isAbsorbing, setIsAbsorbing] = useState(false);
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -56,10 +62,23 @@ export default function Home() {
       const commentRes = await fetch(`/api/comments?projectId=${projectId}`);
       const commentData = await commentRes.json();
       setComments(commentData);
+
+      fetchAbsorbData(projectId);
     } catch (e) {
       console.error("Fetch Error:", e);
     }
   }, []);
+
+  const fetchAbsorbData = async (projectId: number) => {
+    try {
+      const res = await fetch(`/api/absorb/data?projectId=${projectId}`);
+      const data = await res.json();
+      setDailyNotes(data.dailyNotes || []);
+      setSuggestedTasks(data.suggestedTasks || []);
+    } catch (e) {
+      console.error("Absorb Data Fetch Error:", e);
+    }
+  };
 
   const fetchThemes = useCallback(async () => {
     try {
@@ -172,6 +191,53 @@ export default function Home() {
       }
     } catch (e) {
       console.error("Update Project Error:", e);
+    }
+  };
+
+  const handleAbsorb = async () => {
+    if (!activeProject || isAbsorbing) return;
+    setIsAbsorbing(true);
+    try {
+      const res = await fetch('/api/absorb', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectId: activeProject.id })
+      });
+      if (res.ok) {
+        fetchAbsorbData(activeProject.id);
+        setActiveTab("daily_notes");
+      }
+    } catch (e) {
+      console.error("Absorb Error:", e);
+    } finally {
+      setIsAbsorbing(false);
+    }
+  };
+
+  const handleTaskStatusUpdate = async (taskId: number, status: string, taskText?: string) => {
+    if (!activeProject) return;
+    try {
+      // If adding, create a comment first
+      if (status === 'added' && taskText) {
+        await fetch('/api/comments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: `[Suggested Task] ${taskText}`, projectId: activeProject.id })
+        });
+        fetchData(activeProject.id);
+      }
+
+      const res = await fetch('/api/absorb/tasks', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskId, status })
+      });
+      
+      if (res.ok) {
+        fetchAbsorbData(activeProject.id);
+      }
+    } catch (e) {
+      console.error("Task Status Update Error:", e);
     }
   };
 
@@ -326,6 +392,28 @@ export default function Home() {
           </div>
 
           <div 
+            onClick={() => setActiveTab("daily_notes")}
+            className={`notion-item flex items-center gap-3 ${activeTab === "daily_notes" ? "active" : ""}`}
+          >
+            <span>✨</span>
+            <div className="flex-1 flex justify-between items-center">
+              <span>Daily Notes</span>
+              {dailyNotes.length > 0 && <span className="text-[10px] bg-blue-50 text-blue-500 px-1.5 rounded-full font-bold">{dailyNotes.length}</span>}
+            </div>
+          </div>
+
+          <div 
+            onClick={() => setActiveTab("suggested_tasks")}
+            className={`notion-item flex items-center gap-3 ${activeTab === "suggested_tasks" ? "active" : ""}`}
+          >
+            <span>💡</span>
+            <div className="flex-1 flex justify-between items-center">
+              <span>Suggestions</span>
+              {suggestedTasks.length > 0 && <span className="text-[10px] bg-amber-50 text-amber-500 px-1.5 rounded-full font-bold">{suggestedTasks.length}</span>}
+            </div>
+          </div>
+
+          <div 
             onClick={() => setActiveTab("calendar")}
             className={`notion-item flex items-center gap-3 ${activeTab === "calendar" ? "active" : ""}`}
           >
@@ -364,7 +452,7 @@ export default function Home() {
                   <div className="relative">
                     <label className="block text-xs font-semibold notion-text-subtle mb-1">Icon</label>
                     <button 
-                      onClick={() => setShowIconPicker('add')}
+                      onClick={() => setIconPickerTarget('add')}
                       className="w-10 h-10 border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50 bg-white"
                     >
                       {projectForm.icon ? (
@@ -373,14 +461,14 @@ export default function Home() {
                         <span className="text-gray-300 text-xl">+</span>
                       )}
                     </button>
-                    {showIconPicker === 'add' && (
+                    {iconPickerTarget === 'add' && (
                        <IconPicker 
                         selectedIcon={projectForm.icon}
                         onSelect={(icon) => {
                           setProjectForm({ ...projectForm, icon });
-                          setShowIconPicker(null);
+                          setIconPickerTarget(null);
                         }}
-                        onClose={() => setShowIconPicker(null)}
+                        onClose={() => setIconPickerTarget(null)}
                       />
                     )}
                   </div>
@@ -454,7 +542,7 @@ export default function Home() {
           <h1 className="group relative flex items-center text-4xl font-bold tracking-tight mb-2">
             <div className="relative mr-4">
               <div 
-                onClick={() => setShowIconPicker('header')}
+                onClick={() => setIconPickerTarget('header')}
                 className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-gray-100 cursor-pointer transition-colors border border-transparent hover:border-gray-200"
               >
                 {activeProject?.icon ? (
@@ -463,15 +551,15 @@ export default function Home() {
                     <span className="text-2xl opacity-20">◦</span>
                 )}
               </div>
-              {showIconPicker === 'header' && (
+              {iconPickerTarget === 'header' && (
                 <div className="left-0 top-full">
                   <IconPicker 
                     selectedIcon={activeProject?.icon}
                     onSelect={(icon) => {
                       handleUpdateProjectIcon(icon);
-                      setShowIconPicker(null);
+                      setIconPickerTarget(null);
                     }}
-                    onClose={() => setShowIconPicker(null)}
+                    onClose={() => setIconPickerTarget(null)}
                   />
                 </div>
               )}
@@ -479,14 +567,33 @@ export default function Home() {
             <span>
               {activeTab === "git" && "Git History"}
               {activeTab === "progress" && "Development Progress"}
+              {activeTab === "daily_notes" && "Daily Notes"}
+              {activeTab === "suggested_tasks" && "AI Task Suggestions"}
               {activeTab === "comments" && "Developer Notes"}
               {activeTab === "calendar" && "System Calendar"}
             </span>
             {activeProject && <span className="text-lg ml-4 opacity-30 font-normal">/ {activeProject.name}</span>}
+            
+            {activeProject && (
+              <button 
+                onClick={handleAbsorb}
+                disabled={isAbsorbing}
+                className={`ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  isAbsorbing 
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                    : 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm'
+                }`}
+              >
+                <Sparkles size={14} className={isAbsorbing ? 'animate-spin' : 'animate-pulse text-amber-400'} />
+                {isAbsorbing ? 'Absorbing...' : 'Absorb Context'}
+              </button>
+            )}
           </h1>
           <p className="text-lg notion-text-subtle">
             {activeTab === "git" && "Track recent system changes and commits."}
             {activeTab === "progress" && "Live status of the Antigravity task checklist."}
+            {activeTab === "daily_notes" && "AI-summarized report of recent development activities."}
+            {activeTab === "suggested_tasks" && "AI-powered recommendations for upcoming work."}
             {activeTab === "comments" && "Your manual notes and thoughts recorded here."}
             {activeTab === "calendar" && "Visual timeline of commits and notes."}
           </p>
@@ -528,6 +635,22 @@ export default function Home() {
           )}
 
           {activeTab === "calendar" && renderFullCalendar()}
+
+          {activeTab === "daily_notes" && (
+            <div className="animate-fade-in">
+              <DailyNotes notes={dailyNotes} />
+            </div>
+          )}
+
+          {activeTab === "suggested_tasks" && (
+            <div className="animate-fade-in">
+              <SuggestedTasks 
+                tasks={suggestedTasks} 
+                onAdd={(t) => handleTaskStatusUpdate(t.id, 'added', t.task)}
+                onDismiss={(t) => handleTaskStatusUpdate(t.id, 'dismissed')}
+              />
+            </div>
+          )}
 
           {activeTab === "comments" && (
             <div key="comments-content" className="space-y-8">

@@ -41,3 +41,19 @@ export interface Progress {
   task: string;
   walkthrough: string;
 }
+
+export interface DailyNote {
+  id: number;
+  project_id: number;
+  date: string;
+  content: string;
+  timestamp: string;
+}
+
+export interface SuggestedTask {
+  id: number;
+  project_id: number;
+  task: string;
+  status: 'proposed' | 'added' | 'dismissed';
+  timestamp: string;
+}

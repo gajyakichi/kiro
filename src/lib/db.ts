@@ -41,6 +41,24 @@ db.exec(`
     active INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS daily_notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER,
+    date TEXT NOT NULL, -- YYYY-MM-DD
+    content TEXT NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (project_id) REFERENCES projects(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS suggested_tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER,
+    task TEXT NOT NULL,
+    status TEXT DEFAULT 'proposed', -- 'proposed', 'added', 'dismissed'
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (project_id) REFERENCES projects(id)
+  );
 `);
 
 export default db;
