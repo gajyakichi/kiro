@@ -1,10 +1,29 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
-import { Theme } from "@/lib/types";
+
+interface ThemeRow {
+  id: number;
+  name: string;
+  css: string;
+  active: number;
+}
 
 export async function GET() {
   try {
-    const themes = db.prepare('SELECT * FROM themes ORDER BY created_at DESC').all() as any[];
+    let themes = db.prepare('SELECT * FROM themes ORDER BY created_at DESC').all() as ThemeRow[];
+    
+    // Auto-seed if empty
+    if (themes.length === 0) {
+      const presets = [
+        { name: 'Darcula', css: 'body { background: #2b2b2b !important; color: #a9b7c6 !important; } .notion-sidebar { background: #3c3f41 !important; } .notion-card { background: #313335 !important; border: 1px solid #4e5052 !important; } .notion-item:hover, .notion-item.active { background: #4e5254 !important; color: #cc7832 !important; }' },
+        { name: 'Monokai', css: 'body { background: #272822 !important; color: #f8f8f2 !important; } .notion-sidebar { background: #1e1f1c !important; } .notion-card { background: #23241f !important; border: 1px solid #49483e !important; } .notion-item:hover, .notion-item.active { background: #3e3d32 !important; color: #f92672 !important; }' },
+        { name: 'Nord', css: 'body { background: #2e3440 !important; color: #d8dee9 !important; } .notion-sidebar { background: #3b4252 !important; } .notion-card { background: #434c5e !important; border: 1px solid #4c566a !important; } .notion-item:hover, .notion-item.active { background: #4c566a !important; color: #88c0d0 !important; }' }
+      ];
+      const insert = db.prepare('INSERT INTO themes (name, css, active) VALUES (?, ?, 0)');
+      presets.forEach(p => insert.run(p.name, p.css));
+      themes = db.prepare('SELECT * FROM themes ORDER BY created_at DESC').all() as ThemeRow[];
+    }
+
     // Convert active INTEGER to boolean
     const formattedThemes = themes.map(t => ({
       ...t,

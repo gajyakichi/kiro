@@ -156,12 +156,16 @@ export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, on
                     onPreview(e.target.value);
                   }}
                 />
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {PRESET_THEMES.map(preset => (
                     <button 
                       key={preset.name}
-                      onClick={() => { setNewName(preset.name); setNewCss(preset.css); onPreview(preset.css); }}
-                      className="text-[10px] bg-purple-50 text-purple-600 px-3 py-1.5 rounded-full hover:bg-purple-100 font-bold transition-colors"
+                      onClick={() => { 
+                        setNewName(preset.name); 
+                        setNewCss(preset.css); 
+                        onPreview(preset.css); 
+                      }}
+                      className="text-[10px] bg-purple-50 text-purple-600 px-3 py-1.5 rounded-full hover:bg-purple-600 hover:text-white font-bold transition-all"
                     >
                       {preset.name}
                     </button>
@@ -169,9 +173,9 @@ export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, on
                 </div>
                 <button 
                   onClick={handleSave}
-                  className="w-full bg-purple-600 text-white font-black py-4 rounded-xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 active:scale-[0.98]"
+                  className="w-full bg-purple-600 text-white font-black py-4 rounded-xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-200 active:scale-[0.98] mt-4"
                 >
-                  SAVE & REGISTER VIBE
+                  SAVE & ADD TO SELECTOR
                 </button>
               </div>
             </div>
@@ -180,23 +184,15 @@ export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, on
             <div className="bg-gray-900 rounded-3xl p-8 relative overflow-hidden shadow-2xl flex flex-col justify-center items-center text-center space-y-6">
               <div className="absolute inset-0 bg-linear-to-br from-purple-500/20 to-blue-500/20 pointer-events-none"></div>
               
-              <div className="relative w-full max-w-sm bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/20 animate-pulse"></div>
-                  <div className="h-4 w-32 bg-white/20 rounded animate-pulse"></div>
-                </div>
-                <div className="h-24 w-full bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
-                   <Play size={32} className="text-white opacity-40" weight="fill" />
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="h-4 w-20 bg-white/20 rounded"></div>
-                  <div className="h-8 w-8 rounded-lg bg-purple-500 shadow-lg shadow-purple-500/50"></div>
-                </div>
-              </div>
-
               <div className="z-10 text-white flex flex-col items-center">
-                <p className="text-xs uppercase tracking-[0.3em] font-black text-purple-400 mb-2">Live Preview Zone</p>
-                <p className="text-sm opacity-60">CSS changes are automatically reflected in the entire dashboard while editing.</p>
+                <Play size={48} className="text-purple-400 mb-4 animate-pulse" weight="fill" />
+                <p className="text-xs uppercase tracking-[0.3em] font-black text-purple-400 mb-2">Editor Mode: Active</p>
+                <p className="text-sm opacity-80 leading-relaxed px-4">
+                  Changes typed here are <span className="text-purple-300 font-bold underline italic">immediately applied</span> as a temporary preview to the entire console.
+                </p>
+                <div className="mt-8 px-4 py-2 bg-white/10 rounded-lg border border-white/10 text-[10px] font-mono opacity-60">
+                  Total Control: CSS @ Dashboard
+                </div>
               </div>
             </div>
           </div>

@@ -114,7 +114,10 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, css })
       });
-      if (res.ok) fetchThemes();
+      if (res.ok) {
+        fetchThemes();
+        setPreviewCss("");
+      }
     } catch (e) {
       console.error("Theme Save Error:", e);
     }
@@ -129,26 +132,29 @@ export default function Home() {
     }
   };
 
-  const handleToggleTheme = async (theme: Theme | null) => {
+  const handleSelectTheme = async (theme: Theme | null) => {
     try {
+      setPreviewCss(""); 
       if (!theme) {
         // Deactivate all themes (Switch to Original)
         await fetch('/api/themes', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: -1, active: false }) // Use a dummy ID or handle on server
+          body: JSON.stringify({ id: -1, active: false }) 
         });
         fetchThemes();
         return;
       }
+      
+      // Select new theme: backend deactivates others automatically
       await fetch('/api/themes', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...theme, active: !theme.active })
+        body: JSON.stringify({ ...theme, active: true })
       });
       fetchThemes();
     } catch (e) {
-      console.error("Theme Toggle Error:", e);
+      console.error("Theme Selection Error:", e);
     }
   };
 
@@ -552,7 +558,7 @@ export default function Home() {
               themes={themes}
               onSave={handleSaveTheme}
               onDelete={handleDeleteTheme}
-              onToggle={handleToggleTheme}
+              onToggle={handleSelectTheme}
               onPreview={setPreviewCss}
             />
           )}
@@ -564,7 +570,7 @@ export default function Home() {
         </footer>
       </main>
 
-      <style jsx global>{`
+      <style key={themes.find(t => t.active)?.id || 'original'} dangerouslySetInnerHTML={{ __html: `
         ${previewCss || themes.find(t => t.active)?.css || ''}
         .markdown-content ul { list-style-type: none; padding-left: 0; }
         .markdown-content li { margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px; }
@@ -573,7 +579,7 @@ export default function Home() {
         .markdown-content h1, .markdown-content h2, .markdown-content h3 { font-weight: 600; margin-top: 1.5em; margin-bottom: 0.5em; }
         .markdown-content h1 { font-size: 1.5em; }
         .markdown-content h2 { font-size: 1.25em; border-bottom: 1px solid #efefef; padding-bottom: 2px; }
-      `}</style>
+      `}} />
     </div>
   );
 }
