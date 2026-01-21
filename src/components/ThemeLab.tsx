@@ -27,52 +27,52 @@ export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, on
   const PRESET_THEMES = [
     {
       name: "Darcula",
-      css: `body { background: #2b2b2b !important; color: #a9b7c6 !important; }
+      css: `body { background: #2b2b2b !important; color: #a9b7c6 !important; font-weight: 450; }
 .notion-sidebar { background: #3c3f41 !important; border-right: 1px solid #2b2b2b !important; }
-.notion-card { background: #313335 !important; border: 1px solid #4e5052 !important; box-shadow: none !important; color: #a9b7c6 !important; }
+.notion-card { background: #313335 !important; border: 1px solid #4e5052 !important; box-shadow: none !important; color: #cfd8dc !important; }
 .notion-item:hover, .notion-item.active { background: #4e5254 !important; color: #cc7832 !important; }
-.notion-text-subtle { color: #808080 !important; }
-h1, h2, h3 { color: #cc7832 !important; }
+.notion-text-subtle { color: #9da5b4 !important; font-size: 0.95em; }
+h1, h2, h3 { color: #cc7832 !important; font-weight: 700; }
 .accent-text { color: #cc7832 !important; }`
     },
     {
       name: "Monokai",
-      css: `body { background: #272822 !important; color: #f8f8f2 !important; }
+      css: `body { background: #272822 !important; color: #f8f8f2 !important; font-weight: 450; }
 .notion-sidebar { background: #1e1f1c !important; }
 .notion-card { background: #23241f !important; border: 1px solid #49483e !important; color: #f8f8f2 !important; }
 .notion-item:hover, .notion-item.active { background: #3e3d32 !important; color: #f92672 !important; }
-.notion-text-subtle { color: #88846f !important; }
-h1, h2, h3 { color: #ae81ff !important; }
+.notion-text-subtle { color: #a09d8d !important; }
+h1, h2, h3 { color: #ae81ff !important; font-weight: 700; }
 .accent-text { color: #a6e22e !important; }`
     },
     {
       name: "Catppuccin",
-      css: `body { background: #1e1e2e !important; color: #cdd6f4 !important; }
+      css: `body { background: #1e1e2e !important; color: #cdd6f4 !important; font-weight: 450; }
 .notion-sidebar { background: #181825 !important; }
 .notion-card { background: #313244 !important; border: 1px solid #45475a !important; color: #cdd6f4 !important; }
 .notion-item:hover, .notion-item.active { background: #45475a !important; color: #cba6f7 !important; }
-.notion-text-subtle { color: #9399b2 !important; }
-h1, h2, h3 { color: #89b4fa !important; }
+.notion-text-subtle { color: #bac2de !important; }
+h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
 .accent-text { color: #f5c2e7 !important; }`
     },
     {
       name: "Solarized Dark",
-      css: `body { background: #002b36 !important; color: #839496 !important; }
+      css: `body { background: #002b36 !important; color: #93a1a1 !important; font-weight: 450; }
 .notion-sidebar { background: #073642 !important; border-right: 1px solid #586e75 !important; }
 .notion-card { background: #073642 !important; border: 1px solid #586e75 !important; color: #93a1a1 !important; }
 .notion-item:hover, .notion-item.active { background: #586e75 !important; color: #eee8d5 !important; }
-.notion-text-subtle { color: #586e75 !important; }
-h1, h2, h3 { color: #268bd2 !important; }
+.notion-text-subtle { color: #839496 !important; }
+h1, h2, h3 { color: #268bd2 !important; font-weight: 700; }
 .accent-text { color: #268bd2 !important; }`
     },
     {
       name: "Nord",
-      css: `body { background: #2e3440 !important; color: #d8dee9 !important; }
+      css: `body { background: #2e3440 !important; color: #eceff4 !important; font-weight: 450; }
 .notion-sidebar { background: #3b4252 !important; }
 .notion-card { background: #434c5e !important; border: 1px solid #4c566a !important; color: #eceff4 !important; }
 .notion-item:hover, .notion-item.active { background: #4c566a !important; color: #88c0d0 !important; }
-.notion-text-subtle { color: #616e88 !important; }
-h1, h2, h3 { color: #81a1c1 !important; }
+.notion-text-subtle { color: #d8dee9 !important; opacity: 0.8; }
+h1, h2, h3 { color: #81a1c1 !important; font-weight: 700; }
 .accent-text { color: #88c0d0 !important; }`
     }
   ];
