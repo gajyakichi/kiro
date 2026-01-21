@@ -1,26 +1,86 @@
 @import "tailwindcss";
 
+@theme {
+  --color-background: #f7f7f5;
+  --color-foreground: #37352f;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f7f5;
+  --foreground: #37352f;
+  --sidebar-bg: #f1f1ef;
+  --card-bg: #ffffff;
+  --border-color: rgba(55, 53, 47, 0.09);
+  --accent: #2383e2;
+  --hover-bg: rgba(55, 53, 47, 0.06);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html, body {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.notion-sidebar {
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.notion-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 2px 4px;
+}
+
+.notion-item {
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.1s ease-in;
+}
+
+.notion-item:hover {
+  background-color: var(--hover-bg);
+}
+
+.notion-item.active {
+  background-color: var(--hover-bg);
+  font-weight: 600;
+}
+
+.notion-text-subtle {
+  color: rgba(55, 53, 47, 0.65);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(55, 53, 47, 0.16);
+  border-radius: 20px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(55, 53, 47, 0.28);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in forwards;
+}
+
+.prose pre {
+  background-color: #f7f7f5 !important;
+  color: #37352f !important;
+  border: 1px solid var(--border-color);
 }
