@@ -267,7 +267,7 @@ export default function Home() {
   if (!mounted) return <div className="min-h-screen bg-background" />;
 
   return (
-    <div className="flex min-h-screen text-[14px]">
+    <div className={`flex min-h-screen text-[14px] ${((previewCss || themes.some(t => t.active))) ? 'theme-active' : ''}`}>
       {/* Notion Sidebar */}
       <aside className="w-64 notion-sidebar flex flex-col pt-8 pb-4 px-3 sticky top-0 h-screen overflow-y-auto">
         <div className="mb-6">
@@ -570,8 +570,14 @@ export default function Home() {
         </footer>
       </main>
 
+      {/* Dynamic Theme Styles */}
       <style key={themes.find(t => t.active)?.id || 'original'} dangerouslySetInnerHTML={{ __html: `
         ${previewCss || themes.find(t => t.active)?.css || ''}
+        
+        /* Global Readability Improvements for Themes */
+        .theme-active body { line-height: 1.6; letter-spacing: 0.015em; -webkit-font-smoothing: subpixel-antialiased; }
+        .theme-active .notion-card { box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important; transition: transform 0.2s ease; }
+        
         .markdown-content ul { list-style-type: none; padding-left: 0; }
         .markdown-content li { margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px; }
         .markdown-content li input[type="checkbox"] { margin-top: 4px; pointer-events: none; }
