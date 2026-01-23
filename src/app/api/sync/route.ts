@@ -68,27 +68,37 @@ export async function POST(request: Request) {
       });
     }
 
-    // 2. Harvest Task Progress
+    // 2. Harvest Task & Walkthrough Progress
     if (artifactDir) {
-      const taskPath = path.join(artifactDir, "task.md");
-      try {
-        const taskContent = await fs.readFile(taskPath, "utf-8");
-        const lastTaskLog = await db.log.findFirst({
-          where: { project_id: Number(projectId), type: 'task' },
-          orderBy: { timestamp: 'desc' }
-        });
-        
-        if (!lastTaskLog || lastTaskLog.content !== taskContent) {
-          await db.log.create({
-            data: {
-              project_id: Number(projectId),
-              type: 'task',
-              content: taskContent
-            }
+      const filesToHarvest = [
+        { name: "task.md", type: "task" as const },
+        { name: "walkthrough.md", type: "walkthrough" as const }
+      ];
+
+      for (const { name, type } of filesToHarvest) {
+        const filePath = path.join(artifactDir, name);
+        try {
+          const content = await fs.readFile(filePath, "utf-8");
+          const lastLog = await db.log.findFirst({
+            where: { project_id: Number(projectId), type: type as string },
+            orderBy: { timestamp: 'desc' }
           });
+          
+          if (!lastLog || lastLog.content !== content) {
+            await db.log.create({
+              data: {
+                project_id: Number(projectId),
+                type: type as string,
+                content: content
+              }
+            });
+          }
+        } catch (e: unknown) {
+          // Only log error if not file not found
+          if (e instanceof Error && (e as any).code !== 'ENOENT') {
+            console.error(`${name} Harvest Error:`, e);
+          }
         }
-      } catch (e) {
-        console.error("Task Harvest Error:", e);
       }
     }
 

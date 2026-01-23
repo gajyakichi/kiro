@@ -629,8 +629,8 @@ export default function Home() {
             <div className="space-y-6">
               <div className="flex justify-between items-end mb-4">
                 <div>
-                  <h2 className="text-2xl font-bold tracking-tight">Notes Timeline</h2>
-                  <p className="text-sm text-gray-500">Chronological history of your manual entries.</p>
+                  <h2 className="text-2xl font-bold tracking-tight">Project Timeline</h2>
+                  <p className="text-sm text-gray-500">A continuous stream of development activity and manual notes.</p>
                 </div>
                 {!isFullEditorOpen && (
                   <button 
@@ -638,7 +638,7 @@ export default function Home() {
                     className="flex items-center gap-2 px-4 py-2 bg-white border border-(--border-color) rounded-xl text-xs font-bold hover:bg-gray-50 transition-all shadow-sm group"
                   >
                     <PenTool size={14} className="text-blue-500 group-hover:rotate-12 transition-transform" />
-                    Open Markdown Editor
+                    Add Note / Entry
                   </button>
                 )}
               </div>
@@ -654,49 +654,87 @@ export default function Home() {
                   }}
                 />
               ) : (
-                <div key="comments-content" className="space-y-8">
-                  {comments.length === 0 ? (
-                    <p className="notion-text-subtle italic">No notes created yet. Use the sidebar or the editor to add your first note.</p>
-                  ) : (
-                    comments.slice().reverse().map((comment) => (
-                      <div key={comment.id} className="group">
-                        <div className="flex gap-4 items-start">
-                          <div className="w-8 h-8 rounded-full bg-(--theme-primary-bg) flex items-center justify-center text-(--theme-primary) text-xs font-bold shadow-sm">
-                            {comment.type === 'code' && <Code size={14} />}
-                            {comment.type === 'markdown' && <FileText size={14} />}
-                            {comment.type === 'text' && <AlignLeft size={14} />}
-                            {(!comment.type || comment.type === 'unknown') && "SY"}
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="font-bold text-[13px] text-(--theme-primary)">
-                                {comment.type === 'code' ? 'Code Block' : comment.type === 'markdown' ? 'Markdown' : 'Note'}
-                              </span>
-                              <span className="text-[11px] notion-text-subtle font-normal bg-(--theme-primary-bg) px-2 py-0.5 rounded-full">{new Date(comment.timestamp).toLocaleString()}</span>
+                <div key="unified-timeline" className="relative">
+                  {/* Vertical Timeline Guide */}
+                  <div className="absolute left-[18px] top-6 bottom-6 w-px bg-(--border-color) opacity-50 z-0"></div>
+
+                  <div className="space-y-0 relative z-10">
+                    {[
+                      ...dbLogs.map(l => ({ ...l, entryType: 'log' as const })),
+                      ...comments.map(c => ({ ...c, entryType: 'comment' as const }))
+                    ]
+                    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                    .map((entry) => {
+                      const isLog = entry.entryType === 'log';
+                      const type = isLog ? (entry as DbLog).type : (entry as Comment).type;
+                      const content = isLog ? (entry as DbLog).content : (entry as Comment).text;
+                      const timestamp = new Date(entry.timestamp);
+
+                      return (
+                        <div key={`${entry.entryType}-${entry.id}`} className="group relative">
+                          <div className="flex gap-6 items-start py-6 -mx-4 px-4 hover:bg-gray-50/50 rounded-2xl transition-all">
+                            {/* Marker Icon */}
+                            <div className="shrink-0 w-9 h-9 rounded-xl bg-(--theme-primary-bg) border border-(--border-color) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 transition-transform">
+                              {type === 'git' && <Code size={16} />}
+                              {type === 'task' && <span>✅</span>}
+                              {type === 'walkthrough' && <span>✨</span>}
+                              {type === 'markdown' && <FileText size={16} />}
+                              {type === 'code' && <Code size={16} />}
+                              {type === 'text' && <AlignLeft size={16} />}
+                              {(!type || type === 'unknown' || type === 'note') && <span className="text-[10px] font-bold">Entry</span>}
                             </div>
-                            <div className={`bg-white p-6 rounded-2xl border border-(--border-color) shadow-sm hover:shadow-md transition-shadow ${comment.type === 'code' ? 'bg-neutral-900 border-neutral-800' : ''}`}>
-                                {comment.type === 'code' ? (
+
+                            <div className="flex-1 min-w-0">
+                              {/* Metadata Header */}
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="text-[10px] bg-(--theme-primary) text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm">
+                                  {type === 'git' ? 'Git Commit' : 
+                                   type === 'task' ? 'Task Sync' : 
+                                   type === 'walkthrough' ? 'Walkthrough' : 
+                                   type === 'code' ? 'Code Block' : 
+                                   type === 'markdown' ? 'Markdown' : 'Note'}
+                                </span>
+                                <span className="text-[10px] notion-text-subtle font-bold uppercase tracking-widest bg-(--theme-primary-bg) px-2.5 py-1 rounded-lg border border-(--border-color)">
+                                  {timestamp.toLocaleDateString()} {timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                              </div>
+
+                              {/* Content Area - WordPress Block Style */}
+                              <div className={`mt-3 ${type === 'git' ? 'py-1' : ''}`}>
+                                {type === 'git' ? (
+                                  <div>
+                                    <p className="text-[15px] font-medium leading-relaxed">{content}</p>
+                                    <div className="mt-2 flex items-center gap-2 text-[10px] notion-text-subtle font-mono">
+                                      <span className="bg-(--theme-primary-bg) px-1.5 py-0.5 rounded border border-(--border-color)">
+                                        {JSON.parse((entry as DbLog).metadata || '{}').hash?.substring(0, 7) || '---'}
+                                      </span>
+                                      <span>{JSON.parse((entry as DbLog).metadata || '{}').author || 'Unknown'}</span>
+                                    </div>
+                                  </div>
+                                ) : type === 'code' ? (
+                                  <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-2xl shadow-inner my-2">
                                     <pre className="text-sm font-mono text-emerald-400 overflow-x-auto p-0 m-0 bg-transparent border-none">
-                                        <code>{comment.text}</code>
+                                      <code>{content}</code>
                                     </pre>
-                                ) : comment.type === 'text' ? (
-                                    <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                                        {comment.text}
-                                    </div>
+                                  </div>
                                 ) : (
-                                    <div className="markdown-content">
-                                        <ReactMarkdown>
-                                            {comment.text}
-                                        </ReactMarkdown>
-                                    </div>
+                                  <div className="markdown-content">
+                                    <ReactMarkdown>
+                                      {content}
+                                    </ReactMarkdown>
+                                  </div>
                                 )}
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div className="h-12 border-l border-(--border-color) ml-4 group-last:hidden"></div>
-                      </div>
-                    ))
-                  )}
+                      );
+                    })}
+
+                    {comments.length === 0 && dbLogs.length === 0 && (
+                      <p className="notion-text-subtle italic text-center py-20">No activity or notes discovered yet.</p>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
