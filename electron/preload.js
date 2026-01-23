@@ -1,4 +1,9 @@
-// Preload script
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('electron', {
+  selectDirectory: () => ipcRenderer.invoke('select-directory')
+});
+
 window.addEventListener('DOMContentLoaded', () => {
   console.log('Electron Preload Initialized');
 });

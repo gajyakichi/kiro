@@ -13,6 +13,18 @@
   --border-color: rgba(55, 53, 47, 0.09);
   --accent: #2383e2;
   --hover-bg: rgba(55, 53, 47, 0.06);
+
+  /* Semantic Theme Variables */
+  --theme-primary: #37352f;
+  --theme-primary-bg: rgba(55, 53, 47, 0.05);
+  --theme-accent: #2383e2;
+  --theme-accent-bg: rgba(35, 131, 226, 0.1);
+  --theme-success: #0f7b46;
+  --theme-success-bg: rgba(15, 123, 70, 0.1);
+  --theme-warning: #dfab01;
+  --theme-warning-bg: rgba(223, 171, 1, 0.1);
+  --theme-error: #eb5757;
+  --theme-error-bg: rgba(235, 87, 87, 0.1);
 }
 
 html, body {

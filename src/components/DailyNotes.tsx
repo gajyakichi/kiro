@@ -18,9 +18,9 @@ const DailyNotes: React.FC<DailyNotesProps> = ({ notes }) => {
   return (
     <div className="space-y-8">
       {notes.map((note) => (
-        <div key={note.id} className="group relative pl-6 border-l-2 border-gray-100 hover:border-gray-200 transition-colors">
-          <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-gray-200 group-hover:border-gray-300 transition-colors flex items-center justify-center">
-            <div className="w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-gray-400 transition-colors" />
+        <div key={note.id} className="group relative pl-6 border-l-2 border-(--theme-primary-bg) hover:border-(--theme-primary) transition-colors">
+          <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-(--theme-primary-bg) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center">
+            <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
           </div>
           
           <div className="mb-2 flex items-center gap-2">

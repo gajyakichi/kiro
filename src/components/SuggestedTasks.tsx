@@ -20,10 +20,10 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {tasks.filter(t => t.status === 'proposed').map((task) => (
-        <div key={task.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:border-blue-200 transition-all flex flex-col justify-between group">
+        <div key={task.id} className="bg-white notion-card p-4 rounded-xl border border-gray-200 shadow-sm hover:border-(--theme-accent) transition-all flex flex-col justify-between group">
           <div className="flex gap-3 mb-4">
             <div className="mt-1 shrink-0">
-              <Lightbulb size={18} className="text-amber-400" />
+              <Lightbulb size={18} className="text-(--theme-accent)" />
             </div>
             <p className="text-sm text-gray-700 font-medium leading-snug">
               {task.task}
@@ -33,14 +33,14 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
           <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
             <button 
               onClick={() => onDismiss(task)}
-              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-neutral-100 rounded-md transition-colors"
               title="Dismiss"
             >
               <X size={16} />
             </button>
             <button 
               onClick={() => onAdd(task)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-md text-xs font-semibold transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background hover:bg-neutral-800 rounded-md text-xs font-semibold transition-all"
             >
               <Plus size={14} />
               Add to Notes

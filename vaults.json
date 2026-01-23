@@ -1,0 +1,14 @@
+[
+  {
+    "id": "default",
+    "name": "Default Vault",
+    "path": "",
+    "active": false
+  },
+  {
+    "id": "yhyz7z8",
+    "name": "Test",
+    "path": "/Document/",
+    "active": true
+  }
+]

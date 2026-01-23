@@ -59,3 +59,10 @@ export interface SuggestedTask {
   status: 'proposed' | 'added' | 'dismissed';
   timestamp: string;
 }
+
+export interface Vault {
+  id: string;
+  name: string;
+  path: string;
+  active: boolean;
+}

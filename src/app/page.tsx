@@ -1,16 +1,17 @@
 "use client";
 
-import { Progress, Comment, DbLog, Project, Theme, DailyNote, SuggestedTask } from "@/lib/types";
+import { Progress, Comment, DbLog, Project, Theme, DailyNote, SuggestedTask, Vault } from "@/lib/types";
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { IconRenderer } from '@/components/IconRenderer';
 import { IconPicker } from '@/components/IconPicker';
 import { ThemeLab } from '@/components/ThemeLab';
-import { Sparkles, PenTool, AlignLeft, FileText, Code } from 'lucide-react';
+import { Sparkles, PenTool, AlignLeft, FileText, Code, ShieldAlert, PlusCircle } from 'lucide-react';
 import DailyNotes from '@/components/DailyNotes';
 import SuggestedTasks from '@/components/SuggestedTasks';
 import MarkdownEditor from '@/components/MarkdownEditor';
+import { VaultSwitcher } from '@/components/VaultSwitcher';
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -30,6 +31,21 @@ export default function Home() {
   const [suggestedTasks, setSuggestedTasks] = useState<SuggestedTask[]>([]);
   const [isAbsorbing, setIsAbsorbing] = useState(false);
   const [isFullEditorOpen, setIsFullEditorOpen] = useState(false);
+  
+  const [vaults, setVaults] = useState<Vault[]>([]);
+  const [isVaultLoading, setIsVaultLoading] = useState(true);
+
+  const fetchVaults = useCallback(async () => {
+    try {
+      const res = await fetch('/api/vaults');
+      const data = await res.json();
+      setVaults(data);
+    } catch (e) {
+      console.error("Vault Fetch Error:", e);
+    } finally {
+      setIsVaultLoading(false);
+    }
+  }, []);
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -57,7 +73,6 @@ export default function Home() {
 
   const fetchData = useCallback(async (projectId: number) => {
     try {
-      // Sync and Fetch Logs from SQLite
       await fetch('/api/sync', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,9 +109,10 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
+    fetchVaults();
     fetchProjects();
     fetchThemes();
-  }, [fetchProjects, fetchThemes]);
+  }, [fetchProjects, fetchThemes, fetchVaults]);
 
   useEffect(() => {
     if (activeProject) {
@@ -219,14 +235,12 @@ export default function Home() {
     }
   };
 
-
   const renderMiniCalendar = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const firstDay = new Date(year, month, 1).getDay();
     const days = new Date(year, month + 1, 0).getDate();
     
-    // Quick and dirty check for activity
     const activityDays = new Set([
       ...dbLogs.map(l => new Date(l.timestamp).getDate()),
       ...comments.map(c => new Date(c.timestamp).getDate())
@@ -265,8 +279,7 @@ export default function Home() {
     const firstDay = new Date(year, month, 1).getDay();
     const days = new Date(year, month + 1, 0).getDate();
 
-    // Group logs and comments by day
-    const aggregatedData = [
+    const aggregatedData: ( (DbLog & { dateObj: Date }) | (Comment & { dateObj: Date, type: string }) )[] = [
       ...dbLogs.map(l => ({ ...l, dateObj: new Date(l.timestamp) })),
       ...comments.map(c => ({ ...c, dateObj: new Date(c.timestamp), type: 'note' }))
     ];
@@ -308,10 +321,39 @@ export default function Home() {
     );
   };
 
-  if (!mounted) return <div className="min-h-screen bg-background" />;
+  // Mandatory Vault Check
+  const activeVault = vaults.find(v => v.active);
+  const isVaultMandatory = !activeVault || !activeVault.path;
+
+  if (!mounted || isVaultLoading) return <div className="min-h-screen bg-(--background)" />;
 
   return (
     <div className={`flex min-h-screen text-[14px] ${((previewCss || themes.some(t => t.active))) ? 'theme-active' : ''}`}>
+      {/* Mandatory Vault Overlay */}
+      {isVaultMandatory && (
+        <div className="fixed inset-0 z-9999 bg-(--background)/90 backdrop-blur-md flex items-center justify-center p-6">
+          <div className="max-w-md w-full bg-white border border-(--border-color) rounded-3xl shadow-2xl p-10 text-center animate-in zoom-in-95 duration-300">
+            <div className="w-20 h-20 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-6 text-(--theme-primary)">
+              <ShieldAlert size={40} />
+            </div>
+            <h2 className="text-2xl font-bold mb-3 tracking-tight">Storage Vault Required</h2>
+            <p className="text-sm notion-text-subtle mb-8 leading-relaxed">
+              Please select or create a storage location (Vault) to start using Kiro. 
+              Your data will be safely stored in the specified directory.
+            </p>
+            <div className="space-y-3">
+              <Link 
+                href="/settings"
+                className="w-full bg-foreground text-background py-4 rounded-xl font-black text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-neutral-100 no-underline"
+              >
+                <PlusCircle size={18} />
+                CONFIGURE VAULT IN SETTINGS
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Notion Sidebar */}
       <aside className="w-64 notion-sidebar flex flex-col pt-8 pb-4 px-3 sticky top-0 h-screen overflow-y-auto">
         <div className="mb-6">
@@ -324,7 +366,7 @@ export default function Home() {
                     const p = projects.find(proj => proj.id === parseInt(e.target.value));
                     if (p) setActiveProject(p);
                 }}
-                className="w-full bg-white border border-gray-200 rounded px-2 py-1.5 pl-8 text-sm focus:outline-none appearance-none"
+                className="w-full bg-white border border-(--border-color) rounded px-2 py-1.5 pl-8 text-sm focus:outline-none appearance-none"
                 >
                 <option value="" disabled>Select Workspace</option>
                 {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -364,7 +406,7 @@ export default function Home() {
             <span>✨</span>
             <div className="flex-1 flex justify-between items-center">
               <span>Daily Notes</span>
-              {dailyNotes.length > 0 && <span className="text-[10px] bg-blue-50 text-blue-500 px-1.5 rounded-full font-bold">{dailyNotes.length}</span>}
+              {dailyNotes.length > 0 && <span className="text-[10px] bg-(--theme-primary-bg) text-(--theme-primary) px-1.5 rounded-full font-bold">{dailyNotes.length}</span>}
             </div>
           </div>
 
@@ -375,7 +417,7 @@ export default function Home() {
             <span>💡</span>
             <div className="flex-1 flex justify-between items-center">
               <span>Suggestions</span>
-              {suggestedTasks.length > 0 && <span className="text-[10px] bg-amber-50 text-amber-500 px-1.5 rounded-full font-bold">{suggestedTasks.length}</span>}
+              {suggestedTasks.length > 0 && <span className="text-[10px] bg-(--theme-accent-bg) text-(--theme-accent) px-1.5 rounded-full font-bold">{suggestedTasks.length}</span>}
             </div>
           </div>
 
@@ -417,7 +459,13 @@ export default function Home() {
 
         {renderMiniCalendar()}
 
-        <div className="mt-auto px-2 pt-4 border-t border-gray-200">
+        {/* Vault Switcher Integration */}
+        <div className="mt-8 pt-4 border-t border-(--border-color)">
+          <div className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest px-2 mb-2">Active Storage</div>
+          <VaultSwitcher onSwitch={fetchProjects} className="px-2" />
+        </div>
+
+        <div className="mt-auto px-2 pt-4 border-t border-(--border-color)">
           <div className="flex items-center justify-between mb-3">
             <div className="font-bold text-[10px] text-gray-500 uppercase tracking-widest bg-gray-100/50 w-fit px-2 py-0.5 rounded">Quick Note</div>
             <div className="flex gap-1.5 bg-gray-100/30 p-1 rounded-lg border border-gray-100/50">
@@ -447,12 +495,12 @@ export default function Home() {
           <textarea 
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            className="w-full bg-white border border-gray-200 rounded-md p-2 text-sm focus:outline-none focus:border-gray-400 h-20 mb-2 resize-none text-neutral-800 placeholder:text-neutral-400 font-medium"
+            className="w-full bg-white border border-(--border-color) rounded-md p-2 text-sm focus:outline-none focus:border-gray-400 h-20 mb-2 resize-none text-neutral-800 placeholder:text-neutral-400 font-medium"
             placeholder={activeBlockType === 'code' ? '// write some code...' : activeBlockType === 'markdown' ? '# Heading...' : 'Write something...'}
           />
           <button 
             onClick={handleAddComment}
-            className="w-full bg-foreground hover:opacity-90 text-white font-medium py-1.5 rounded-md transition-colors text-xs flex items-center justify-center gap-2"
+            className="w-full bg-foreground text-background hover:opacity-90 font-medium py-1.5 rounded-md transition-colors text-xs flex items-center justify-center gap-2"
           >
             {activeBlockType === 'code' && <Code size={12} />}
             {activeBlockType === 'markdown' && <FileText size={12} />}
@@ -462,9 +510,8 @@ export default function Home() {
         </div>
       </aside>
 
-      {/* Notion Content Area */}
       <main className="flex-1 overflow-y-auto p-12 lg:px-20 xl:px-40">
-        <header className="mb-12 animate-fade-in">
+        <header className="mb-12 animate-fade-in relative z-50">
           <h1 className="group relative flex items-center text-4xl font-bold tracking-tight mb-2">
             <div className="relative mr-4">
               <div 
@@ -478,7 +525,7 @@ export default function Home() {
                 )}
               </div>
               {iconPickerTarget === 'header' && (
-                <div className="left-0 top-full">
+                <div className="absolute left-0 top-full z-100">
                   <IconPicker 
                     selectedIcon={activeProject?.icon}
                     onSelect={(icon: string) => {
@@ -506,11 +553,11 @@ export default function Home() {
                 disabled={isAbsorbing}
                 className={`ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   isAbsorbing 
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                    : 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white shadow-sm'
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-100' 
+                    : 'bg-white text-foreground border border-gray-200 hover:bg-gray-100 shadow-xs'
                 }`}
               >
-                <Sparkles size={14} className={isAbsorbing ? 'animate-spin' : 'animate-pulse text-amber-400'} />
+                <Sparkles size={14} className={isAbsorbing ? 'animate-spin' : 'text-(--theme-accent) transition-colors'} />
                 {isAbsorbing ? 'Absorbing...' : 'Absorb Context'}
               </button>
             )}
@@ -588,7 +635,7 @@ export default function Home() {
                 {!isFullEditorOpen && (
                   <button 
                     onClick={() => setIsFullEditorOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 transition-all shadow-sm group"
+                    className="flex items-center gap-2 px-4 py-2 bg-white border border-(--border-color) rounded-xl text-xs font-bold hover:bg-gray-50 transition-all shadow-sm group"
                   >
                     <PenTool size={14} className="text-blue-500 group-hover:rotate-12 transition-transform" />
                     Open Markdown Editor
@@ -614,7 +661,7 @@ export default function Home() {
                     comments.slice().reverse().map((comment) => (
                       <div key={comment.id} className="group">
                         <div className="flex gap-4 items-start">
-                          <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-xs font-bold shadow-sm">
+                          <div className="w-8 h-8 rounded-full bg-(--theme-primary-bg) flex items-center justify-center text-(--theme-primary) text-xs font-bold shadow-sm">
                             {comment.type === 'code' && <Code size={14} />}
                             {comment.type === 'markdown' && <FileText size={14} />}
                             {comment.type === 'text' && <AlignLeft size={14} />}
@@ -622,12 +669,12 @@ export default function Home() {
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <span className="font-bold text-[13px] text-gray-800">
+                              <span className="font-bold text-[13px] text-(--theme-primary)">
                                 {comment.type === 'code' ? 'Code Block' : comment.type === 'markdown' ? 'Markdown' : 'Note'}
                               </span>
-                              <span className="text-[11px] notion-text-subtle font-normal bg-gray-50 px-2 py-0.5 rounded-full">{new Date(comment.timestamp).toLocaleString()}</span>
+                              <span className="text-[11px] notion-text-subtle font-normal bg-(--theme-primary-bg) px-2 py-0.5 rounded-full">{new Date(comment.timestamp).toLocaleString()}</span>
                             </div>
-                            <div className={`bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow ${comment.type === 'code' ? 'bg-neutral-900 border-neutral-800' : ''}`}>
+                            <div className={`bg-white p-6 rounded-2xl border border-(--border-color) shadow-sm hover:shadow-md transition-shadow ${comment.type === 'code' ? 'bg-neutral-900 border-neutral-800' : ''}`}>
                                 {comment.type === 'code' ? (
                                     <pre className="text-sm font-mono text-emerald-400 overflow-x-auto p-0 m-0 bg-transparent border-none">
                                         <code>{comment.text}</code>
@@ -646,7 +693,7 @@ export default function Home() {
                             </div>
                           </div>
                         </div>
-                        <div className="h-12 border-l border-gray-100 ml-4 group-last:hidden"></div>
+                        <div className="h-12 border-l border-(--border-color) ml-4 group-last:hidden"></div>
                       </div>
                     ))
                   )}
@@ -666,27 +713,26 @@ export default function Home() {
           )}
         </section>
 
-        <footer className="mt-24 pt-8 border-t border-gray-100 text-xs notion-text-subtle flex justify-between items-center">
+        <footer className="mt-24 pt-8 border-t border-(--border-color) text-xs notion-text-subtle flex justify-between items-center">
           <span>{activeProject?.name || "Ready"}</span>
           <span>System Status: Online</span>
         </footer>
       </main>
 
-      {/* Dynamic Theme Styles */}
       <style key={themes.find(t => t.active)?.id || 'original'} dangerouslySetInnerHTML={{ __html: `
         ${previewCss || themes.find(t => t.active)?.css || ''}
-        
-        /* Global Readability Improvements for Themes */
         .theme-active body { line-height: 1.6; letter-spacing: 0.015em; -webkit-font-smoothing: subpixel-antialiased; }
         .theme-active .notion-card { box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important; transition: transform 0.2s ease; }
-        
         .markdown-content ul { list-style-type: none; padding-left: 0; }
         .markdown-content li { margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px; }
         .markdown-content li input[type="checkbox"] { margin-top: 4px; pointer-events: none; }
         .markdown-content p { margin: 0; }
         .markdown-content h1, .markdown-content h2, .markdown-content h3 { font-weight: 600; margin-top: 1.5em; margin-bottom: 0.5em; }
         .markdown-content h1 { font-size: 1.5em; }
-        .markdown-content h2 { font-size: 1.25em; border-bottom: 1px solid #efefef; padding-bottom: 2px; }
+        .markdown-content h2 { font-size: 1.25em; border-bottom: 1px solid var(--border-color); padding-bottom: 2px; }
+        .markdown-content blockquote { border-left: 3px solid var(--theme-primary); padding-left: 1rem; color: var(--theme-primary); opacity: 0.8; font-style: italic; background: var(--theme-primary-bg); border-radius: 0 4px 4px 0; margin: 1em 0; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .markdown-content pre { background: var(--theme-primary-bg) !important; border: 1px solid var(--theme-primary-bg) !important; border-radius: 8px; }
+        .markdown-content code { color: var(--theme-primary); }
       `}} />
     </div>
   );

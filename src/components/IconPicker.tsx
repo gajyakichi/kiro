@@ -13,36 +13,43 @@ interface IconPickerProps {
 
 export const IconPicker: React.FC<IconPickerProps> = ({ selectedIcon, onSelect, onClose }) => {
   const [tab, setTab] = useState<'lucide' | 'phosphor' | 'notion'>('notion');
+  const [internalSelectedIcon, setInternalSelectedIcon] = useState(selectedIcon || "");
+
+  const handleSave = () => {
+    if (internalSelectedIcon) {
+      onSelect(internalSelectedIcon);
+    }
+  };
 
   return (
-    <div className="absolute z-50 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-xl p-2 notion-card">
-      <div className="flex border-b border-gray-100 mb-2 pb-1 overflow-x-auto">
+    <div className="absolute z-100 mt-1 w-64 bg-white border border-gray-200 rounded-xl shadow-2xl p-4 notion-card animate-fade-in">
+      <div className="flex bg-gray-100 p-1 rounded-lg mb-4 gap-1">
         <button 
           onClick={() => setTab('notion')}
-          className={`px-2 py-1 text-xs font-medium rounded ${tab === 'notion' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
+          className={`flex-1 py-1.5 text-[11px] font-bold rounded-md transition-all ${tab === 'notion' ? 'bg-white shadow-sm text-foreground' : 'text-gray-400 hover:text-gray-600'}`}
         >
           Notion
         </button>
         <button 
           onClick={() => setTab('lucide')}
-          className={`px-2 py-1 text-xs font-medium rounded ${tab === 'lucide' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
+          className={`flex-1 py-1.5 text-[11px] font-bold rounded-md transition-all ${tab === 'lucide' ? 'bg-white shadow-sm text-foreground' : 'text-gray-400 hover:text-gray-600'}`}
         >
           Lucide
         </button>
         <button 
           onClick={() => setTab('phosphor')}
-          className={`px-2 py-1 text-xs font-medium rounded ${tab === 'phosphor' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
+          className={`flex-1 py-1.5 text-[11px] font-bold rounded-md transition-all ${tab === 'phosphor' ? 'bg-white shadow-sm text-foreground' : 'text-gray-400 hover:text-gray-600'}`}
         >
           Phosphor
         </button>
       </div>
 
-      <div className="grid grid-cols-6 gap-1 max-h-48 overflow-y-auto p-1">
+      <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto p-1 mb-4 scrollbar-hide">
         {tab === 'notion' && EMOJIS.map(emoji => (
           <button
             key={emoji}
-            onClick={() => onSelect(emoji)}
-            className={`flex items-center justify-center h-8 w-8 rounded hover:bg-gray-100 ${selectedIcon === emoji ? 'bg-gray-100' : ''}`}
+            onClick={() => setInternalSelectedIcon(emoji)}
+            className={`flex items-center justify-center h-10 w-10 rounded-xl transition-all border-2 ${internalSelectedIcon === emoji ? 'border-foreground bg-gray-50' : 'border-transparent hover:bg-gray-50'}`}
           >
             <span className="text-xl">{emoji}</span>
           </button>
@@ -50,8 +57,8 @@ export const IconPicker: React.FC<IconPickerProps> = ({ selectedIcon, onSelect, 
         {tab === 'lucide' && LUCIDE_ICONS.map(name => (
           <button
             key={name}
-            onClick={() => onSelect(`lucide:${name}`)}
-            className={`flex items-center justify-center h-8 w-8 rounded hover:bg-gray-100 ${selectedIcon === `lucide:${name}` ? 'bg-gray-100' : ''}`}
+            onClick={() => setInternalSelectedIcon(`lucide:${name}`)}
+            className={`flex items-center justify-center h-10 w-10 rounded-xl transition-all border-2 ${internalSelectedIcon === `lucide:${name}` ? 'border-foreground bg-gray-50' : 'border-transparent hover:bg-gray-50'}`}
           >
             <IconRenderer icon={`lucide:${name}`} size={20} />
           </button>
@@ -59,16 +66,28 @@ export const IconPicker: React.FC<IconPickerProps> = ({ selectedIcon, onSelect, 
         {tab === 'phosphor' && PHOSPHOR_ICONS.map(name => (
           <button
             key={name}
-            onClick={() => onSelect(`phosphor:${name}`)}
-            className={`flex items-center justify-center h-8 w-8 rounded hover:bg-gray-100 ${selectedIcon === `phosphor:${name}` ? 'bg-gray-100' : ''}`}
+            onClick={() => setInternalSelectedIcon(`phosphor:${name}`)}
+            className={`flex items-center justify-center h-10 w-10 rounded-xl transition-all border-2 ${internalSelectedIcon === `phosphor:${name}` ? 'border-foreground bg-gray-50' : 'border-transparent hover:bg-gray-50'}`}
           >
             <IconRenderer icon={`phosphor:${name}`} size={20} />
           </button>
         ))}
       </div>
       
-      <div className="mt-2 pt-2 border-t border-gray-100 flex justify-end">
-        <button onClick={onClose} className="text-[10px] text-gray-500 hover:text-gray-700">Close</button>
+      <div className="flex gap-2">
+        <button 
+          onClick={onClose} 
+          className="flex-1 px-3 py-2 border border-gray-200 text-gray-500 rounded-lg text-xs font-bold hover:bg-gray-50 transition-colors"
+        >
+          Cancel
+        </button>
+        <button 
+          onClick={handleSave}
+          disabled={!internalSelectedIcon}
+          className="flex-1 px-3 py-2 bg-foreground text-background rounded-lg text-xs font-bold hover:opacity-90 disabled:opacity-30 transition-all"
+        >
+          Save Icon
+        </button>
       </div>
     </div>
   );
