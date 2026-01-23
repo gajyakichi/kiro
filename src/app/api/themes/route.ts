@@ -1,16 +1,11 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 
-interface ThemeRow {
-  id: number;
-  name: string;
-  css: string;
-  active: number;
-}
-
 export async function GET() {
   try {
-    let themes = db.prepare('SELECT * FROM themes ORDER BY created_at DESC').all() as ThemeRow[];
+    let themes = await db.theme.findMany({
+      orderBy: { id: 'desc' }
+    });
     
     // Auto-seed if empty
     if (themes.length === 0) {
@@ -19,17 +14,17 @@ export async function GET() {
         { name: 'Monokai', css: 'body { background: #272822 !important; color: #f8f8f2 !important; } .notion-sidebar { background: #1e1f1c !important; } .notion-card { background: #23241f !important; border: 1px solid #49483e !important; color: #f8f8f2 !important; } .notion-item:hover, .notion-item.active { background: #3e3d32 !important; color: #f92672 !important; } .notion-text-subtle { color: #88846f !important; } h1, h2, h3 { color: #ae81ff !important; } .accent-text { color: #a6e22e !important; }' },
         { name: 'Nord', css: 'body { background: #2e3440 !important; color: #d8dee9 !important; } .notion-sidebar { background: #3b4252 !important; } .notion-card { background: #434c5e !important; border: 1px solid #4c566a !important; color: #eceff4 !important; } .notion-item:hover, .notion-item.active { background: #4c566a !important; color: #88c0d0 !important; } .notion-text-subtle { color: #616e88 !important; } h1, h2, h3 { color: #81a1c1 !important; } .accent-text { color: #88c0d0 !important; }' }
       ];
-      const insert = db.prepare('INSERT INTO themes (name, css, active) VALUES (?, ?, 0)');
-      presets.forEach(p => insert.run(p.name, p.css));
-      themes = db.prepare('SELECT * FROM themes ORDER BY created_at DESC').all() as ThemeRow[];
+      
+      await db.theme.createMany({
+        data: presets.map(p => ({ ...p, active: false }))
+      });
+      
+      themes = await db.theme.findMany({
+        orderBy: { id: 'desc' }
+      });
     }
 
-    // Convert active INTEGER to boolean
-    const formattedThemes = themes.map(t => ({
-      ...t,
-      active: !!t.active
-    }));
-    return NextResponse.json(formattedThemes);
+    return NextResponse.json(themes);
   } catch (error) {
     console.error("Theme Fetch Error:", error);
     return NextResponse.json([]);
@@ -39,12 +34,14 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const { name, css } = await request.json();
-    const insert = db.prepare(`
-      INSERT INTO themes (name, css, active) 
-      VALUES (?, ?, 0)
-    `);
-    const info = insert.run(name, css);
-    return NextResponse.json({ success: true, id: info.lastInsertRowid });
+    const theme = await db.theme.create({
+      data: {
+        name,
+        css,
+        active: false
+      }
+    });
+    return NextResponse.json({ success: true, id: theme.id });
   } catch (error) {
     console.error("Theme Create Error:", error);
     return NextResponse.json({ error: "Failed to create theme" }, { status: 500 });
@@ -58,21 +55,27 @@ export async function PATCH(request: Request) {
 
     // Handle "Reset to Original" (Deactivate all)
     if (id === -1) {
-      db.prepare('UPDATE themes SET active = 0').run();
+      await db.theme.updateMany({
+        data: { active: false }
+      });
       return NextResponse.json({ success: true });
     }
 
     // If setting a theme as active, deactivate others
     if (active) {
-      db.prepare('UPDATE themes SET active = 0').run();
+      await db.theme.updateMany({
+        data: { active: false }
+      });
     }
 
-    const update = db.prepare(`
-      UPDATE themes 
-      SET name = COALESCE(?, name), css = COALESCE(?, css), active = ?
-      WHERE id = ?
-    `);
-    update.run(name || null, css || null, active ? 1 : 0, id);
+    await db.theme.update({
+      where: { id: Number(id) },
+      data: {
+        name: name || undefined,
+        css: css || undefined,
+        active: active ?? undefined
+      }
+    });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Theme Update Error:", error);
@@ -86,7 +89,9 @@ export async function DELETE(request: Request) {
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
     
-    db.prepare('DELETE FROM themes WHERE id = ?').run(id);
+    await db.theme.delete({
+      where: { id: Number(id) }
+    });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Theme Delete Error:", error);

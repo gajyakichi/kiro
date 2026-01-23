@@ -1,19 +1,25 @@
 {
-  "name": "kaihatsunote",
+  "name": "kiro",
   "version": "0.1.0",
   "private": true,
+  "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "electron:dev": "electron .",
+    "app": "concurrently \"npm run dev -- -p 3005\" \"wait-on http://localhost:3005 && npm run electron:dev\""
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
+    "@prisma/adapter-better-sqlite3": "^7.2.0",
+    "@prisma/client": "^7.3.0",
     "better-sqlite3": "^12.6.2",
     "lucide-react": "^0.562.0",
     "next": "16.1.4",
     "openai": "^6.16.0",
+    "prisma": "^7.3.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-markdown": "^10.1.0"
@@ -24,9 +30,13 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
+    "electron": "^40.0.0",
+    "electron-is-dev": "^3.0.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wait-on": "^9.0.3"
   }
 }

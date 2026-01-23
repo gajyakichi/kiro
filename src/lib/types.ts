@@ -9,6 +9,8 @@ export interface Comment {
   id: number;
   project_id: number;
   text: string;
+  type: string;
+  metadata?: string;
   timestamp: string;
 }
 

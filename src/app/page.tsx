@@ -2,13 +2,15 @@
 
 import { Progress, Comment, DbLog, Project, Theme, DailyNote, SuggestedTask } from "@/lib/types";
 import { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { IconRenderer } from '@/components/IconRenderer';
 import { IconPicker } from '@/components/IconPicker';
 import { ThemeLab } from '@/components/ThemeLab';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, PenTool, AlignLeft, FileText, Code } from 'lucide-react';
 import DailyNotes from '@/components/DailyNotes';
 import SuggestedTasks from '@/components/SuggestedTasks';
+import MarkdownEditor from '@/components/MarkdownEditor';
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -17,17 +19,17 @@ export default function Home() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [dbLogs, setDbLogs] = useState<DbLog[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [activeBlockType, setActiveBlockType] = useState<'markdown' | 'text' | 'code'>('markdown');
   const [activeTab, setActiveTab] = useState("git");
   const [mounted, setMounted] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [isAddingProject, setIsAddingProject] = useState(false);
-  const [projectForm, setProjectForm] = useState({ name: "", git_path: "", artifact_path: "", icon: "" });
   const [iconPickerTarget, setIconPickerTarget] = useState<string | null>(null); // 'add' | 'header'
   const [themes, setThemes] = useState<Theme[]>([]);
   const [previewCss, setPreviewCss] = useState("");
   const [dailyNotes, setDailyNotes] = useState<DailyNote[]>([]);
   const [suggestedTasks, setSuggestedTasks] = useState<SuggestedTask[]>([]);
   const [isAbsorbing, setIsAbsorbing] = useState(false);
+  const [isFullEditorOpen, setIsFullEditorOpen] = useState(false);
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -41,6 +43,17 @@ export default function Home() {
       console.error("Project Fetch Error:", e);
     }
   }, [activeProject]);
+
+  const fetchAbsorbData = useCallback(async (projectId: number) => {
+    try {
+      const res = await fetch(`/api/absorb/data?projectId=${projectId}`);
+      const data = await res.json();
+      setDailyNotes(data.dailyNotes || []);
+      setSuggestedTasks(data.suggestedTasks || []);
+    } catch (e) {
+      console.error("Absorb Data Fetch Error:", e);
+    }
+  }, []);
 
   const fetchData = useCallback(async (projectId: number) => {
     try {
@@ -67,18 +80,7 @@ export default function Home() {
     } catch (e) {
       console.error("Fetch Error:", e);
     }
-  }, []);
-
-  const fetchAbsorbData = async (projectId: number) => {
-    try {
-      const res = await fetch(`/api/absorb/data?projectId=${projectId}`);
-      const data = await res.json();
-      setDailyNotes(data.dailyNotes || []);
-      setSuggestedTasks(data.suggestedTasks || []);
-    } catch (e) {
-      console.error("Absorb Data Fetch Error:", e);
-    }
-  };
+  }, [fetchAbsorbData]);
 
   const fetchThemes = useCallback(async () => {
     try {
@@ -110,10 +112,15 @@ export default function Home() {
       const res = await fetch('/api/comments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: newComment, projectId: activeProject.id })
+        body: JSON.stringify({ 
+          text: newComment, 
+          projectId: activeProject.id,
+          type: activeBlockType
+        })
       });
       if (res.ok) {
         setNewComment("");
+        setActiveBlockType("markdown");
         fetchData(activeProject.id);
         setActiveTab("comments");
       }
@@ -122,8 +129,69 @@ export default function Home() {
     }
   };
 
-  const handleAddProject = async () => {
-    // ... existings
+  const handleSelectTheme = async (id: number) => {
+    try {
+      const res = await fetch('/api/themes', { 
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, active: id !== -1 })
+      });
+      if (res.ok) fetchThemes();
+    } catch (e) {
+      console.error("Theme Select Error:", e);
+    }
+  };
+
+  const updateSuggestedTaskStatus = async (taskId: number, status: string, task?: string) => {
+    if (!activeProject) return;
+    try {
+      const res = await fetch('/api/absorb/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskId, status, projectId: activeProject.id, task })
+      });
+      if (res.ok) {
+        fetchAbsorbData(activeProject.id);
+      }
+    } catch (e) {
+      console.error("Task Update Error:", e);
+    }
+  };
+
+  const handleUpdateProjectIcon = async (icon: string) => {
+    if (!activeProject) return;
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: activeProject.id, icon })
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setActiveProject(updated);
+        fetchProjects();
+      }
+    } catch (e) {
+      console.error("Icon Update Error:", e);
+    }
+  };
+
+  const handleAbsorb = async () => {
+    if (!activeProject) return;
+    setIsAbsorbing(true);
+    try {
+      const res = await fetch('/api/absorb', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectId: activeProject.id })
+      });
+      if (res.ok) {
+        fetchAbsorbData(activeProject.id);
+      }
+    } catch (e) {
+      console.error("Absorb Error:", e);
+    }
+    setIsAbsorbing(false);
   };
 
   const handleSaveTheme = async (name: string, css: string) => {
@@ -144,144 +212,48 @@ export default function Home() {
 
   const handleDeleteTheme = async (id: number) => {
     try {
-      await fetch(`/api/themes?id=${id}`, { method: 'DELETE' });
-      fetchThemes();
+      const res = await fetch(`/api/themes?id=${id}`, { method: 'DELETE' });
+      if (res.ok) fetchThemes();
     } catch (e) {
       console.error("Theme Delete Error:", e);
     }
   };
 
-  const handleSelectTheme = async (theme: Theme | null) => {
-    try {
-      setPreviewCss(""); 
-      if (!theme) {
-        // Deactivate all themes (Switch to Original)
-        await fetch('/api/themes', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: -1, active: false }) 
-        });
-        fetchThemes();
-        return;
-      }
-      
-      // Select new theme: backend deactivates others automatically
-      await fetch('/api/themes', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...theme, active: true })
-      });
-      fetchThemes();
-    } catch (e) {
-      console.error("Theme Selection Error:", e);
-    }
-  };
-
-  const handleUpdateProjectIcon = async (icon: string) => {
-    if (!activeProject) return;
-    try {
-      const res = await fetch('/api/projects', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...activeProject, icon })
-      });
-      if (res.ok) {
-        setActiveProject({ ...activeProject, icon });
-        fetchProjects();
-      }
-    } catch (e) {
-      console.error("Update Project Error:", e);
-    }
-  };
-
-  const handleAbsorb = async () => {
-    if (!activeProject || isAbsorbing) return;
-    setIsAbsorbing(true);
-    try {
-      const res = await fetch('/api/absorb', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId: activeProject.id })
-      });
-      if (res.ok) {
-        fetchAbsorbData(activeProject.id);
-        setActiveTab("daily_notes");
-      }
-    } catch (e) {
-      console.error("Absorb Error:", e);
-    } finally {
-      setIsAbsorbing(false);
-    }
-  };
-
-  const handleTaskStatusUpdate = async (taskId: number, status: string, taskText?: string) => {
-    if (!activeProject) return;
-    try {
-      // If adding, create a comment first
-      if (status === 'added' && taskText) {
-        await fetch('/api/comments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: `[Suggested Task] ${taskText}`, projectId: activeProject.id })
-        });
-        fetchData(activeProject.id);
-      }
-
-      const res = await fetch('/api/absorb/tasks', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ taskId, status })
-      });
-      
-      if (res.ok) {
-        fetchAbsorbData(activeProject.id);
-      }
-    } catch (e) {
-      console.error("Task Status Update Error:", e);
-    }
-  };
-
-  // Calendar Helpers
-  const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
-  const getFirstDayOfMonth = (year: number, month: number) => new Date(year, month, 1).getDay();
-
-  // Combine data for calendar display
-  const aggregatedData = [
-    ...dbLogs.filter(l => l.type === 'git').map(l => ({ ...l, type: 'git', dateObj: new Date(l.timestamp), message: l.content })),
-    ...comments.map(c => ({ ...c, type: 'note', dateObj: new Date(c.timestamp) }))
-  ];
 
   const renderMiniCalendar = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    const days = getDaysInMonth(year, month);
-    const firstDay = getFirstDayOfMonth(year, month);
-    const today = new Date();
-
-    const calendarHeader = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
+    const firstDay = new Date(year, month, 1).getDay();
+    const days = new Date(year, month + 1, 0).getDate();
+    
+    // Quick and dirty check for activity
+    const activityDays = new Set([
+      ...dbLogs.map(l => new Date(l.timestamp).getDate()),
+      ...comments.map(c => new Date(c.timestamp).getDate())
+    ]);
 
     return (
-      <div className="mt-6 mb-8 px-2">
+      <div className="mt-8 px-2">
         <div className="flex justify-between items-center mb-2 px-1">
-          <span className="font-semibold text-xs notion-text-subtle uppercase tracking-wider">{calendarHeader}</span>
-          <div className="flex gap-1 text-[10px]">
-             <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))}>◀</button>
-             <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))}>▶</button>
+          <span className="text-[11px] font-bold notion-text-subtle uppercase tracking-wider">
+            {new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' }).format(currentDate)}
+          </span>
+          <div className="flex gap-1">
+            <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-0.5 hover:bg-gray-100 rounded text-gray-400">‹</button>
+            <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-0.5 hover:bg-gray-100 rounded text-gray-400">›</button>
           </div>
         </div>
-        <div className="grid grid-cols-7 gap-y-1 text-center text-[10px]">
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => <div key={`${d}-${i}`} className="opacity-40">{d}</div>)}
-          {Array(firstDay).fill(null).map((_, i) => <div key={`empty-${i}`} />)}
-          {Array.from({ length: days }, (_, i) => i + 1).map(day => {
-            const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
-            const hasData = aggregatedData.some(d => d.dateObj.getDate() === day && d.dateObj.getMonth() === month && d.dateObj.getFullYear() === year);
-            return (
-              <div key={day} className={`relative flex items-center justify-center h-5 w-5 mx-auto rounded-full ${isToday ? 'bg-black text-white' : ''}`}>
-                {day}
-                {hasData && <div className="absolute bottom-0 w-1 h-1 bg-blue-400 rounded-full"></div>}
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-7 gap-px text-[10px] text-center">
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => <div key={`${d}-${i}`} className="py-1 text-gray-400 font-medium">{d}</div>)}
+          {Array(firstDay).fill(null).map((_, i) => <div key={`e-${i}`} />)}
+          {Array.from({ length: days }, (_, i) => i + 1).map(day => (
+            <div 
+              key={day} 
+              className={`py-1 rounded-sm transition-colors cursor-default ${activityDays.has(day) ? 'bg-blue-50 text-blue-600 font-bold' : 'text-gray-500 hover:bg-gray-50'}`}
+            >
+              {day}
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -290,8 +262,14 @@ export default function Home() {
   const renderFullCalendar = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    const days = getDaysInMonth(year, month);
-    const firstDay = getFirstDayOfMonth(year, month);
+    const firstDay = new Date(year, month, 1).getDay();
+    const days = new Date(year, month + 1, 0).getDate();
+
+    // Group logs and comments by day
+    const aggregatedData = [
+      ...dbLogs.map(l => ({ ...l, dateObj: new Date(l.timestamp) })),
+      ...comments.map(c => ({ ...c, dateObj: new Date(c.timestamp), type: 'note' }))
+    ];
 
     return (
       <div className="animate-fade-in">
@@ -317,8 +295,8 @@ export default function Home() {
                 <span className="text-xs font-semibold notion-text-subtle">{day}</span>
                 <div className="mt-2 space-y-1 overflow-hidden max-h-[85px]">
                   {dayData.map((item, idx) => (
-                    <div key={`${item.type}-${'id' in item ? item.id : idx}`} className={`text-[10px] px-1 py-0.5 rounded truncate ${item.type === 'git' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-orange-50 text-orange-700 border border-orange-100'}`}>
-                      {item.type === 'git' ? 'Commit: ' : ''}{'message' in item ? item.message : 'text' in item ? item.text : ''}
+                    <div key={`${'type' in item ? item.type : 'unknown'}-${'id' in item ? item.id : idx}`} className={`text-[10px] px-1 py-0.5 rounded truncate ${'type' in item && item.type === 'git' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-orange-50 text-orange-700 border border-orange-100'}`}>
+                      {'type' in item && item.type === 'git' ? 'Commit: ' : ''}{'content' in item ? item.content : 'text' in item ? item.text : ''}
                     </div>
                   ))}
                 </div>
@@ -337,27 +315,19 @@ export default function Home() {
       {/* Notion Sidebar */}
       <aside className="w-64 notion-sidebar flex flex-col pt-8 pb-4 px-3 sticky top-0 h-screen overflow-y-auto">
         <div className="mb-6">
-          {/* No branding header, starting directly with workspace switcher */}
-          
           <div className="px-2 mt-4">
             <div className="text-[11px] font-semibold notion-text-subtle uppercase mb-2">Workspace</div>
             <div className="relative">
                 <select 
                 value={activeProject?.id || ""}
                 onChange={(e) => {
-                    const val = e.target.value;
-                    if (val === "new") {
-                        setIsAddingProject(true);
-                    } else {
-                        const p = projects.find(proj => proj.id === parseInt(val));
-                        if (p) setActiveProject(p);
-                    }
+                    const p = projects.find(proj => proj.id === parseInt(e.target.value));
+                    if (p) setActiveProject(p);
                 }}
                 className="w-full bg-white border border-gray-200 rounded px-2 py-1.5 pl-8 text-sm focus:outline-none appearance-none"
                 >
                 <option value="" disabled>Select Workspace</option>
                 {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                <option value="new">+ Add Project</option>
                 </select>
                 <div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
                     {activeProject ? (
@@ -367,10 +337,6 @@ export default function Home() {
                     )}
                 </div>
             </div>
-            {activeProject === null && projects.length === 0 && (
-                <button onClick={() => setIsAddingProject(true)} className="mt-2 text-[12px] text-blue-600 hover:underline">Register first project</button>
-            )}
-            {/* Direct selector for Add Project if select value becomes 'new' handled in a better way below or by state */}
           </div>
         </div>
 
@@ -439,99 +405,59 @@ export default function Home() {
             <span className="animate-pulse">✨</span>
             <span>Theme Lab</span>
           </div>
+
+          <Link 
+            href="/settings"
+            className="notion-item flex items-center gap-3 no-underline text-inherit"
+          >
+            <span>⚙️</span>
+            <span>Settings</span>
+          </Link>
         </nav>
 
         {renderMiniCalendar()}
 
-        {isAddingProject && (
-          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white notion-card w-full max-w-md p-6 animate-fade-in">
-              <h2 className="text-xl font-bold mb-4">Add New Project</h2>
-              <div className="space-y-4">
-                <div className="flex gap-4 items-start">
-                  <div className="relative">
-                    <label className="block text-xs font-semibold notion-text-subtle mb-1">Icon</label>
-                    <button 
-                      onClick={() => setIconPickerTarget('add')}
-                      className="w-10 h-10 border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50 bg-white"
-                    >
-                      {projectForm.icon ? (
-                        <IconRenderer icon={projectForm.icon} size={24} />
-                      ) : (
-                        <span className="text-gray-300 text-xl">+</span>
-                      )}
-                    </button>
-                    {iconPickerTarget === 'add' && (
-                       <IconPicker 
-                        selectedIcon={projectForm.icon}
-                        onSelect={(icon) => {
-                          setProjectForm({ ...projectForm, icon });
-                          setIconPickerTarget(null);
-                        }}
-                        onClose={() => setIconPickerTarget(null)}
-                      />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-xs font-semibold notion-text-subtle mb-1">Project Name</label>
-                    <input 
-                      className="w-full border border-gray-200 rounded p-2 text-sm"
-                      placeholder="e.g. My Website"
-                      value={projectForm.name}
-                      onChange={(e) => setProjectForm({ ...projectForm, name: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold notion-text-subtle mb-1">Git Repository Path</label>
-                  <input 
-                    className="w-full border border-gray-200 rounded p-2 text-sm"
-                    placeholder="/Users/name/repo"
-                    value={projectForm.git_path}
-                    onChange={(e) => setProjectForm({ ...projectForm, git_path: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold notion-text-subtle mb-1">Antigravity Artifact Directory</label>
-                  <input 
-                    className="w-full border border-gray-200 rounded p-2 text-sm"
-                    placeholder="/Users/name/.gemini/antigravity/brain/session-id"
-                    value={projectForm.artifact_path}
-                    onChange={(e) => setProjectForm({ ...projectForm, artifact_path: e.target.value })}
-                  />
-                </div>
-                <div className="flex gap-2 pt-2">
-                  <button 
-                    onClick={handleAddProject}
-                    className="flex-1 bg-foreground text-white font-medium py-2 rounded text-sm transition-opacity hover:opacity-90"
-                  >
-                    Save Project
-                  </button>
-                  <button 
-                    onClick={() => setIsAddingProject(false)}
-                    className="flex-1 bg-gray-100 text-gray-700 font-medium py-2 rounded text-sm hover:bg-gray-200"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
+        <div className="mt-auto px-2 pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-between mb-3">
+            <div className="font-bold text-[10px] text-gray-500 uppercase tracking-widest bg-gray-100/50 w-fit px-2 py-0.5 rounded">Quick Note</div>
+            <div className="flex gap-1.5 bg-gray-100/30 p-1 rounded-lg border border-gray-100/50">
+              <button 
+                onClick={() => setActiveBlockType('text')}
+                className={`p-1 rounded transition-all ${activeBlockType === 'text' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
+                title="Text"
+              >
+                <AlignLeft size={12} />
+              </button>
+              <button 
+                onClick={() => setActiveBlockType('markdown')}
+                className={`p-1 rounded transition-all ${activeBlockType === 'markdown' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
+                title="Markdown"
+              >
+                <FileText size={12} />
+              </button>
+              <button 
+                onClick={() => setActiveBlockType('code')}
+                className={`p-1 rounded transition-all ${activeBlockType === 'code' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
+                title="Code"
+              >
+                <Code size={12} />
+              </button>
             </div>
           </div>
-        )}
-
-        <div className="mt-auto px-2 pt-4 border-t border-gray-200">
-          <div className="mb-3 font-semibold text-xs notion-text-subtle uppercase tracking-wider">Quick Note</div>
           <textarea 
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            className="w-full bg-white border border-gray-200 rounded-md p-2 text-sm focus:outline-none focus:border-gray-400 h-24 mb-2 resize-none"
-            placeholder="Write something..."
+            className="w-full bg-white border border-gray-200 rounded-md p-2 text-sm focus:outline-none focus:border-gray-400 h-20 mb-2 resize-none text-neutral-800 placeholder:text-neutral-400 font-medium"
+            placeholder={activeBlockType === 'code' ? '// write some code...' : activeBlockType === 'markdown' ? '# Heading...' : 'Write something...'}
           />
           <button 
             onClick={handleAddComment}
-            className="w-full bg-foreground hover:opacity-90 text-white font-medium py-1.5 rounded-md transition-colors text-xs"
+            className="w-full bg-foreground hover:opacity-90 text-white font-medium py-1.5 rounded-md transition-colors text-xs flex items-center justify-center gap-2"
           >
-            Add to Notes
+            {activeBlockType === 'code' && <Code size={12} />}
+            {activeBlockType === 'markdown' && <FileText size={12} />}
+            {activeBlockType === 'text' && <AlignLeft size={12} />}
+            Add {activeBlockType.charAt(0).toUpperCase() + activeBlockType.slice(1)} Block
           </button>
         </div>
       </aside>
@@ -555,7 +481,7 @@ export default function Home() {
                 <div className="left-0 top-full">
                   <IconPicker 
                     selectedIcon={activeProject?.icon}
-                    onSelect={(icon) => {
+                    onSelect={(icon: string) => {
                       handleUpdateProjectIcon(icon);
                       setIconPickerTarget(null);
                     }}
@@ -607,13 +533,13 @@ export default function Home() {
                   <div className="flex items-start gap-4">
                     <div className="text-2xl mt-1 opacity-40">◦</div>
                     <div>
-                      <div className="font-medium text-[15px] mb-1">{log.content}</div>
-                      <div className="flex items-center gap-2 text-xs notion-text-subtle font-mono">
-                        <span className="bg-gray-200 px-1.5 py-0.5 rounded text-[10px]">{JSON.parse(log.metadata || '{}').hash?.substring(0, 7) || '---'}</span>
-                        <span>{JSON.parse(log.metadata || '{}').author || 'Unknown'}</span>
-                        <span>•</span>
-                        <span>{new Date(log.timestamp).toLocaleDateString()} {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      </div>
+                       <div className="font-medium text-[15px] mb-1">{log.content}</div>
+                       <div className="flex items-center gap-2 text-xs notion-text-subtle font-mono">
+                         <span className="bg-gray-200 px-1.5 py-0.5 rounded text-[10px]">{JSON.parse(log.metadata || '{}').hash?.substring(0, 7) || '---'}</span>
+                         <span>{JSON.parse(log.metadata || '{}').author || 'Unknown'}</span>
+                         <span>•</span>
+                         <span>{new Date(log.timestamp).toLocaleDateString()} {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                       </div>
                     </div>
                   </div>
                 </div>
@@ -646,32 +572,85 @@ export default function Home() {
             <div className="animate-fade-in">
               <SuggestedTasks 
                 tasks={suggestedTasks} 
-                onAdd={(t) => handleTaskStatusUpdate(t.id, 'added', t.task)}
-                onDismiss={(t) => handleTaskStatusUpdate(t.id, 'dismissed')}
+                onAdd={(t) => updateSuggestedTaskStatus(t.id, 'added', t.task)}
+                onDismiss={(t) => updateSuggestedTaskStatus(t.id, 'dismissed')}
               />
             </div>
           )}
 
           {activeTab === "comments" && (
-            <div key="comments-content" className="space-y-8">
-              {comments.length === 0 ? (
-                <p className="notion-text-subtle italic">No notes created yet. Use the sidebar to add your first note.</p>
+            <div className="space-y-6">
+              <div className="flex justify-between items-end mb-4">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight">Notes Timeline</h2>
+                  <p className="text-sm text-gray-500">Chronological history of your manual entries.</p>
+                </div>
+                {!isFullEditorOpen && (
+                  <button 
+                    onClick={() => setIsFullEditorOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 transition-all shadow-sm group"
+                  >
+                    <PenTool size={14} className="text-blue-500 group-hover:rotate-12 transition-transform" />
+                    Open Markdown Editor
+                  </button>
+                )}
+              </div>
+
+              {isFullEditorOpen ? (
+                <MarkdownEditor 
+                  value={newComment}
+                  onChange={setNewComment}
+                  onCancel={() => setIsFullEditorOpen(false)}
+                  onSave={() => {
+                    handleAddComment();
+                    setIsFullEditorOpen(false);
+                  }}
+                />
               ) : (
-                comments.slice().reverse().map((comment) => (
-                  <div key={comment.id} className="group">
-                    <div className="flex gap-4 items-start">
-                      <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-xs font-bold">SY</div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-[13px]">User</span>
-                          <span className="text-[11px] notion-text-subtle font-normal">{new Date(comment.timestamp).toLocaleString()}</span>
+                <div key="comments-content" className="space-y-8">
+                  {comments.length === 0 ? (
+                    <p className="notion-text-subtle italic">No notes created yet. Use the sidebar or the editor to add your first note.</p>
+                  ) : (
+                    comments.slice().reverse().map((comment) => (
+                      <div key={comment.id} className="group">
+                        <div className="flex gap-4 items-start">
+                          <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-xs font-bold shadow-sm">
+                            {comment.type === 'code' && <Code size={14} />}
+                            {comment.type === 'markdown' && <FileText size={14} />}
+                            {comment.type === 'text' && <AlignLeft size={14} />}
+                            {(!comment.type || comment.type === 'unknown') && "SY"}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="font-bold text-[13px] text-gray-800">
+                                {comment.type === 'code' ? 'Code Block' : comment.type === 'markdown' ? 'Markdown' : 'Note'}
+                              </span>
+                              <span className="text-[11px] notion-text-subtle font-normal bg-gray-50 px-2 py-0.5 rounded-full">{new Date(comment.timestamp).toLocaleString()}</span>
+                            </div>
+                            <div className={`bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow ${comment.type === 'code' ? 'bg-neutral-900 border-neutral-800' : ''}`}>
+                                {comment.type === 'code' ? (
+                                    <pre className="text-sm font-mono text-emerald-400 overflow-x-auto p-0 m-0 bg-transparent border-none">
+                                        <code>{comment.text}</code>
+                                    </pre>
+                                ) : comment.type === 'text' ? (
+                                    <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                        {comment.text}
+                                    </div>
+                                ) : (
+                                    <div className="markdown-content">
+                                        <ReactMarkdown>
+                                            {comment.text}
+                                        </ReactMarkdown>
+                                    </div>
+                                )}
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-[15px] leading-relaxed whitespace-pre-wrap">{comment.text}</div>
+                        <div className="h-12 border-l border-gray-100 ml-4 group-last:hidden"></div>
                       </div>
-                    </div>
-                      <div className="h-px bg-gray-100 mt-8 group-last:hidden"></div>
-                  </div>
-                ))
+                    ))
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -681,7 +660,7 @@ export default function Home() {
               themes={themes}
               onSave={handleSaveTheme}
               onDelete={handleDeleteTheme}
-              onToggle={handleSelectTheme}
+              onToggle={(theme) => handleSelectTheme(theme ? theme.id : -1)}
               onPreview={setPreviewCss}
             />
           )}

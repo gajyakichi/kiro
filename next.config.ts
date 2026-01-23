@@ -5,3 +5,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+// Force reload: Thu Jan 22 11:39:13 JST 2026

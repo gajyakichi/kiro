@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
-import { Project } from "@/lib/types";
 
 export async function GET() {
   try {
-    const projects = db.prepare('SELECT * FROM projects ORDER BY created_at DESC').all() as Project[];
+    const projects = await db.project.findMany({
+      orderBy: { id: 'desc' } // Prisma doesn't have created_at in the model I defined yet, using id as proxy for now
+    });
     return NextResponse.json(projects);
   } catch (error) {
     console.error("Project Fetch Error:", error);
@@ -15,12 +16,15 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const { name, git_path, artifact_path, icon } = await request.json();
-    const insert = db.prepare(`
-      INSERT INTO projects (name, git_path, artifact_path, icon) 
-      VALUES (?, ?, ?, ?)
-    `);
-    const info = insert.run(name, git_path, artifact_path, icon || null);
-    return NextResponse.json({ success: true, id: info.lastInsertRowid });
+    const project = await db.project.create({
+      data: {
+        name,
+        git_path,
+        artifact_path,
+        icon: icon || null
+      }
+    });
+    return NextResponse.json({ success: true, id: project.id });
   } catch (error) {
     console.error("Project Create Error:", error);
     return NextResponse.json({ error: "Failed to create project" }, { status: 500 });
@@ -34,22 +38,19 @@ export async function PATCH(request: Request) {
     
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
-    console.log("Updating project:", { id, name, git_path, artifact_path, icon });
-
-    const update = db.prepare(`
-      UPDATE projects 
-      SET name = ?, git_path = ?, artifact_path = ?, icon = ?
-      WHERE id = ?
-    `);
-    
-    // Use fallback to existing values or empty strings to avoid NOT NULL constraints if missing
-    // Actually, it's better to just log what's missing.
     if (!name || !git_path || !artifact_path) {
-        console.error("Missing required fields for update:", { name, git_path, artifact_path });
         return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    update.run(name, git_path, artifact_path, icon || null, id);
+    await db.project.update({
+      where: { id: Number(id) },
+      data: {
+        name,
+        git_path,
+        artifact_path,
+        icon: icon || null
+      }
+    });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Project Update Error:", error);
@@ -63,7 +64,9 @@ export async function DELETE(request: Request) {
         const id = searchParams.get('id');
         if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
         
-        db.prepare('DELETE FROM projects WHERE id = ?').run(id);
+        await db.project.delete({
+          where: { id: Number(id) }
+        });
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error("Project Delete Error:", error);

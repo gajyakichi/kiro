@@ -10,8 +10,17 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const dailyNotes = db.prepare('SELECT * FROM daily_notes WHERE project_id = ? ORDER BY date DESC').all(projectId);
-    const suggestedTasks = db.prepare('SELECT * FROM suggested_tasks WHERE project_id = ? AND status = "proposed" ORDER BY timestamp DESC').all(projectId);
+    const dailyNotes = await db.dailyNote.findMany({
+      where: { project_id: Number(projectId) },
+      orderBy: { date: 'desc' }
+    });
+    const suggestedTasks = await db.suggestedTask.findMany({
+      where: { 
+        project_id: Number(projectId),
+        status: 'proposed'
+      },
+      orderBy: { timestamp: 'desc' }
+    });
 
     return NextResponse.json({
       dailyNotes,

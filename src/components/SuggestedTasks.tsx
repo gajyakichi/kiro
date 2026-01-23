@@ -22,7 +22,7 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
       {tasks.filter(t => t.status === 'proposed').map((task) => (
         <div key={task.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:border-blue-200 transition-all flex flex-col justify-between group">
           <div className="flex gap-3 mb-4">
-            <div className="mt-1 flex-shrink-0">
+            <div className="mt-1 shrink-0">
               <Lightbulb size={18} className="text-amber-400" />
             </div>
             <p className="text-sm text-gray-700 font-medium leading-snug">

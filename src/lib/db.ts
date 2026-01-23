@@ -1,64 +1,58 @@
-import Database from 'better-sqlite3';
+import { PrismaClient } from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import path from 'path';
+import fs from 'fs';
+import os from 'os';
 
-const dbPath = path.join(process.cwd(), 'development.db');
-const db = new Database(dbPath);
+// Environment switching logic
+const STORAGE_MODE = process.env.STORAGE_MODE || 'local';
+const DATABASE_URL = process.env.DATABASE_URL || 'file:./prisma/dev.db';
+const VAULT_PATH = process.env.VAULT_PATH || '';
 
-// Initialize Schema
-db.exec(`
-  CREATE TABLE IF NOT EXISTS projects (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    git_path TEXT NOT NULL,
-    artifact_path TEXT NOT NULL,
-    icon TEXT, -- Stores icon identifier (e.g., 'lucide:home', 'phosphor:user', or emoji)
-    metadata TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
 
-  CREATE TABLE IF NOT EXISTS logs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    project_id INTEGER,
-    type TEXT NOT NULL, -- 'git', 'task', 'tool'
-    content TEXT NOT NULL,
-    metadata TEXT, -- JSON string for extra info (hash, author, etc.)
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects(id)
-  );
+const expandPath = (p: string) => {
+  if (p.startsWith('~/')) {
+    return path.join(os.homedir(), p.slice(2));
+  }
+  return path.resolve(p);
+};
 
-  CREATE TABLE IF NOT EXISTS comments (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    project_id INTEGER,
-    text TEXT NOT NULL,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects(id)
-  );
+const createPrismaClient = () => {
+  if (STORAGE_MODE === 'local') {
+    let absolutePath: string;
 
-  CREATE TABLE IF NOT EXISTS themes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    css TEXT NOT NULL,
-    active INTEGER DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
+    if (VAULT_PATH && VAULT_PATH.trim() !== '') {
+      const vaultDir = expandPath(VAULT_PATH);
+      if (!fs.existsSync(vaultDir)) {
+        fs.mkdirSync(vaultDir, { recursive: true });
+      }
+      absolutePath = path.join(vaultDir, 'kiro.db');
+    } else {
+      const dbPath = DATABASE_URL.replace('file:', '');
+      absolutePath = path.isAbsolute(dbPath) ? dbPath : path.join(process.cwd(), dbPath);
+      // If DATABASE_URL is the default or contains kaihatsunote, we might want to ensure it's kiro.db
+      // But for now, let's just make the VAULT rename explicit.
+      // Ensure the directory for the default path exists
+      const dir = path.dirname(absolutePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    }
 
-  CREATE TABLE IF NOT EXISTS daily_notes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    project_id INTEGER,
-    date TEXT NOT NULL, -- YYYY-MM-DD
-    content TEXT NOT NULL,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects(id)
-  );
+    const adapter = new PrismaBetterSqlite3({ url: `file:${absolutePath}` });
+    console.log(`📡 Storage: Local SQLite (${absolutePath})`);
+    return new PrismaClient({ adapter });
+  } else {
+    console.log(`🌐 Storage: Remote Database (${DATABASE_URL})`);
+    return new PrismaClient();
+  }
+};
 
-  CREATE TABLE IF NOT EXISTS suggested_tasks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    project_id INTEGER,
-    task TEXT NOT NULL,
-    status TEXT DEFAULT 'proposed', -- 'proposed', 'added', 'dismissed'
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects(id)
-  );
-`);
+const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
-export default db;
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+export default prisma;

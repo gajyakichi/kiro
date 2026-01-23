@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { Project } from '@/lib/types';
 import { getProjectContext } from '@/lib/git';
 import { generateDailySummary, suggestTasks } from '@/lib/ai';
+import { Prisma } from '@prisma/client';
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,13 +13,15 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. Fetch project details
-    const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(projectId) as Project;
+    const project = await db.project.findUnique({
+      where: { id: Number(projectId) }
+    });
     if (!project) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
     // 2. Extract context
-    const contextData = getProjectContext(project.git_path, project.artifact_path);
+    const contextData = getProjectContext(project.git_path || '', project.artifact_path || '');
     const contextString = `
 GIT LOGS:
 ${contextData.recentLogs.map(l => `${l.date} [${l.hash}] ${l.message} (${l.author})`).join('\n')}
@@ -37,35 +39,43 @@ ${contextData.walkthrough || 'No walkthrough available.'}
     const date = new Date().toISOString().split('T')[0];
 
     // 4. Persistence
-    const transaction = db.transaction(() => {
-      // Save Daily Note (overwrite for same day or keep multiple? Let's overwrite/update to keep it simple for now)
-      db.prepare(`
-        INSERT INTO daily_notes (project_id, date, content)
-        VALUES (?, ?, ?)
-        ON CONFLICT(id) DO UPDATE SET content = excluded.content
-      `).run(projectId, date, summary);
-      // Wait, SQLite ON CONFLICT(id) works, but we don't have a unique constraint on (project_id, date).
-      // Let's use a simpler approach: check if exists, then update or insert.
-      
-      const existingNote = db.prepare('SELECT id FROM daily_notes WHERE project_id = ? AND date = ?').get(projectId, date) as { id: number } | undefined;
-      if (existingNote) {
-        db.prepare('UPDATE daily_notes SET content = ? WHERE id = ?').run(summary, existingNote.id);
-      } else {
-        db.prepare('INSERT INTO daily_notes (project_id, date, content) VALUES (?, ?, ?)').run(projectId, date, summary);
-      }
+    await db.$transaction(async (tx: Prisma.TransactionClient) => {
+      // Save Daily Note (upsert)
+      await tx.dailyNote.upsert({
+        where: {
+          project_id_date: {
+            project_id: Number(projectId),
+            date: date
+          }
+        },
+        update: { content: summary },
+        create: {
+          project_id: Number(projectId),
+          date: date,
+          content: summary
+        }
+      });
 
-      // Save Suggested Tasks (avoid duplicates if possible)
-      const insertTask = db.prepare('INSERT INTO suggested_tasks (project_id, task, status) VALUES (?, ?, ?)');
+      // Save Suggested Tasks
       for (const task of tasks) {
-        // Simple duplicate check
-        const exists = db.prepare('SELECT id FROM suggested_tasks WHERE project_id = ? AND task = ? AND status = "proposed"').get(projectId, task);
+        const exists = await tx.suggestedTask.findFirst({
+          where: {
+            project_id: Number(projectId),
+            task: task,
+            status: 'proposed'
+          }
+        });
         if (!exists) {
-          insertTask.run(projectId, task, 'proposed');
+          await tx.suggestedTask.create({
+            data: {
+              project_id: Number(projectId),
+              task: task,
+              status: 'proposed'
+            }
+          });
         }
       }
     });
-
-    transaction();
 
     return NextResponse.json({ 
       success: true, 

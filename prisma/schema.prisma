@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Project {
+  id             Int             @id @default(autoincrement())
+  name           String
+  icon           String?
+  git_path       String?
+  artifact_path  String?
+  comments       Comment[]
+  dailyNotes     DailyNote[]
+  logs           Log[]
+  suggestedTasks SuggestedTask[]
+}
+
+model Log {
+  id         Int      @id @default(autoincrement())
+  timestamp  DateTime @default(now())
+  type       String
+  content    String
+  metadata   String?
+  project_id Int
+  project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id         Int      @id @default(autoincrement())
+  timestamp  DateTime @default(now())
+  text       String
+  type       String   @default("markdown")
+  metadata   String?
+  project_id Int
+  project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+}
+
+model Theme {
+  id        Int      @id @default(autoincrement())
+  name      String
+  css       String
+  active    Boolean  @default(false)
+  timestamp DateTime @default(now())
+}
+
+model DailyNote {
+  id         Int      @id @default(autoincrement())
+  project_id Int
+  date       String
+  content    String
+  timestamp  DateTime @default(now())
+  project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+
+  @@unique([project_id, date])
+}
+
+model SuggestedTask {
+  id         Int      @id @default(autoincrement())
+  project_id Int
+  task       String
+  status     String   @default("proposed")
+  timestamp  DateTime @default(now())
+  project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+}

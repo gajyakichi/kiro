@@ -9,7 +9,10 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Task ID and status are required' }, { status: 400 });
     }
 
-    db.prepare('UPDATE suggested_tasks SET status = ? WHERE id = ?').run(status, taskId);
+    await db.suggestedTask.update({
+      where: { id: Number(taskId) },
+      data: { status }
+    });
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

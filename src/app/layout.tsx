@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Development Console",
-  description: "Automated development tracking system",
+  title: "Kiro",
+  description: "Track your development trajectory",
 };
 
 export default function RootLayout({
