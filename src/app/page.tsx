@@ -617,7 +617,7 @@ export default function Home() {
             onClick={() => setActiveTab("git")}
             className={`notion-item flex items-center gap-3 ${activeTab === "git" ? "active" : ""}`}
           >
-            <span>📜</span>
+            <IconRenderer icon="lucide:Scroll" size={16} baseSet={appIconSet} />
             <span>{t.git_logs}</span>
           </div>
           
@@ -625,7 +625,7 @@ export default function Home() {
             onClick={() => setActiveTab("progress")}
             className={`notion-item flex items-center gap-3 ${activeTab === "progress" ? "active" : ""}`}
           >
-            <span>✅</span>
+            <IconRenderer icon="lucide:CheckSquare" size={16} baseSet={appIconSet} />
             <span>{t.progress}</span>
           </div>
 
@@ -633,7 +633,7 @@ export default function Home() {
             onClick={() => setActiveTab("daily_notes")}
             className={`notion-item flex items-center gap-3 ${activeTab === "daily_notes" ? "active" : ""}`}
           >
-            <span>✨</span>
+            <IconRenderer icon="lucide:Sparkles" size={16} baseSet={appIconSet} />
             <div className="flex-1 flex justify-between items-center">
               <span>{t.daily_notes}</span>
               {dailyNotes.length > 0 && <span className="text-[10px] bg-(--theme-primary-bg) text-(--theme-primary) px-1.5 rounded-full font-bold">{dailyNotes.length}</span>}
@@ -644,7 +644,7 @@ export default function Home() {
             onClick={() => setActiveTab("suggested_tasks")}
             className={`notion-item flex items-center gap-3 ${activeTab === "suggested_tasks" ? "active" : ""}`}
           >
-            <span>💡</span>
+            <IconRenderer icon="lucide:Lightbulb" size={16} baseSet={appIconSet} />
             <div className="flex-1 flex justify-between items-center">
               <span>{t.suggestions}</span>
               {suggestedTasks.length > 0 && <span className="text-[10px] bg-(--theme-accent-bg) text-(--theme-accent) px-1.5 rounded-full font-bold">{suggestedTasks.length}</span>}
@@ -655,7 +655,7 @@ export default function Home() {
             onClick={() => setActiveTab("calendar")}
             className={`notion-item flex items-center gap-3 ${activeTab === "calendar" ? "active" : ""}`}
           >
-            <span>📅</span>
+            <IconRenderer icon="lucide:Calendar" size={16} baseSet={appIconSet} />
             <span>{t.calendar}</span>
           </div>
 
@@ -663,7 +663,7 @@ export default function Home() {
             onClick={() => setActiveTab("comments")}
             className={`notion-item flex items-center gap-3 ${activeTab === "comments" ? "active" : ""}`}
           >
-            <span>📝</span>
+            <IconRenderer icon="lucide:SquarePen" size={16} baseSet={appIconSet} />
             <div className="flex-1 flex justify-between items-center">
               <span>{t.notes}</span>
               <span className="text-xs notion-text-subtle">{comments.length}</span>
@@ -674,7 +674,7 @@ export default function Home() {
             onClick={() => setActiveTab("themes")}
             className={`notion-item flex items-center gap-3 ${activeTab === "themes" ? "active" : ""}`}
           >
-            <span className="animate-pulse">✨</span>
+            <IconRenderer icon="lucide:Palette" size={16} baseSet={appIconSet} className={activeTab === "themes" ? "" : "animate-pulse"} />
             <span>{t.theme_lab}</span>
           </div>
 
@@ -682,7 +682,7 @@ export default function Home() {
             href="/settings"
             className="notion-item flex items-center gap-3 no-underline text-inherit"
           >
-            <span>⚙️</span>
+            <IconRenderer icon="lucide:Settings" size={16} baseSet={appIconSet} />
             <span>{t.settings}</span>
           </Link>
         </nav>

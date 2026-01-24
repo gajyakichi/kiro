@@ -12,9 +12,21 @@ interface IconRendererProps {
 export const IconRenderer: React.FC<IconRendererProps> = ({ icon, className, size = 16, baseSet }) => {
   if (!icon) return null;
 
-  // If explicitly set to original, skip library mapping
+  const cleanIcon = icon.replace(/^(lucide|phosphor):/, '');
+
+  // If explicitly set to original, strip prefix and map common icons to emojis
   if (baseSet === 'original') {
-     return <span className={className} style={{ fontSize: `${size}px` }}>{icon}</span>;
+     const lower = cleanIcon.toLowerCase();
+     if (lower === 'folder') return <span className={className} style={{ fontSize: `${size}px` }}>📁</span>;
+     if (lower === 'settings' || lower === 'gear') return <span className={className} style={{ fontSize: `${size}px` }}>⚙️</span>;
+     if (lower === 'scroll' || lower === 'git') return <span className={className} style={{ fontSize: `${size}px` }}>📜</span>;
+     if (lower === 'checksquare' || lower === 'task') return <span className={className} style={{ fontSize: `${size}px` }}>✅</span>;
+     if (lower === 'sparkles' || lower === 'daily') return <span className={className} style={{ fontSize: `${size}px` }}>✨</span>;
+     if (lower === 'lightbulb' || lower === 'suggest') return <span className={className} style={{ fontSize: `${size}px` }}>💡</span>;
+     if (lower === 'calendar') return <span className={className} style={{ fontSize: `${size}px` }}>📅</span>;
+     if (lower === 'squarepen' || lower === 'notepencil' || lower === 'note') return <span className={className} style={{ fontSize: `${size}px` }}>📝</span>;
+     if (lower === 'palette') return <span className={className} style={{ fontSize: `${size}px` }}>✨</span>;
+     return <span className={className} style={{ fontSize: `${size}px` }}>{cleanIcon}</span>;
   }
 
   if (icon.startsWith('lucide:')) {
@@ -42,5 +54,5 @@ export const IconRenderer: React.FC<IconRendererProps> = ({ icon, className, siz
   if (PotentialLucide) return <PotentialLucide className={className} size={size} />;
 
   // Final Fallback as emoji or raw text
-  return <span className={className} style={{ fontSize: `${size}px` }}>{icon}</span>;
+  return <span className={className} style={{ fontSize: `${size}px` }}>{cleanIcon}</span>;
 };

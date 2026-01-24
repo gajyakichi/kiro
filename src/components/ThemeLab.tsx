@@ -64,50 +64,50 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
         </div>
 
         {/* Global Icon Settings Row */}
-        <div className="mb-8 p-6 bg-neutral-50 rounded-2xl border border-neutral-100 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-             <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
-                <IconRenderer icon="lucide:Settings" size={20} className="text-neutral-400" baseSet={appIconSet} />
+        <div className="mb-8 p-6 bg-neutral-50 rounded-2xl border border-neutral-100 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+          <div className="flex items-center gap-5 w-full md:w-auto">
+             <div className="w-12 h-12 shrink-0 rounded-xl bg-white border border-neutral-200 flex items-center justify-center shadow-xs">
+                <IconRenderer icon="lucide:Settings" size={24} className="text-neutral-500" baseSet={appIconSet} />
              </div>
-             <div>
-                <p className="text-sm font-bold">Global Icon Set</p>
-                <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest">Selected Style applies to all themes</p>
+             <div className="min-w-0">
+                <p className="text-[15px] font-black text-gray-800 tracking-tight">Global Icon Set</p>
+                <p className="text-[11px] text-neutral-400 font-bold uppercase tracking-widest whitespace-nowrap">Selected style applies everywhere</p>
              </div>
           </div>
-          <div className="flex bg-white p-1.5 rounded-xl border border-neutral-200 gap-1">
+          <div className="flex bg-white p-1.5 rounded-xl border border-neutral-200 gap-1 w-full md:w-auto shrink-0 shadow-inner group">
              <button 
                 onClick={() => onUpdateIconSet('lucide')}
-                className={`flex-1 px-4 py-2 rounded-lg text-[10px] font-black transition-all duration-200 active:scale-90 ${appIconSet === 'lucide' ? 'bg-foreground text-background shadow-lg shadow-neutral-200 ring-2 ring-foreground/10' : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'lucide' ? 'bg-foreground text-background shadow-lg shadow-neutral-300 ring-2 ring-foreground/5' : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'}`}
              >
                 LUCIDE
              </button>
              <button 
                 onClick={() => onUpdateIconSet('phosphor')}
-                className={`flex-1 px-4 py-2 rounded-lg text-[10px] font-black transition-all duration-200 active:scale-90 ${appIconSet === 'phosphor' ? 'bg-foreground text-background shadow-lg shadow-neutral-200 ring-2 ring-foreground/10' : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'phosphor' ? 'bg-foreground text-background shadow-lg shadow-neutral-300 ring-2 ring-foreground/5' : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'}`}
              >
                 PHOSPHOR
              </button>
              <button 
                 onClick={() => onUpdateIconSet('original')}
-                className={`flex-1 px-4 py-2 rounded-lg text-[10px] font-black transition-all duration-200 active:scale-90 ${appIconSet === 'original' ? 'bg-foreground text-background shadow-lg shadow-neutral-200 ring-2 ring-foreground/10' : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'original' ? 'bg-foreground text-background shadow-lg shadow-neutral-300 ring-2 ring-foreground/5' : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'}`}
              >
                 ORIGINAL
              </button>
           </div>
         </div>
         
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-6 pt-4 pb-4">
           <button 
             onClick={() => onToggle(null)}
             onMouseEnter={() => onPreview("")}
-            className={`group flex items-center gap-4 px-6 py-4 rounded-xl border-2 transition-all duration-300 ease-out bg-white hover:-translate-y-3 hover:shadow-2xl hover:z-20 active:scale-95 relative ${!activeTheme ? 'border-foreground shadow-lg shadow-gray-100' : 'border-gray-100 hover:border-gray-200 opacity-60 hover:opacity-100'}`}
+            className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 transition-all duration-500 ease-in-out bg-white hover:-translate-y-3 hover:translate-x-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 active:scale-[0.98] outline-none relative ${!activeTheme ? 'border-foreground shadow-xl shadow-gray-200' : 'border-gray-100 hover:border-gray-200 opacity-70 hover:opacity-100'}`}
           >
-            <div className={`w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform ${!activeTheme ? 'text-foreground' : ''}`}>
-              {!activeTheme ? <CheckCircle size={20} weight="fill" className="text-foreground" /> : <Circle size={20} />}
+            <div className={`w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform duration-500 ${!activeTheme ? 'text-foreground border-foreground/10' : ''}`}>
+              {!activeTheme ? <CheckCircle size={22} weight="fill" className="text-foreground" /> : <Circle size={22} />}
             </div>
             <div className="text-left">
-              <div className="font-bold text-sm">Original</div>
-              <div className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Default System</div>
+              <div className="font-black text-sm tracking-tight">Original</div>
+              <div className="text-[10px] text-gray-400 uppercase tracking-widest font-black opacity-60">Default System</div>
             </div>
           </button>
 
@@ -117,19 +117,19 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
               onClick={() => onToggle(theme)}
               onMouseEnter={() => onPreview(theme.css)}
               onMouseLeave={() => onPreview("")}
-              className={`group flex items-center gap-4 px-6 py-4 rounded-xl border-2 transition-all duration-300 ease-out bg-white hover:-translate-y-3 hover:shadow-2xl hover:z-20 active:scale-95 relative ${theme.active ? 'border-foreground shadow-lg shadow-gray-100' : 'border-gray-100 hover:border-gray-200 opacity-60 hover:opacity-100'}`}
+              className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 transition-all duration-500 ease-in-out bg-white hover:-translate-y-3 hover:translate-x-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 active:scale-[0.98] outline-none relative ${theme.active ? 'border-foreground shadow-xl shadow-gray-200' : 'border-gray-100 hover:border-gray-200 opacity-70 hover:opacity-100'}`}
             >
-              <div className={`w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform ${theme.active ? 'text-foreground' : ''}`}>
-                {theme.active ? <CheckCircle size={20} weight="fill" className="text-foreground" /> : <Circle size={20} />}
+              <div className={`w-10 h-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform duration-500 ${theme.active ? 'text-foreground border-foreground/10' : ''}`}>
+                {theme.active ? <CheckCircle size={22} weight="fill" className="text-foreground" /> : <Circle size={22} />}
               </div>
               <div className="text-left relative">
-                 <div className="font-bold text-sm flex items-center gap-2">
+                 <div className="font-black text-sm flex items-center gap-2 tracking-tight">
                    {theme.name}
-                   <span onClick={(e) => { e.stopPropagation(); onDelete(theme.id); }} className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 transition-opacity">
-                     <Trash size={14} />
+                   <span onClick={(e) => { e.stopPropagation(); onDelete(theme.id); }} className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-125">
+                     <Trash size={16} />
                    </span>
                  </div>
-                 <div className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Custom Style</div>
+                 <div className="text-[10px] text-gray-400 uppercase tracking-widest font-black opacity-60">Custom Style</div>
               </div>
             </button>
           ))}
