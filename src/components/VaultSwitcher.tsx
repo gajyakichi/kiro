@@ -4,15 +4,20 @@ import { useEffect, useState } from 'react';
 import { Database, ShieldCheck, ChevronRight, Check } from 'lucide-react';
 import { Vault } from '@/lib/types';
 
+import { getTranslation } from '@/lib/i18n';
+
 interface VaultSwitcherProps {
+  appLang?: string;
   onSwitch?: () => void;
   className?: string;
 }
 
-export const VaultSwitcher = ({ onSwitch, className = "" }: VaultSwitcherProps) => {
+export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: VaultSwitcherProps) => {
   const [vaults, setVaults] = useState<Vault[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+
+  const t = getTranslation(appLang);
 
   useEffect(() => {
     fetchVaults();
@@ -49,7 +54,7 @@ export const VaultSwitcher = ({ onSwitch, className = "" }: VaultSwitcherProps) 
 
   const activeVault = vaults.find(v => v.active);
 
-  if (loading) return <div className="text-[10px] notion-text-subtle animate-pulse">Loading Vault...</div>;
+  if (loading) return <div className="text-[10px] notion-text-subtle animate-pulse">{t.loading_vault}</div>;
 
   return (
     <div className={`relative ${className}`}>
@@ -62,10 +67,10 @@ export const VaultSwitcher = ({ onSwitch, className = "" }: VaultSwitcherProps) 
         </div>
         <div className="flex-1 text-left">
           <div className="text-[11px] font-bold truncate leading-tight">
-            {activeVault?.name || "Select Vault"}
+            {activeVault?.name || t.select_vault}
           </div>
           <div className="text-[9px] notion-text-subtle truncate">
-            {activeVault?.path ? "External" : "Internal"}
+            {activeVault?.path ? t.external : t.internal}
           </div>
         </div>
         <ChevronRight size={14} className={`notion-text-subtle transition-transform ${isOpen ? 'rotate-90' : ''}`} />
@@ -74,7 +79,7 @@ export const VaultSwitcher = ({ onSwitch, className = "" }: VaultSwitcherProps) 
       {isOpen && (
         <div className="absolute left-0 bottom-full mb-2 w-64 bg-white border border-(--border-color) rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
           <div className="p-2 border-b border-(--border-color) bg-neutral-50/50">
-            <span className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest px-2">Storage Vaults</span>
+            <span className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest px-2">{t.storage_vaults}</span>
           </div>
           <div className="max-h-64 overflow-y-auto p-1">
             {vaults.map((vault) => (
@@ -94,7 +99,7 @@ export const VaultSwitcher = ({ onSwitch, className = "" }: VaultSwitcherProps) 
                       {vault.name}
                     </div>
                     <div className="text-[10px] notion-text-subtle truncate max-w-[120px]">
-                      {vault.path || "Internal"}
+                      {vault.path || t.internal}
                     </div>
                   </div>
                 </div>
@@ -107,7 +112,7 @@ export const VaultSwitcher = ({ onSwitch, className = "" }: VaultSwitcherProps) 
               href="/settings" 
               className="block w-full text-center py-2 text-[10px] font-bold notion-text-subtle hover:text-(--theme-primary) transition-colors"
             >
-              MANAGE VAULTS IN SETTINGS
+              {t.manage_vaults}
             </a>
           </div>
         </div>

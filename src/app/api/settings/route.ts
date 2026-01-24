@@ -14,6 +14,7 @@ export async function GET() {
       AI_PROVIDER: process.env.AI_PROVIDER || "openai",
       OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL || "http://localhost:11434",
       VAULT_PATH: process.env.VAULT_PATH || "",
+      APP_LANG: process.env.APP_LANG || "en",
     });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
@@ -22,7 +23,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { STORAGE_MODE, DATABASE_URL, OPENAI_API_KEY, AI_MODEL, VAULT_PATH, AI_PROVIDER, OLLAMA_BASE_URL } = await request.json();
+    const { STORAGE_MODE, DATABASE_URL, OPENAI_API_KEY, AI_MODEL, VAULT_PATH, AI_PROVIDER, OLLAMA_BASE_URL, APP_LANG } = await request.json();
     
     // Read current .env
     let envContent = "";
@@ -58,6 +59,9 @@ export async function POST(request: Request) {
       } else if (line.startsWith("OLLAMA_BASE_URL=")) {
         newLines.push(`OLLAMA_BASE_URL="${OLLAMA_BASE_URL}"`);
         keysHandled.add("OLLAMA_BASE_URL");
+      } else if (line.startsWith("APP_LANG=")) {
+        newLines.push(`APP_LANG="${APP_LANG}"`);
+        keysHandled.add("APP_LANG");
       } else {
         newLines.push(line);
       }
@@ -83,6 +87,9 @@ export async function POST(request: Request) {
     }
     if (!keysHandled.has("OLLAMA_BASE_URL")) {
       newLines.push(`OLLAMA_BASE_URL="${OLLAMA_BASE_URL}"`);
+    }
+    if (!keysHandled.has("APP_LANG")) {
+      newLines.push(`APP_LANG="${APP_LANG}"`);
     }
 
     await fs.writeFile(ENV_FILE, newLines.join("\n"));

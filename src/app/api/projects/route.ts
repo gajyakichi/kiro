@@ -15,7 +15,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { name, git_path, artifact_path, icon } = await request.json();
+    const data = await request.json();
+    console.log("Adding Project Request Data:", data);
+    const { name, git_path, artifact_path, icon } = data;
     const project = await db.project.create({
       data: {
         name,
@@ -24,10 +26,11 @@ export async function POST(request: Request) {
         icon: icon || null
       }
     });
+    console.log("Project created successfully:", project.id);
     return NextResponse.json({ success: true, id: project.id });
   } catch (error) {
-    console.error("Project Create Error:", error);
-    return NextResponse.json({ error: "Failed to create project" }, { status: 500 });
+    console.error("Project Create Error Detail:", error);
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
 

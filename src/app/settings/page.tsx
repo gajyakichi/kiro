@@ -4,13 +4,16 @@ import { useEffect, useState, useCallback } from 'react';
 import { Settings, Database, Server, Save, RotateCcw, ArrowLeft, Cloud, ShieldCheck, AlertTriangle, RefreshCw, Plus, X, Folder, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 import { Vault, Theme } from '@/lib/types';
+import { getTranslation } from '@/lib/i18n';
 
-const VaultManager = ({ onVaultSwitch }: { onVaultSwitch: () => void }) => {
+const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onVaultSwitch: () => void }) => {
   const [vaults, setVaults] = useState<Vault[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [newVaultName, setNewVaultName] = useState("");
   const [newVaultPath, setNewVaultPath] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const t = getTranslation(appLang);
 
   useEffect(() => {
     fetchVaults();
@@ -80,44 +83,53 @@ const VaultManager = ({ onVaultSwitch }: { onVaultSwitch: () => void }) => {
     }
   };
 
-  if (loading) return <div className="text-xs text-neutral-400 animate-pulse">Loading vaults...</div>;
+  if (loading) return <div className="text-xs text-neutral-400 animate-pulse">{t.loading_vault}</div>;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <p className="text-sm notion-text-subtle max-w-md leading-relaxed">
-          Manage multiple storage locations (Vaults). Switching vaults changes the active database and file storage.
+          {t.vault_manager_desc}
         </p>
-        <button 
-          onClick={() => setIsAdding(!isAdding)}
-          className="flex items-center gap-2 px-4 py-2 bg-(--theme-primary) text-white rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-sm"
-        >
-          {isAdding ? <X size={14} /> : <Plus size={14} />}
-          {isAdding ? "Cancel" : "Add New Vault"}
-        </button>
+        <div className="flex gap-2">
+            <button 
+              onClick={fetchVaults}
+              className="p-2 bg-neutral-100 text-neutral-500 rounded-xl hover:bg-neutral-200 transition-all shadow-sm"
+              title="Refresh"
+            >
+              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            </button>
+            <button 
+              onClick={() => setIsAdding(!isAdding)}
+              className="flex items-center gap-2 px-4 py-2 bg-(--theme-primary) text-white rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-sm"
+            >
+              {isAdding ? <X size={14} /> : <Plus size={14} />}
+              {isAdding ? t.cancel : t.add_new_vault}
+            </button>
+        </div>
       </div>
 
       {isAdding && (
         <div className="bg-(--theme-primary-bg) p-6 rounded-2xl border border-(--border-color) animate-in slide-in-from-top-2 duration-300">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-(--theme-primary) uppercase tracking-widest opacity-60">Vault Name</label>
+              <label className="text-[10px] font-black text-(--theme-primary) uppercase tracking-widest opacity-60">{t.vault_name_label}</label>
               <input 
                 type="text" 
                 value={newVaultName}
                 onChange={(e) => setNewVaultName(e.target.value)}
-                placeholder="e.g. Personal Projects"
+                placeholder={t.vault_name_placeholder}
                 className="w-full p-4 bg-white border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 transition-all font-medium"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-(--theme-primary) uppercase tracking-widest opacity-60">Directory Path</label>
+              <label className="text-[10px] font-black text-(--theme-primary) uppercase tracking-widest opacity-60">{t.dir_path_label}</label>
               <div className="relative group">
                 <input 
                   type="text" 
                   value={newVaultPath}
                   onChange={(e) => setNewVaultPath(e.target.value)}
-                  placeholder="~/Documents/KiroVault"
+                  placeholder={t.dir_path_placeholder}
                   className="w-full p-4 bg-white border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 pr-12 transition-all font-mono"
                 />
                 <button 
@@ -128,19 +140,19 @@ const VaultManager = ({ onVaultSwitch }: { onVaultSwitch: () => void }) => {
                     : 'text-neutral-300 opacity-20 cursor-not-allowed'
                   }`}
                   disabled={!window.electron}
-                  title={window.electron ? "Select folder via native dialog" : "Native dialog not available"}
+                  title={window.electron ? t.select_folder_title : t.native_dialog_not_available}
                 >
                   <Folder size={18} />
                 </button>
               </div>
-              {!window.electron && <p className="text-[9px] text-orange-500 font-medium">Native directory dialog is only available in the desktop app.</p>}
+              {!window.electron && <p className="text-[9px] text-orange-500 font-medium">{t.native_desc_only_desktop}</p>}
             </div>
           </div>
           <button 
             onClick={handleAdd}
             className="w-full py-3 bg-(--theme-primary) text-white rounded-xl text-xs font-black shadow-lg shadow-(--theme-primary)/10 hover:opacity-90 transition-all"
           >
-            CONFIRM AND ADD VAULT
+            {t.confirm_add_vault}
           </button>
         </div>
       )}
@@ -162,9 +174,9 @@ const VaultManager = ({ onVaultSwitch }: { onVaultSwitch: () => void }) => {
               <div>
                 <div className="font-bold text-[15px] flex items-center gap-3">
                   {vault.name}
-                  {vault.active && <span className="text-[9px] bg-(--theme-success-bg) text-(--theme-success) px-2 py-0.5 rounded-full uppercase font-black tracking-tighter">Current Active</span>}
+                  {vault.active && <span className="text-[9px] bg-(--theme-success-bg) text-(--theme-success) px-2 py-0.5 rounded-full uppercase font-black tracking-tighter">{t.current_active}</span>}
                 </div>
-                <div className="text-[11px] notion-text-subtle font-mono mt-1 opacity-60">{vault.path || "Internal/Default Storage"}</div>
+                <div className="text-[11px] notion-text-subtle font-mono mt-1 opacity-60">{vault.path || t.internal}</div>
               </div>
             </div>
             
@@ -175,7 +187,7 @@ const VaultManager = ({ onVaultSwitch }: { onVaultSwitch: () => void }) => {
                     onClick={() => handleSwitch(vault.id)}
                     className="px-4 py-2 bg-neutral-100 text-(--theme-primary) hover:bg-(--theme-primary) hover:text-white rounded-xl text-[11px] font-black transition-all"
                   >
-                    SELECT
+                    {t.select}
                   </button>
                   {vault.id !== 'default' && (
                     <button 
@@ -207,7 +219,8 @@ export default function SettingsPage() {
     AI_MODEL: 'gpt-4o-mini',
     AI_PROVIDER: 'openai',
     OLLAMA_BASE_URL: 'http://localhost:11434',
-    VAULT_PATH: ''
+    VAULT_PATH: '',
+    APP_LANG: 'en'
   });
   const [themes, setThemes] = useState<Theme[]>([]);
   const [ollamaModels, setOllamaModels] = useState<string[]>([]);
@@ -285,9 +298,10 @@ export default function SettingsPage() {
     setSaving(false);
   };
 
-  if (loading) return <div className="p-8 text-(--theme-primary) animate-pulse">Loading settings...</div>;
+  if (loading) return <div className="p-8 text-(--theme-primary) animate-pulse">{getTranslation(config.APP_LANG).loading_settings}</div>;
 
   const activeTheme = themes.find(t => t.active);
+  const t = getTranslation(config.APP_LANG);
 
   return (
     <div className={`min-h-screen bg-(--background) text-(--foreground) font-sans ${activeTheme ? 'theme-active' : ''}`}>
@@ -300,9 +314,9 @@ export default function SettingsPage() {
             <div>
               <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
                 <Settings className="text-(--theme-primary) opacity-40" size={28} />
-                Environment Settings
+                {t.environment_settings}
               </h1>
-              <p className="notion-text-subtle text-sm mt-1">Manage storage vaults, AI models, and account configuration.</p>
+              <p className="notion-text-subtle text-sm mt-1">{t.settings_desc}</p>
             </div>
           </div>
           <button
@@ -311,7 +325,7 @@ export default function SettingsPage() {
             className="flex items-center gap-2 px-6 py-3 bg-(--theme-primary) text-white rounded-2xl hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-(--theme-primary)/10 text-sm font-bold"
           >
             {saving ? <RotateCcw className="animate-spin" size={18} /> : <Save size={18} />}
-            SAVE CONFIGURATION
+            {saving ? t.saving : t.save_config}
           </button>
         </header>
 
@@ -333,7 +347,7 @@ export default function SettingsPage() {
           <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm">
             <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
               <Server size={22} className="text-(--theme-primary) opacity-40" />
-              Storage Identity
+              {t.storage_identity}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <button
@@ -347,8 +361,8 @@ export default function SettingsPage() {
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'local' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
                   <Database size={24} />
                 </div>
-                <span className="font-black text-sm uppercase tracking-widest">Local Vaults</span>
-                <span className="text-xs notion-text-subtle mt-2 leading-relaxed opacity-70">Highly private, file-based storage. Perfect for offline work and independent projects.</span>
+                <span className="font-black text-sm uppercase tracking-widest">{t.local_vaults}</span>
+                <span className="text-xs notion-text-subtle mt-2 leading-relaxed opacity-70">{t.local_vault_desc}</span>
               </button>
               <button
                 onClick={() => setConfig({ ...config, STORAGE_MODE: 'server' })}
@@ -361,8 +375,8 @@ export default function SettingsPage() {
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'server' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
                   <Cloud size={24} />
                 </div>
-                <span className="font-black text-sm uppercase tracking-widest">Remote Sync</span>
-                <span className="text-xs notion-text-subtle mt-2 leading-relaxed opacity-70">Cloud-based SQL connection. Access your development logs across all devices instantly.</span>
+                <span className="font-black text-sm uppercase tracking-widest">{t.remote_sync}</span>
+                <span className="text-xs notion-text-subtle mt-2 leading-relaxed opacity-70">{t.remote_sync_desc}</span>
               </button>
             </div>
           </section>
@@ -373,9 +387,9 @@ export default function SettingsPage() {
               <div className="absolute top-0 left-0 w-1 h-full bg-(--theme-primary)"></div>
               <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
                 <LayoutGrid size={22} className="text-(--theme-primary) opacity-40" />
-                Vault Management
+                {t.vault_management}
               </h2>
-              <VaultManager onVaultSwitch={fetchSettings} />
+              <VaultManager appLang={config.APP_LANG} onVaultSwitch={fetchSettings} />
             </section>
           )}
 
@@ -383,11 +397,11 @@ export default function SettingsPage() {
             <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm animate-fade-in">
               <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
                 <Database size={22} className="text-(--theme-primary) opacity-40" />
-                SQL Connection URL
+                {t.sql_connection}
               </h2>
               <div className="space-y-5">
                 <p className="text-sm notion-text-subtle leading-relaxed">
-                  Provide your PostgreSQL, MySQL or SQLite connection string.
+                  {t.sql_connection}
                 </p>
                 <input
                   type="text"
@@ -405,10 +419,10 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-xl font-bold flex items-center gap-3">
                 <ShieldCheck size={22} className="text-(--theme-primary) opacity-40" />
-                Intelligence Layer
+                {t.intelligence_layer}
               </h2>
               <div className="text-[9px] bg-neutral-100 text-neutral-400 px-3 py-1 rounded-full font-black uppercase tracking-widest">
-                API Configuration
+                {t.api_config}
               </div>
             </div>
             <div className="space-y-10">
@@ -429,8 +443,31 @@ export default function SettingsPage() {
                   }`}
                 >
                   <Server size={16} />
-                  OLLAMA (LOCAL)
+                  {t.ollama_local}
                 </button>
+              </div>
+
+              {/* Section: Language */}
+              <div className="space-y-4 pt-4 border-t border-neutral-100">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">{t.language}</label>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setConfig({ ...config, APP_LANG: 'en' })}
+                    className={`flex-1 py-3 rounded-xl text-xs font-black transition-all border-2 ${
+                      config.APP_LANG === 'en' ? 'border-(--theme-primary) bg-(--theme-primary-bg) text-(--theme-primary)' : 'border-neutral-100 bg-white text-neutral-400 hover:border-neutral-200'
+                    }`}
+                  >
+                    {t.english}
+                  </button>
+                  <button
+                    onClick={() => setConfig({ ...config, APP_LANG: 'ja' })}
+                    className={`flex-1 py-3 rounded-xl text-xs font-black transition-all border-2 ${
+                      config.APP_LANG === 'ja' ? 'border-(--theme-primary) bg-(--theme-primary-bg) text-(--theme-primary)' : 'border-neutral-100 bg-white text-neutral-400 hover:border-neutral-200'
+                    }`}
+                  >
+                    {t.japanese}
+                  </button>
+                </div>
               </div>
 
               {config.AI_PROVIDER === 'openai' ? (
@@ -452,7 +489,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Target Model</label>
+                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">{t.target_model}</label>
                     <div className="relative">
                       <select
                         value={config.AI_MODEL}
@@ -483,14 +520,14 @@ export default function SettingsPage() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1 flex items-center justify-between">
-                      Active Model
+                      {t.active_model}
                       <button 
                         onClick={fetchOllamaModels}
                         disabled={fetchingModels}
                         className="text-[9px] text-(--theme-primary) hover:underline flex items-center gap-1.5"
                       >
                         <RefreshCw size={10} className={fetchingModels ? 'animate-spin' : ''} />
-                        REFRESH MODELS
+                        {t.refresh_models}
                       </button>
                     </label>
                     <div className="relative">
@@ -530,7 +567,7 @@ export default function SettingsPage() {
               <div className="flex items-start gap-3 p-4 bg-(--theme-warning-bg) border border-(--theme-warning)/10 rounded-2xl text-(--theme-warning) text-xs">
                 <AlertTriangle size={18} className="shrink-0" />
                 <span className="font-bold leading-relaxed">
-                   CRITICAL: Server restart required after key changes. Never share API keys in screenshots or logs.
+                   {t.restart_required}
                 </span>
               </div>
             </div>

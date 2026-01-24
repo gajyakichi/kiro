@@ -7,8 +7,8 @@
   },
   {
     "id": "yhyz7z8",
-    "name": "Test",
-    "path": "/Document/",
+    "name": "Test (Invalid Path Fixed)",
+    "path": "./vault",
     "active": true
   }
 ]
