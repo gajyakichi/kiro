@@ -6,17 +6,37 @@ const ENV_FILE = path.join(process.cwd(), ".env");
 
 export async function GET() {
   try {
-    return NextResponse.json({
-      STORAGE_MODE: process.env.STORAGE_MODE || "local",
-      DATABASE_URL: process.env.DATABASE_URL || "file:./prisma.db",
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY || "",
-      AI_MODEL: process.env.AI_MODEL || "gpt-4o-mini",
-      AI_PROVIDER: process.env.AI_PROVIDER || "openai",
-      OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL || "http://localhost:11434",
-      VAULT_PATH: process.env.VAULT_PATH || "",
-      APP_LANG: process.env.APP_LANG || "en",
-      APP_ICON_SET: process.env.APP_ICON_SET || "lucide",
-    });
+    const currentSettings: Record<string, string> = {
+      STORAGE_MODE: "local",
+      DATABASE_URL: "file:./prisma.db",
+      OPENAI_API_KEY: "",
+      AI_MODEL: "gpt-4o-mini",
+      AI_PROVIDER: "openai",
+      OLLAMA_BASE_URL: "http://localhost:11434",
+      VAULT_PATH: "",
+      APP_LANG: "en",
+      APP_ICON_SET: "lucide",
+    };
+
+    try {
+      const envContent = await fs.readFile(ENV_FILE, "utf-8");
+      const lines = envContent.split("\n");
+      for (const line of lines) {
+        if (!line || line.startsWith("#")) continue;
+        const [key, ...rest] = line.split("=");
+        if (key && rest.length > 0) {
+          let value = rest.join("=").trim();
+          // Remove wrapping quotes if present
+          if (value.startsWith('"') && value.endsWith('"')) value = value.substring(1, value.length - 1);
+          if (value.startsWith("'") && value.endsWith("'")) value = value.substring(1, value.length - 1);
+          currentSettings[key.trim()] = value;
+        }
+      }
+    } catch {
+      // Use defaults if file missing
+    }
+
+    return NextResponse.json(currentSettings);
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

@@ -100,7 +100,7 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
           <button 
             onClick={() => onToggle(null)}
             onMouseEnter={() => onPreview("")}
-            className={`group flex items-center gap-4 px-6 py-4 rounded-xl border-2 transition-all duration-300 ease-out bg-white hover:-translate-y-2 hover:shadow-2xl active:scale-95 ${!activeTheme ? 'border-foreground shadow-lg shadow-gray-100' : 'border-gray-100 hover:border-gray-200 opacity-60 hover:opacity-100'}`}
+            className={`group flex items-center gap-4 px-6 py-4 rounded-xl border-2 transition-all duration-300 ease-out bg-white hover:-translate-y-3 hover:shadow-2xl hover:z-20 active:scale-95 relative ${!activeTheme ? 'border-foreground shadow-lg shadow-gray-100' : 'border-gray-100 hover:border-gray-200 opacity-60 hover:opacity-100'}`}
           >
             <div className={`w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform ${!activeTheme ? 'text-foreground' : ''}`}>
               {!activeTheme ? <CheckCircle size={20} weight="fill" className="text-foreground" /> : <Circle size={20} />}
@@ -117,7 +117,7 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
               onClick={() => onToggle(theme)}
               onMouseEnter={() => onPreview(theme.css)}
               onMouseLeave={() => onPreview("")}
-              className={`group flex items-center gap-4 px-6 py-4 rounded-xl border-2 transition-all duration-300 ease-out bg-white hover:-translate-y-2 hover:shadow-2xl active:scale-95 ${theme.active ? 'border-foreground shadow-lg shadow-gray-100' : 'border-gray-100 hover:border-gray-200 opacity-60 hover:opacity-100'}`}
+              className={`group flex items-center gap-4 px-6 py-4 rounded-xl border-2 transition-all duration-300 ease-out bg-white hover:-translate-y-3 hover:shadow-2xl hover:z-20 active:scale-95 relative ${theme.active ? 'border-foreground shadow-lg shadow-gray-100' : 'border-gray-100 hover:border-gray-200 opacity-60 hover:opacity-100'}`}
             >
               <div className={`w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform ${theme.active ? 'text-foreground' : ''}`}>
                 {theme.active ? <CheckCircle size={20} weight="fill" className="text-foreground" /> : <Circle size={20} />}
