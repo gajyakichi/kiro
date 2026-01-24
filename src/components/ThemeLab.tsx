@@ -77,15 +77,21 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
           <div className="flex bg-white p-1.5 rounded-xl border border-neutral-200 gap-1">
              <button 
                 onClick={() => onUpdateIconSet('lucide')}
-                className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${appIconSet === 'lucide' ? 'bg-foreground text-background shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
+                className={`flex-1 px-4 py-2 rounded-lg text-[10px] font-black transition-all duration-200 active:scale-90 ${appIconSet === 'lucide' ? 'bg-foreground text-background shadow-lg shadow-neutral-200 ring-2 ring-foreground/10' : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'}`}
              >
                 LUCIDE
              </button>
              <button 
                 onClick={() => onUpdateIconSet('phosphor')}
-                className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${appIconSet === 'phosphor' ? 'bg-foreground text-background shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
+                className={`flex-1 px-4 py-2 rounded-lg text-[10px] font-black transition-all duration-200 active:scale-90 ${appIconSet === 'phosphor' ? 'bg-foreground text-background shadow-lg shadow-neutral-200 ring-2 ring-foreground/10' : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'}`}
              >
                 PHOSPHOR
+             </button>
+             <button 
+                onClick={() => onUpdateIconSet('original')}
+                className={`flex-1 px-4 py-2 rounded-lg text-[10px] font-black transition-all duration-200 active:scale-90 ${appIconSet === 'original' ? 'bg-foreground text-background shadow-lg shadow-neutral-200 ring-2 ring-foreground/10' : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'}`}
+             >
+                ORIGINAL
              </button>
           </div>
         </div>
@@ -94,7 +100,7 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
           <button 
             onClick={() => onToggle(null)}
             onMouseEnter={() => onPreview("")}
-            className={`group flex items-center gap-4 px-6 py-4 rounded-xl border-2 transition-all duration-300 bg-white ${!activeTheme ? 'border-foreground shadow-lg shadow-gray-100' : 'border-gray-100 hover:border-gray-200 opacity-60 hover:opacity-100'}`}
+            className={`group flex items-center gap-4 px-6 py-4 rounded-xl border-2 transition-all duration-300 ease-out bg-white hover:-translate-y-2 hover:shadow-2xl active:scale-95 ${!activeTheme ? 'border-foreground shadow-lg shadow-gray-100' : 'border-gray-100 hover:border-gray-200 opacity-60 hover:opacity-100'}`}
           >
             <div className={`w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform ${!activeTheme ? 'text-foreground' : ''}`}>
               {!activeTheme ? <CheckCircle size={20} weight="fill" className="text-foreground" /> : <Circle size={20} />}
@@ -111,7 +117,7 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
               onClick={() => onToggle(theme)}
               onMouseEnter={() => onPreview(theme.css)}
               onMouseLeave={() => onPreview("")}
-              className={`group flex items-center gap-4 px-6 py-4 rounded-xl border-2 transition-all duration-300 bg-white ${theme.active ? 'border-foreground shadow-lg shadow-gray-100' : 'border-gray-100 hover:border-gray-200 opacity-60 hover:opacity-100'}`}
+              className={`group flex items-center gap-4 px-6 py-4 rounded-xl border-2 transition-all duration-300 ease-out bg-white hover:-translate-y-2 hover:shadow-2xl active:scale-95 ${theme.active ? 'border-foreground shadow-lg shadow-gray-100' : 'border-gray-100 hover:border-gray-200 opacity-60 hover:opacity-100'}`}
             >
               <div className={`w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform ${theme.active ? 'text-foreground' : ''}`}>
                 {theme.active ? <CheckCircle size={20} weight="fill" className="text-foreground" /> : <Circle size={20} />}

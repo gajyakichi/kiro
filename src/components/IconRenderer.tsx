@@ -12,6 +12,11 @@ interface IconRendererProps {
 export const IconRenderer: React.FC<IconRendererProps> = ({ icon, className, size = 16, baseSet }) => {
   if (!icon) return null;
 
+  // If explicitly set to original, skip library mapping
+  if (baseSet === 'original') {
+     return <span className={className} style={{ fontSize: `${size}px` }}>{icon}</span>;
+  }
+
   if (icon.startsWith('lucide:')) {
     const iconName = icon.replace('lucide:', '') as keyof typeof LucideIcons;
     const IconComponent = LucideIcons[iconName] as React.ElementType;

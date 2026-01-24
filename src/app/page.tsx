@@ -275,18 +275,29 @@ export default function Home() {
     setIsAbsorbing(false);
   };
 
-  const handleUpdateSettings = async (newSettings: any) => {
+  const handleUpdateSettings = async (newSettings: Partial<Record<string, string>>) => {
+    // Optimistic state updates
+    if (newSettings.APP_LANG) setAppLang(newSettings.APP_LANG);
+    if (newSettings.APP_ICON_SET) setAppIconSet(newSettings.APP_ICON_SET);
+    
+    const nextSettings = { ...settings, ...newSettings };
+    const oldSettings = settings;
+    setSettings(nextSettings);
+
     try {
       const res = await fetch('/api/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...settings, ...newSettings })
+        body: JSON.stringify(nextSettings)
       });
-      if (res.ok) {
-        fetchSettings();
-      }
+      if (!res.ok) throw new Error("Failed to save settings");
+      fetchSettings(); // Refresh from server to sync
     } catch (e) {
       console.error("Settings Update Error:", e);
+      // Rollback on error
+      setSettings(oldSettings);
+      if (oldSettings?.APP_LANG) setAppLang(oldSettings.APP_LANG);
+      if (oldSettings?.APP_ICON_SET) setAppIconSet(oldSettings.APP_ICON_SET);
     }
   };
 
