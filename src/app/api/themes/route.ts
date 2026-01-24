@@ -33,11 +33,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { name, css } = await request.json();
+    const { name, css, iconSet } = await request.json();
     const theme = await db.theme.create({
       data: {
         name,
         css,
+        iconSet: iconSet || "lucide",
         active: false
       }
     });
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const { id, name, css, active } = await request.json();
+    const { id, name, css, iconSet, active } = await request.json();
     if (id === undefined) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
     // Handle "Reset to Original" (Deactivate all)
@@ -73,6 +74,7 @@ export async function PATCH(request: Request) {
       data: {
         name: name || undefined,
         css: css || undefined,
+        iconSet: iconSet || undefined,
         active: active ?? undefined
       }
     });

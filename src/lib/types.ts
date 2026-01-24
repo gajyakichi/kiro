@@ -36,6 +36,7 @@ export interface Theme {
   id: number;
   name: string;
   css: string;
+  iconSet?: string;
   active: boolean;
 }
 

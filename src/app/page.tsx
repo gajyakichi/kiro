@@ -43,6 +43,9 @@ export default function Home() {
   const [newWPath, setNewWPath] = useState("");
   const [isCreatingW, setIsCreatingW] = useState(false);
 
+  // Heatmap State
+  const [selectedHeatmapDate, setSelectedHeatmapDate] = useState<string | null>(null);
+
   const fetchSettings = useCallback(async () => {
     try {
       const res = await fetch('/api/settings');
@@ -222,7 +225,7 @@ export default function Home() {
           name: newWName,
           git_path: newWPath,
           artifact_path: newWPath, // Defaulting same as git_path for simplicity
-          icon: 'Folder'
+          icon: 'lucide:Folder'
         })
       });
       if (res.ok) {
@@ -268,12 +271,12 @@ export default function Home() {
     setIsAbsorbing(false);
   };
 
-  const handleSaveTheme = async (name: string, css: string) => {
+  const handleSaveTheme = async (name: string, css: string, iconSet?: string) => {
     try {
       const res = await fetch('/api/themes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, css })
+        body: JSON.stringify({ name, css, iconSet })
       });
       if (res.ok) {
         fetchThemes();
@@ -334,50 +337,134 @@ export default function Home() {
     );
   };
 
-  const renderFullCalendar = () => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const firstDay = new Date(year, month, 1).getDay();
-    const days = new Date(year, month + 1, 0).getDate();
+  const renderContributionGraph = () => {
+    // 1. Generate date range (last 52 weeks)
+    const today = new Date();
+    const startDate = new Date();
+    startDate.setDate(today.getDate() - 364); // One year ago
+    
+    // Adjust to starting the week
+    const firstDayOfWeek = startDate.getDay();
+    startDate.setDate(startDate.getDate() - firstDayOfWeek);
 
-    const aggregatedData: ( (DbLog & { dateObj: Date }) | (Comment & { dateObj: Date, type: string }) )[] = [
-      ...dbLogs.map(l => ({ ...l, dateObj: new Date(l.timestamp) })),
-      ...comments.map(c => ({ ...c, dateObj: new Date(c.timestamp), type: 'note' }))
+    const aggregatedData = [
+      ...dbLogs.map(l => ({ ...l, dateStr: new Date(l.timestamp).toISOString().split('T')[0] })),
+      ...comments.map(c => ({ ...c, dateStr: new Date(c.timestamp).toISOString().split('T')[0], type: 'note' }))
     ];
 
+    type ActivityEntry = (typeof aggregatedData)[0];
+    const activityMap = aggregatedData.reduce((acc: Record<string, ActivityEntry[]>, item) => {
+      if (!acc[item.dateStr]) acc[item.dateStr] = [];
+      acc[item.dateStr].push(item);
+      return acc;
+    }, {});
+
+    const getColor = (count: number) => {
+      if (count === 0) return 'bg-neutral-50 border border-neutral-100/50';
+      if (count <= 2) return 'bg-emerald-100 border border-emerald-200';
+      if (count <= 5) return 'bg-emerald-300 border border-emerald-400';
+      if (count <= 10) return 'bg-emerald-500 border border-emerald-600';
+      return 'bg-emerald-700 border border-emerald-800';
+    };
+
+    const weeks = [];
+    const current = new Date(startDate);
+
+    for (let i = 0; i < 53; i++) {
+      const days = [];
+      for (let j = 0; j < 7; j++) {
+        const dStr = current.toISOString().split('T')[0];
+        const dayData = activityMap[dStr] || [];
+        days.push({
+          date: new Date(current),
+          dateStr: dStr,
+          data: dayData
+        });
+        current.setDate(current.getDate() + 1);
+      }
+      weeks.push(days);
+    }
+
     return (
-      <div className="animate-fade-in">
-        <div className="flex justify-between items-center mb-8">
-           <h2 className="text-3xl font-bold accent-text">
-            {new Intl.DateTimeFormat(appLang, { month: 'long', year: 'numeric' }).format(currentDate)}
-           </h2>
-           <div className="flex gap-2">
-              <button className="notion-item px-3 py-1 bg-white notion-card text-xs font-medium" onClick={() => setCurrentDate(new Date(year, month - 1, 1))}>{t.prev}</button>
-              <button className="notion-item px-3 py-1 bg-white notion-card text-xs font-medium" onClick={() => setCurrentDate(new Date())}>{t.today}</button>
-              <button className="notion-item px-3 py-1 bg-white notion-card text-xs font-medium" onClick={() => setCurrentDate(new Date(year, month + 1, 1))}>{t.next}</button>
-           </div>
-        </div>
-        <div className="grid grid-cols-7 border-t border-l border-gray-100">
-          {t.days_short.map(d => (
-            <div key={d} className="p-2 text-center text-xs notion-text-subtle font-semibold border-r border-b border-gray-100 bg-gray-50/50">{d}</div>
-          ))}
-          {Array(firstDay).fill(null).map((_, i) => <div key={`e-${i}`} className="border-r border-b border-gray-100 h-32 bg-gray-50/20" />)}
-          {Array.from({ length: days }, (_, i) => i + 1).map(day => {
-            const dayData = aggregatedData.filter(d => d.dateObj.getDate() === day && d.dateObj.getMonth() === month && d.dateObj.getFullYear() === year);
-            return (
-              <div key={day} className="border-r border-b border-gray-100 h-32 p-2 relative group hover:bg-gray-50/50 transition-colors">
-                <span className="text-xs font-semibold notion-text-subtle">{day}</span>
-                <div className="mt-2 space-y-1 overflow-hidden max-h-[85px]">
-                  {dayData.map((item, idx) => (
-                    <div key={`${'type' in item ? item.type : 'unknown'}-${'id' in item ? item.id : idx}`} className={`text-[10px] px-1 py-0.5 rounded truncate ${'type' in item && item.type === 'git' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-orange-50 text-orange-700 border border-orange-100'}`}>
-                      {'type' in item && item.type === 'git' ? t.commit : ''}{'content' in item ? item.content : 'text' in item ? item.text : ''}
-                    </div>
+      <div className="animate-fade-in space-y-8">
+        <div className="bg-white border border-(--border-color) p-8 rounded-3xl shadow-sm">
+          <div className="flex justify-between items-end mb-6">
+            <div>
+              <h2 className="text-2xl font-black tracking-tight">{t.system_calendar}</h2>
+              <p className="text-sm notion-text-subtle">{t.calendar_desc}</p>
+            </div>
+            <div className="flex items-center gap-4 text-[10px] font-bold text-neutral-400 uppercase tracking-widest bg-neutral-50 px-4 py-2 rounded-xl border border-neutral-100">
+              <span>{t.less}</span>
+              <div className="flex gap-1">
+                {[0, 2, 5, 10, 15].map(v => <div key={v} className={`w-3 h-3 rounded-sm ${getColor(v)}`} />)}
+              </div>
+              <span>{t.more}</span>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto pb-4 custom-scrollbar">
+            <div className="flex gap-1.5 min-w-max">
+              {weeks.map((week, wi) => (
+                <div key={wi} className="flex flex-col gap-1.5">
+                  {week.map((day, di) => (
+                    <button
+                      key={di}
+                      onClick={() => setSelectedHeatmapDate(day.dateStr)}
+                      title={t.activity_level.replace('{count}', day.data.length.toString()).replace('{date}', day.dateStr)}
+                      className={`w-4 h-4 rounded-sm transition-all hover:scale-125 hover:z-10 ${getColor(day.data.length)} ${selectedHeatmapDate === day.dateStr ? 'ring-2 ring-(--theme-primary) ring-offset-2' : ''}`}
+                    />
                   ))}
                 </div>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+          </div>
         </div>
+
+        {selectedHeatmapDate && (
+          <div className="bg-neutral-50/50 border border-(--border-color) rounded-3xl p-8 animate-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center justify-between mb-8">
+               <h3 className="text-xl font-bold flex items-center gap-3">
+                 <div className="w-2 h-8 bg-(--theme-primary) rounded-full" />
+                 {new Date(selectedHeatmapDate).toLocaleDateString(appLang, { dateStyle: 'full' })}
+               </h3>
+               <span className="text-xs font-black text-white bg-(--theme-primary) px-3 py-1 rounded-full uppercase tracking-tighter shadow-sm">
+                 {activityMap[selectedHeatmapDate]?.length || 0} {t.entry_marker}s
+               </span>
+            </div>
+            
+            <div className="space-y-4">
+              {(activityMap[selectedHeatmapDate] || []).map((entry, idx) => (
+                <div key={idx} className="bg-white p-5 rounded-2xl border border-(--border-color) shadow-xs flex gap-5 group hover:shadow-md transition-all">
+                   <div className="shrink-0 w-10 h-10 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center justify-center text-neutral-400 group-hover:bg-(--theme-primary-bg) group-hover:text-(--theme-primary) transition-colors">
+                      {'type' in entry && entry.type === 'git' ? <Code size={18} /> : <FileText size={18} />}
+                   </div>
+                   <div className="flex-1 min-w-0">
+                      <div className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1">
+                        {('type' in entry && entry.type === 'git') ? t.type_git : t.type_note}
+                      </div>
+                      <div className="text-[15px] font-medium leading-relaxed">
+                        {'content' in entry ? entry.content : 'text' in entry ? entry.text : ''}
+                      </div>
+                      {('metadata' in entry && entry.metadata) && (
+                        <div className="mt-3 flex items-center gap-2 text-[10px] font-mono text-neutral-400">
+                          <span className="bg-neutral-100 px-1.5 py-0.5 rounded uppercase tracking-tighter">
+                            {JSON.parse(entry.metadata as string).hash?.substring(0, 7) || '---'}
+                          </span>
+                          <span>•</span>
+                          <span>{JSON.parse(entry.metadata as string).author || t.unknown_author}</span>
+                        </div>
+                      )}
+                   </div>
+                </div>
+              ))}
+              {(activityMap[selectedHeatmapDate]?.length === 0) && (
+                <div className="py-12 text-center">
+                  <p className="text-sm text-neutral-400 italic">{t.no_activity}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -486,7 +573,7 @@ export default function Home() {
                 </select>
                 <div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
                     {activeProject ? (
-                        <IconRenderer icon={activeProject.icon} size={14} className="opacity-70" />
+                        <IconRenderer icon={activeProject.icon} size={14} className="opacity-70" baseSet={themes.find(t => t.active)?.iconSet} />
                     ) : (
                         <span className="text-xs opacity-40">◦</span>
                     )}
@@ -632,7 +719,7 @@ export default function Home() {
                 className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-gray-100 cursor-pointer transition-colors border border-transparent hover:border-gray-200"
               >
                 {activeProject?.icon ? (
-                    <IconRenderer icon={activeProject.icon} size={32} />
+                    <IconRenderer icon={activeProject.icon} size={32} baseSet={themes.find(t => t.active)?.iconSet} />
                 ) : (
                     <span className="text-2xl opacity-20">◦</span>
                 )}
@@ -720,7 +807,7 @@ export default function Home() {
             </div>
           )}
 
-          {activeTab === "calendar" && renderFullCalendar()}
+          {activeTab === "calendar" && renderContributionGraph()}
 
           {activeTab === "daily_notes" && (
             <div className="animate-fade-in">

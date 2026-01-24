@@ -42,6 +42,7 @@ model Theme {
   id        Int      @id @default(autoincrement())
   name      String
   css       String
+  iconSet   String   @default("lucide")
   active    Boolean  @default(false)
   timestamp DateTime @default(now())
 }

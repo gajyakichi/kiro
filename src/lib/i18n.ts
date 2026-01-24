@@ -120,6 +120,9 @@ const translations = {
     commit: "Commit: ",
     days_short: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     months_full: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    less: "Less",
+    more: "More",
+    activity_level: "{count} contributions on {date}",
   },
   ja: {
     // Sidebar
@@ -240,6 +243,9 @@ const translations = {
     commit: "コミット: ",
     days_short: ["日", "月", "火", "水", "木", "金", "土"],
     months_full: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+    less: "少なめ",
+    more: "多め",
+    activity_level: "{date}: {count} 件のアクティビティ",
   }
 };
 
