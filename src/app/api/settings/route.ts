@@ -15,6 +15,7 @@ export async function GET() {
       OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL || "http://localhost:11434",
       VAULT_PATH: process.env.VAULT_PATH || "",
       APP_LANG: process.env.APP_LANG || "en",
+      APP_ICON_SET: process.env.APP_ICON_SET || "lucide",
     });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
@@ -23,7 +24,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { STORAGE_MODE, DATABASE_URL, OPENAI_API_KEY, AI_MODEL, VAULT_PATH, AI_PROVIDER, OLLAMA_BASE_URL, APP_LANG } = await request.json();
+    const { STORAGE_MODE, DATABASE_URL, OPENAI_API_KEY, AI_MODEL, VAULT_PATH, AI_PROVIDER, OLLAMA_BASE_URL, APP_LANG, APP_ICON_SET } = await request.json();
     
     // Read current .env
     let envContent = "";
@@ -62,6 +63,9 @@ export async function POST(request: Request) {
       } else if (line.startsWith("APP_LANG=")) {
         newLines.push(`APP_LANG="${APP_LANG}"`);
         keysHandled.add("APP_LANG");
+      } else if (line.startsWith("APP_ICON_SET=")) {
+        newLines.push(`APP_ICON_SET="${APP_ICON_SET}"`);
+        keysHandled.add("APP_ICON_SET");
       } else {
         newLines.push(line);
       }
@@ -90,6 +94,9 @@ export async function POST(request: Request) {
     }
     if (!keysHandled.has("APP_LANG")) {
       newLines.push(`APP_LANG="${APP_LANG}"`);
+    }
+    if (!keysHandled.has("APP_ICON_SET")) {
+      newLines.push(`APP_ICON_SET="${APP_ICON_SET}"`);
     }
 
     await fs.writeFile(ENV_FILE, newLines.join("\n"));

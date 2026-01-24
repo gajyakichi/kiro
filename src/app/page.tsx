@@ -36,6 +36,8 @@ export default function Home() {
   const [vaults, setVaults] = useState<Vault[]>([]);
   const [isVaultLoading, setIsVaultLoading] = useState(true);
   const [appLang, setAppLang] = useState("en");
+  const [appIconSet, setAppIconSet] = useState("lucide");
+  const [settings, setSettings] = useState<any>(null); // To store full settings object if needed
 
   // New Workspace State
   const [isAddingWorkspace, setIsAddingWorkspace] = useState(false);
@@ -50,7 +52,9 @@ export default function Home() {
     try {
       const res = await fetch('/api/settings');
       const data = await res.json();
+      setSettings(data);
       if (data.APP_LANG) setAppLang(data.APP_LANG);
+      if (data.APP_ICON_SET) setAppIconSet(data.APP_ICON_SET);
     } catch (e) {
       console.error("Settings Fetch Error:", e);
     }
@@ -271,12 +275,27 @@ export default function Home() {
     setIsAbsorbing(false);
   };
 
-  const handleSaveTheme = async (name: string, css: string, iconSet?: string) => {
+  const handleUpdateSettings = async (newSettings: any) => {
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...settings, ...newSettings })
+      });
+      if (res.ok) {
+        fetchSettings();
+      }
+    } catch (e) {
+      console.error("Settings Update Error:", e);
+    }
+  };
+
+  const handleSaveTheme = async (name: string, css: string) => {
     try {
       const res = await fetch('/api/themes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, css, iconSet })
+        body: JSON.stringify({ name, css })
       });
       if (res.ok) {
         fetchThemes();
@@ -573,7 +592,7 @@ export default function Home() {
                 </select>
                 <div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
                     {activeProject ? (
-                        <IconRenderer icon={activeProject.icon} size={14} className="opacity-70" baseSet={themes.find(t => t.active)?.iconSet} />
+                        <IconRenderer icon={activeProject.icon} size={14} className="opacity-70" baseSet={appIconSet} />
                     ) : (
                         <span className="text-xs opacity-40">◦</span>
                     )}
@@ -719,7 +738,7 @@ export default function Home() {
                 className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-gray-100 cursor-pointer transition-colors border border-transparent hover:border-gray-200"
               >
                 {activeProject?.icon ? (
-                    <IconRenderer icon={activeProject.icon} size={32} baseSet={themes.find(t => t.active)?.iconSet} />
+                    <IconRenderer icon={activeProject.icon} size={32} baseSet={appIconSet} />
                 ) : (
                     <span className="text-2xl opacity-20">◦</span>
                 )}
@@ -947,6 +966,8 @@ export default function Home() {
               onDelete={handleDeleteTheme}
               onToggle={(theme) => handleSelectTheme(theme ? theme.id : -1)}
               onPreview={setPreviewCss}
+              appIconSet={appIconSet}
+              onUpdateIconSet={(set) => handleUpdateSettings({ APP_ICON_SET: set })}
             />
           )}
         </section>

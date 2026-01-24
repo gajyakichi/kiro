@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
 import { Theme } from '@/lib/types';
 import { MagicWand, Trash, Palette, Play, CheckCircle, Circle } from '@phosphor-icons/react';
+import { IconRenderer } from './IconRenderer';
 
 interface ThemeLabProps {
   themes: Theme[];
-  onSave: (name: string, css: string, iconSet?: string) => Promise<void>;
+  onSave: (name: string, css: string) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
   onToggle: (theme: Theme | null) => Promise<void>;
   onPreview: (css: string) => void;
+  appIconSet: string;
+  onUpdateIconSet: (set: string) => void;
 }
 
-export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, onToggle, onPreview }) => {
+export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, onToggle, onPreview, appIconSet, onUpdateIconSet }) => {
   const [newName, setNewName] = useState("");
   const [newCss, setNewCss] = useState("");
-  const [newIconSet, setNewIconSet] = useState("lucide");
   const [isAdding, setIsAdding] = useState(false);
   const activeTheme = themes.find(t => t.active) || null;
 
   const handleSave = async () => {
     if (!newName || !newCss) return;
-    await onSave(newName, newCss, newIconSet);
+    await onSave(newName, newCss);
     setNewName("");
     setNewCss("");
     setIsAdding(false);
@@ -60,6 +62,33 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
           <Palette size={24} className="text-gray-400" weight="bold" />
           <h2 className="text-xl font-bold tracking-tight text-gray-800 uppercase">Theme Selector</h2>
         </div>
+
+        {/* Global Icon Settings Row */}
+        <div className="mb-8 p-6 bg-neutral-50 rounded-2xl border border-neutral-100 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+             <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                <IconRenderer icon="lucide:Settings" size={20} className="text-neutral-400" baseSet={appIconSet} />
+             </div>
+             <div>
+                <p className="text-sm font-bold">Global Icon Set</p>
+                <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest">Selected Style applies to all themes</p>
+             </div>
+          </div>
+          <div className="flex bg-white p-1.5 rounded-xl border border-neutral-200 gap-1">
+             <button 
+                onClick={() => onUpdateIconSet('lucide')}
+                className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${appIconSet === 'lucide' ? 'bg-foreground text-background shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
+             >
+                LUCIDE
+             </button>
+             <button 
+                onClick={() => onUpdateIconSet('phosphor')}
+                className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${appIconSet === 'phosphor' ? 'bg-foreground text-background shadow-md' : 'text-neutral-400 hover:text-neutral-600'}`}
+             >
+                PHOSPHOR
+             </button>
+          </div>
+        </div>
         
         <div className="flex flex-wrap gap-4">
           <button 
@@ -72,7 +101,7 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
             </div>
             <div className="text-left">
               <div className="font-bold text-sm">Original</div>
-              <div className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Default System • Lucide Set</div>
+              <div className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Default System</div>
             </div>
           </button>
 
@@ -94,7 +123,7 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
                      <Trash size={14} />
                    </span>
                  </div>
-                 <div className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Custom Style • {theme.iconSet || 'Lucide'} Set</div>
+                 <div className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Custom Style</div>
               </div>
             </button>
           ))}
@@ -124,27 +153,14 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
                  <span className="font-bold">Laboratory</span>
               </div>
               
-              <div className="flex gap-4">
-                <div className="flex-1 space-y-1.5">
-                  <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">Theme Name</label>
-                  <input 
-                    className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 ring-gray-900 outline-none transition-all shadow-sm"
-                    placeholder="e.g. Cyberpunk"
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                  />
-                </div>
-                <div className="w-1/3 space-y-1.5">
-                  <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">Icon Set</label>
-                  <select 
-                    className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 ring-gray-900 outline-none transition-all shadow-sm bg-white"
-                    value={newIconSet}
-                    onChange={(e) => setNewIconSet(e.target.value)}
-                  >
-                    <option value="lucide">Lucide (Default)</option>
-                    <option value="phosphor">Phosphor (Soft)</option>
-                  </select>
-                </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">Theme Name</label>
+                <input 
+                  className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 ring-gray-900 outline-none transition-all shadow-sm"
+                  placeholder="e.g. Cyberpunk"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                />
               </div>
 
               <div className="space-y-1.5">
@@ -167,7 +183,6 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
                     onClick={() => { 
                       setNewName(preset.name); 
                       setNewCss(preset.css); 
-                      setNewIconSet(preset.iconSet);
                       onPreview(preset.css); 
                     }}
                     className="text-[10px] bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full hover:bg-foreground hover:text-background font-bold transition-all"
