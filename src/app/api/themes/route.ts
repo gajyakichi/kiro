@@ -3,25 +3,44 @@ import db from "@/lib/db";
 
 export async function GET() {
   try {
-    let themes = await db.theme.findMany({
-      orderBy: { id: 'desc' }
-    });
+    interface RawTheme {
+      id: number;
+      name: string;
+      css: string;
+      iconSet: string;
+      active: number | boolean;
+      isPreset: number | boolean;
+      timestamp: Date | string;
+    }
+
+    // Force raw query to bypass potential Prisma Client staleness in dev mode
+    let themes: RawTheme[] = await db.$queryRaw`SELECT * FROM Theme ORDER BY id DESC`;
     
+    // Normalize boolean for SQLite (0/1 -> false/true)
+    themes = themes.map(t => ({
+      ...t,
+      active: !!t.active,
+      isPreset: !!t.isPreset
+    }));
+
     // Auto-seed if empty
     if (themes.length === 0) {
       const presets = [
-        { name: 'Darcula', css: 'body { background: #2b2b2b !important; color: #a9b7c6 !important; --background: #2b2b2b; --foreground: #a9b7c6; --theme-primary: #cc7832; --theme-primary-bg: rgba(204, 120, 50, 0.15); --border-color: rgba(255, 255, 255, 0.1); } .notion-sidebar { background: #3c3f41 !important; } .notion-card { background: #313335 !important; border: 1px solid #4e5052 !important; color: #a9b7c6 !important; } .notion-item:hover, .notion-item.active { background: #4e5254 !important; color: #cc7832 !important; } .notion-text-subtle { color: #808080 !important; } h1, h2, h3 { color: #cc7832 !important; } .accent-text { color: #cc7832 !important; }' },
-        { name: 'Monokai', css: 'body { background: #272822 !important; color: #f8f8f2 !important; --background: #272822; --foreground: #f8f8f2; --theme-primary: #ae81ff; --theme-primary-bg: rgba(174, 129, 255, 0.15); --border-color: rgba(255, 255, 255, 0.1); } .notion-sidebar { background: #1e1f1c !important; } .notion-card { background: #23241f !important; border: 1px solid #49483e !important; color: #f8f8f2 !important; } .notion-item:hover, .notion-item.active { background: #3e3d32 !important; color: #f92672 !important; } .notion-text-subtle { color: #88846f !important; } h1, h2, h3 { color: #ae81ff !important; } .accent-text { color: #a6e22e !important; }' },
-        { name: 'Nord', css: 'body { background: #2e3440 !important; color: #d8dee9 !important; --background: #2e3440; --foreground: #d8dee9; --theme-primary: #88c0d0; --theme-primary-bg: rgba(136, 192, 208, 0.15); --border-color: rgba(255, 255, 255, 0.1); } .notion-sidebar { background: #3b4252 !important; } .notion-card { background: #434c5e !important; border: 1px solid #4c566a !important; color: #eceff4 !important; } .notion-item:hover, .notion-item.active { background: #4c566a !important; color: #88c0d0 !important; } .notion-text-subtle { color: #616e88 !important; } h1, h2, h3 { color: #81a1c1 !important; } .accent-text { color: #88c0d0 !important; }' }
+        { name: 'Darcula', isPreset: true, css: 'body { background: #2b2b2b !important; color: #a9b7c6 !important; --background: #2b2b2b; --foreground: #a9b7c6; --theme-primary: #cc7832; --theme-primary-bg: rgba(204, 120, 50, 0.15); --border-color: rgba(255, 255, 255, 0.1); } .notion-sidebar { background: #3c3f41 !important; } .notion-card { background: #313335 !important; border: 1px solid #4e5052 !important; color: #a9b7c6 !important; } .notion-item:hover, .notion-item.active { background: #4e5254 !important; color: #cc7832 !important; } .notion-text-subtle { color: #808080 !important; } h1, h2, h3 { color: #cc7832 !important; } .accent-text { color: #cc7832 !important; }' },
+        { name: 'Monokai', isPreset: true, css: 'body { background: #272822 !important; color: #f8f8f2 !important; --background: #272822; --foreground: #f8f8f2; --theme-primary: #ae81ff; --theme-primary-bg: rgba(174, 129, 255, 0.15); --border-color: rgba(255, 255, 255, 0.1); } .notion-sidebar { background: #1e1f1c !important; } .notion-card { background: #23241f !important; border: 1px solid #49483e !important; color: #f8f8f2 !important; } .notion-item:hover, .notion-item.active { background: #3e3d32 !important; color: #f92672 !important; } .notion-text-subtle { color: #88846f !important; } h1, h2, h3 { color: #ae81ff !important; } .accent-text { color: #a6e22e !important; }' },
+        { name: 'Nord', isPreset: true, css: 'body { background: #2e3440 !important; color: #d8dee9 !important; --background: #2e3440; --foreground: #d8dee9; --theme-primary: #88c0d0; --theme-primary-bg: rgba(136, 192, 208, 0.15); --border-color: rgba(255, 255, 255, 0.1); } .notion-sidebar { background: #3b4252 !important; } .notion-card { background: #434c5e !important; border: 1px solid #4c566a !important; color: #eceff4 !important; } .notion-item:hover, .notion-item.active { background: #4c566a !important; color: #88c0d0 !important; } .notion-text-subtle { color: #616e88 !important; } h1, h2, h3 { color: #81a1c1 !important; } .accent-text { color: #88c0d0 !important; }' }
       ];
       
       await db.theme.createMany({
         data: presets.map(p => ({ ...p, active: false }))
       });
       
-      themes = await db.theme.findMany({
-        orderBy: { id: 'desc' }
-      });
+      themes = await db.$queryRaw`SELECT * FROM Theme ORDER BY id DESC`;
+      themes = themes.map(t => ({
+        ...t,
+        active: !!t.active,
+        isPreset: !!t.isPreset
+      }));
     }
 
     return NextResponse.json(themes);
@@ -33,13 +52,21 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { name, css, iconSet } = await request.json();
+    const { name, css, iconSet, active, isPreset } = await request.json();
+    
+    if (active) {
+      await db.theme.updateMany({
+        data: { active: false }
+      });
+    }
+
     const theme = await db.theme.create({
       data: {
         name,
         css,
         iconSet: iconSet || "lucide",
-        active: false
+        active: !!active,
+        isPreset: !!isPreset
       }
     });
     return NextResponse.json({ success: true, id: theme.id });

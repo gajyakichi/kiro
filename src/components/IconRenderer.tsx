@@ -43,14 +43,20 @@ export const IconRenderer: React.FC<IconRendererProps> = ({ icon, className, siz
 
   // If baseSet is provided and icon doesn't have prefix, try using baseSet
   if (baseSet === 'phosphor') {
-    const phosphorName = icon as keyof typeof PhosphorIcons;
-    const PhosphorIcon = PhosphorIcons[phosphorName] as React.ElementType;
+    let pName = cleanIcon.charAt(0).toUpperCase() + cleanIcon.slice(1);
+    // Common mappings
+    if (pName === 'Settings') pName = 'Gear';
+    if (pName === 'SquarePen') pName = 'NotePencil';
+    if (pName === 'Calendar') pName = 'CalendarText';
+    if (pName === 'CheckSquare') pName = 'CheckSquareOffset';
+
+    const PhosphorIcon = (PhosphorIcons as unknown as Record<string, React.ElementType>)[pName];
     if (PhosphorIcon) return <PhosphorIcon className={className} size={size} />;
   }
 
   // Default fallback for icons without prefix - try Lucide first or if baseSet is lucide
-  const lucideName = icon as keyof typeof LucideIcons;
-  const PotentialLucide = LucideIcons[lucideName] as React.ElementType;
+  const lName = cleanIcon.charAt(0).toUpperCase() + cleanIcon.slice(1);
+  const PotentialLucide = (LucideIcons as unknown as Record<string, React.ElementType>)[lName];
   if (PotentialLucide) return <PotentialLucide className={className} size={size} />;
 
   // Final Fallback as emoji or raw text

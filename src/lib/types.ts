@@ -38,6 +38,7 @@ export interface Theme {
   css: string;
   iconSet?: string;
   active: boolean;
+  isPreset?: boolean;
 }
 
 export interface Progress {

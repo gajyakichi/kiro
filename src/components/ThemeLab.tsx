@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Theme } from '@/lib/types';
-import { MagicWand, Trash, Palette, Play, CheckCircle, Circle } from '@phosphor-icons/react';
+import { MagicWand, Trash, Palette, CheckCircle, Circle, Folder, Clock } from '@phosphor-icons/react';
 import { IconRenderer } from './IconRenderer';
 
 interface ThemeLabProps {
   themes: Theme[];
-  onSave: (name: string, css: string) => Promise<void>;
+  onSave: (name: string, css: string, active?: boolean, isPreset?: boolean) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
   onToggle: (theme: Theme | null) => Promise<void>;
   onPreview: (css: string) => void;
@@ -16,8 +16,16 @@ interface ThemeLabProps {
 export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, onToggle, onPreview, appIconSet, onUpdateIconSet }) => {
   const [newName, setNewName] = useState("");
   const [newCss, setNewCss] = useState("");
+  const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const activeTheme = themes.find(t => t.active) || null;
+
+  const handleSelectForEdit = (preset: (typeof PRESET_THEMES)[0]) => {
+    setNewName(preset.name);
+    setNewCss(preset.css);
+    setEditingTheme({ id: -1, name: preset.name, css: preset.css, active: false, isPreset: true });
+    onPreview(preset.css);
+  };
 
   const handleSave = async () => {
     if (!newName || !newCss) return;
@@ -25,32 +33,120 @@ export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, on
     setNewName("");
     setNewCss("");
     setIsAdding(false);
+    setEditingTheme(null);
+  };
+
+  const handleQuickAdd = async (preset: { name: string, css: string, isPreset?: boolean }) => {
+    const existing = themes.find(t => t.name === preset.name);
+    if (existing) {
+      await onToggle(existing);
+    } else {
+      await onSave(preset.name, preset.css, true, preset.isPreset);
+    }
   };
 
   const PRESET_THEMES = [
     {
+      name: "Nord",
+      isPreset: true,
+      css: `body { background: #2e3440 !important; color: #d8dee9 !important; --background: #2e3440; --foreground: #d8dee9; --theme-primary: #88c0d0; --theme-primary-bg: rgba(136, 192, 208, 0.15); --border-color: rgba(255, 255, 255, 0.1); } .notion-sidebar { background: #3b4252 !important; } .notion-card { background: #434c5e !important; border: 1px solid #4c566a !important; color: #eceff4 !important; } .notion-item:hover, .notion-item.active { background: #4c566a !important; color: #88c0d0 !important; } .notion-text-subtle { color: #616e88 !important; } h1, h2, h3 { color: #81a1c1 !important; } .accent-text { color: #88c0d0 !important; }`
+    },
+    {
+      name: "Monokai",
+      isPreset: true,
+      css: `body { background: #272822 !important; color: #f8f8f2 !important; --background: #272822; --foreground: #f8f8f2; --theme-primary: #ae81ff; --theme-primary-bg: rgba(174, 129, 255, 0.15); --border-color: rgba(255, 255, 255, 0.1); } .notion-sidebar { background: #1e1f1c !important; } .notion-card { background: #23241f !important; border: 1px solid #49483e !important; color: #f8f8f2 !important; } .notion-item:hover, .notion-item.active { background: #3e3d32 !important; color: #f92672 !important; } .notion-text-subtle { color: #88846f !important; } h1, h2, h3 { color: #ae81ff !important; } .accent-text { color: #a6e22e !important; }`
+    },
+    {
+      name: "OneMonokai",
+      isPreset: true,
+      css: `body { background: #272822 !important; color: #f8f8f2 !important; font-weight: 450; }
+.notion-sidebar { background: #1e1f1c !important; }
+.notion-card { background: #272822 !important; border: 1px solid #49483e !important; color: #f8f8f2 !important; }
+.notion-item:hover, .notion-item.active { background: #49483e !important; color: #f92672 !important; }
+h1, h2, h3 { color: #f92672 !important; }
+.accent-text { color: #ae81ff !important; }
+:root { --theme-primary: #f92672; --theme-primary-bg: rgba(249, 38, 114, 0.15); --theme-accent: #a6e22e; --theme-accent-bg: rgba(166, 226, 46, 0.2); }`
+    },
+    {
+      name: "Atom Material",
+      isPreset: true,
+      css: `body { background: #263238 !important; color: #eeffff !important; font-weight: 450; }
+.notion-sidebar { background: #21282d !important; }
+.notion-card { background: #263238 !important; border: 1px solid #37474f !important; color: #eeffff !important; }
+.notion-item:hover, .notion-item.active { background: #37474f !important; color: #82aaff !important; }
+h1, h2, h3 { color: #82aaff !important; }
+.accent-text { color: #c792ea !important; }
+:root { --theme-primary: #82aaff; --theme-primary-bg: rgba(130, 170, 255, 0.15); --theme-accent: #c3e88d; --theme-accent-bg: rgba(195, 232, 141, 0.2); }`
+    },
+    {
+      name: "Rain Syntax",
+      isPreset: true,
+      css: `body { background: #1c1f2b !important; color: #efefef !important; font-weight: 450; }
+.notion-sidebar { background: #161922 !important; }
+.notion-card { background: #232734 !important; border: 1px solid #2d3345 !important; }
+.notion-item:hover, .notion-item.active { background: #2d3345 !important; color: #94bfff !important; }
+h1, h2, h3 { color: #94bfff !important; }
+:root { --theme-primary: #94bfff; --theme-primary-bg: rgba(148, 191, 255, 0.1); --theme-accent: #78e1c1; }`
+    },
+    {
+      name: "Futurism",
+      isPreset: true,
+      css: `body { background: #080b12 !important; color: #c9d1d9 !important; font-weight: 450; }
+.notion-sidebar { background: #010409 !important; border-right: 1px solid #30363d !important; }
+.notion-card { background: #0d1117 !important; border: 1px solid #30363d !important; }
+.notion-item:hover, .notion-item.active { background: #161b22 !important; color: #58a6ff !important; }
+h1, h2, h3 { color: #58a6ff !important; }
+:root { --theme-primary: #58a6ff; --theme-primary-bg: rgba(88, 166, 255, 0.1); --theme-accent: #3fb950; }`
+    },
+    {
+      name: "Pumpkin",
+      isPreset: true,
+      css: `body { background: #1b1811 !important; color: #ffb088 !important; font-weight: 450; }
+.notion-sidebar { background: #14110b !important; }
+.notion-card { background: #241f16 !important; border: 1px solid #3d3425 !important; }
+.notion-item:hover, .notion-item.active { background: #3d3425 !important; color: #d2691e !important; }
+h1, h2, h3 { color: #d2691e !important; }
+:root { --theme-primary: #d2691e; --theme-primary-bg: rgba(210, 105, 30, 0.1); --theme-accent: #ffb088; }`
+    },
+    {
+      name: "Princess",
+      isPreset: true,
+      css: `body { background: #fff5f8 !important; color: #634e56 !important; font-weight: 450; }
+.notion-sidebar { background: #fde8ef !important; }
+.notion-card { background: #ffffff !important; border: 1px solid #f9dbe4 !important; }
+.notion-item:hover, .notion-item.active { background: #f9dbe4 !important; color: #ff85a2 !important; }
+h1, h2, h3 { color: #ff85a2 !important; }
+:root { --theme-primary: #ff85a2; --theme-primary-bg: rgba(255, 133, 162, 0.1); --theme-accent: #f06292; }`
+    },
+    {
+      name: "Solarized Light",
+      isPreset: true,
+      css: `body { background: #fdf6e3 !important; color: #657b83 !important; font-weight: 450; }
+.notion-sidebar { background: #eee8d5 !important; }
+.notion-card { background: #fdf6e3 !important; border: 1px solid #dcd3ba !important; }
+.notion-item:hover, .notion-item.active { background: #eee8d5 !important; color: #268bd2 !important; }
+h1, h2, h3 { color: #268bd2 !important; }
+:root { --theme-primary: #268bd2; --theme-primary-bg: rgba(38, 139, 210, 0.1); --theme-accent: #859900; }`
+    },
+    {
+      name: "Solarized Dark",
+      isPreset: true,
+      css: `body { background: #002b36 !important; color: #839496 !important; font-weight: 450; }
+.notion-sidebar { background: #073642 !important; }
+.notion-card { background: #002b36 !important; border: 1px solid #073642 !important; color: #839496 !important; }
+.notion-item:hover, .notion-item.active { background: #073642 !important; color: #268bd2 !important; }
+h1, h2, h3 { color: #268bd2 !important; }
+:root { --theme-primary: #268bd2; --theme-primary-bg: rgba(38, 139, 210, 0.1); --theme-accent: #859900; }`
+    },
+    {
       name: "Darcula",
-      iconSet: "lucide",
+      isPreset: true,
       css: `body { background: #2b2b2b !important; color: #a9b7c6 !important; font-weight: 450; }
 .notion-sidebar { background: #3c3f41 !important; border-right: 1px solid #2b2b2b !important; }
 .notion-card { background: #313335 !important; border: 1px solid #4e5052 !important; box-shadow: none !important; color: #cfd8dc !important; }
 .notion-item:hover, .notion-item.active { background: #4e5254 !important; color: #cc7832 !important; }
-.notion-text-subtle { color: #9da5b4 !important; font-size: 0.95em; }
-h1, h2, h3 { color: #cc7832 !important; font-weight: 700; }
-.accent-text { color: #cc7832 !important; }
-:root { --theme-primary: #cc7832; --theme-primary-bg: rgba(204, 120, 50, 0.15); --theme-accent: #cc7832; --theme-accent-bg: rgba(204, 120, 50, 0.2); }`
-    },
-    {
-      name: "Catppuccin",
-      iconSet: "phosphor",
-      css: `body { background: #1e1e2e !important; color: #cdd6f4 !important; font-weight: 450; }
-.notion-sidebar { background: #181825 !important; }
-.notion-card { background: #313244 !important; border: 1px solid #45475a !important; color: #cdd6f4 !important; }
-.notion-item:hover, .notion-item.active { background: #45475a !important; color: #cba6f7 !important; }
-.notion-text-subtle { color: #bac2de !important; }
-h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
-.accent-text { color: #f5c2e7 !important; }
-:root { --theme-primary: #cba6f7; --theme-primary-bg: rgba(203, 166, 247, 0.15); --theme-accent: #89b4fa; --theme-accent-bg: rgba(137, 180, 250, 0.2); }`
+h1, h2, h3 { color: #cc7832 !important; }
+:root { --theme-primary: #cc7832; --theme-primary-bg: rgba(204, 120, 50, 0.15); --theme-accent: #cc7832; }`
     }
   ];
 
@@ -67,7 +163,7 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
         <div className="mb-8 p-6 bg-neutral-50 rounded-2xl border border-neutral-100 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
           <div className="flex items-center gap-5 w-full md:w-auto">
              <div className="w-12 h-12 shrink-0 rounded-xl bg-white border border-neutral-200 flex items-center justify-center shadow-xs">
-                <IconRenderer icon="lucide:Settings" size={24} className="text-neutral-500" baseSet={appIconSet} />
+                <IconRenderer icon="Settings" size={24} className="text-neutral-500" baseSet={appIconSet} />
              </div>
              <div className="min-w-0">
                 <p className="text-[15px] font-black text-gray-800 tracking-tight">Global Icon Set</p>
@@ -100,6 +196,7 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
           <button 
             onClick={() => onToggle(null)}
             onMouseEnter={() => onPreview("")}
+            onMouseLeave={() => onPreview(newCss)}
             className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 transition-all duration-500 ease-in-out bg-white hover:-translate-y-3 hover:translate-x-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 active:scale-[0.98] outline-none relative ${!activeTheme ? 'border-foreground shadow-xl shadow-gray-200' : 'border-gray-100 hover:border-gray-200 opacity-70 hover:opacity-100'}`}
           >
             <div className={`w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform duration-500 ${!activeTheme ? 'text-foreground border-foreground/10' : ''}`}>
@@ -111,12 +208,33 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
             </div>
           </button>
 
+          {/* Render Presets that haven't been added yet */}
+          {PRESET_THEMES.filter(p => !themes.some(t => t.name === p.name)).map(preset => (
+            <button 
+              key={preset.name}
+              onClick={() => handleQuickAdd(preset)}
+              onMouseEnter={() => onPreview(preset.css)}
+              onMouseLeave={() => onPreview(newCss)}
+              className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 border-gray-100 bg-white transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 opacity-70 hover:opacity-100 active:scale-[0.98] outline-none relative`}
+            >
+              <div className="w-10 h-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-300 group-hover:scale-110 transition-transform">
+                <Circle size={22} />
+              </div>
+              <div className="text-left">
+                <div className="font-black text-sm tracking-tight flex items-center gap-2">
+                  {preset.name}
+                </div>
+                <div className="text-[10px] text-gray-400 uppercase tracking-widest font-black opacity-60">Built-in Preset</div>
+              </div>
+            </button>
+          ))}
+
           {themes.map(theme => (
             <button 
               key={theme.id}
               onClick={() => onToggle(theme)}
               onMouseEnter={() => onPreview(theme.css)}
-              onMouseLeave={() => onPreview("")}
+              onMouseLeave={() => onPreview(newCss)}
               className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 transition-all duration-500 ease-in-out bg-white hover:-translate-y-3 hover:translate-x-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 active:scale-[0.98] outline-none relative ${theme.active ? 'border-foreground shadow-xl shadow-gray-200' : 'border-gray-100 hover:border-gray-200 opacity-70 hover:opacity-100'}`}
             >
               <div className={`w-10 h-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform duration-500 ${theme.active ? 'text-foreground border-foreground/10' : ''}`}>
@@ -125,11 +243,13 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
               <div className="text-left relative">
                  <div className="font-black text-sm flex items-center gap-2 tracking-tight">
                    {theme.name}
-                   <span onClick={(e) => { e.stopPropagation(); onDelete(theme.id); }} className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-125">
-                     <Trash size={16} />
-                   </span>
+                   {!theme.isPreset && (
+                     <span onClick={(e) => { e.stopPropagation(); onDelete(theme.id); }} className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-125">
+                       <Trash size={16} />
+                     </span>
+                   )}
                  </div>
-                 <div className="text-[10px] text-gray-400 uppercase tracking-widest font-black opacity-60">Custom Style</div>
+                 <div className="text-[10px] text-gray-400 uppercase tracking-widest font-black opacity-60">{theme.isPreset ? 'Built-in Preset' : 'Custom Style'}</div>
               </div>
             </button>
           ))}
@@ -144,7 +264,20 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
             <h2 className="text-xl font-bold tracking-tight text-gray-800 uppercase">Editor & Preview</h2>
           </div>
           <button 
-            onClick={() => setIsAdding(!isAdding)}
+            onClick={() => {
+              if (!isAdding) {
+                setNewName(activeTheme?.name || "");
+                setNewCss(activeTheme?.css || "");
+                setEditingTheme(activeTheme);
+                onPreview(activeTheme?.css || "");
+              } else {
+                onPreview("");
+                setEditingTheme(null);
+                setNewName("");
+                setNewCss("");
+              }
+              setIsAdding(!isAdding);
+            }}
             className={`notion-item px-4 py-2 rounded-md font-medium text-sm transition-all ${isAdding ? 'bg-gray-100 text-gray-600' : 'bg-foreground text-background'}`}
           >
             {isAdding ? "Close Editor" : "Open CSS Editor"}
@@ -162,36 +295,37 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">Theme Name</label>
                 <input 
-                  className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 ring-gray-900 outline-none transition-all shadow-sm"
+                  className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 ring-gray-900 outline-none transition-all shadow-sm disabled:opacity-50"
                   placeholder="e.g. Cyberpunk"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
+                  disabled={editingTheme?.isPreset}
                 />
               </div>
 
               <div className="space-y-1.5">
                   <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">Custom CSS</label>
                   <textarea 
-                    className="w-full h-80 border border-gray-200 rounded-2xl p-4 text-xs font-mono bg-gray-50 focus:bg-white transition-all focus:ring-2 ring-gray-900 outline-none leading-relaxed shadow-xs"
+                    className="w-full h-80 border border-gray-200 rounded-2xl p-4 text-xs font-mono bg-gray-50 focus:bg-white transition-all focus:ring-2 ring-gray-900 outline-none leading-relaxed shadow-xs disabled:opacity-50"
                     placeholder="/* Add your custom CSS here */"
                     value={newCss}
+                    readOnly={editingTheme?.isPreset}
                     onChange={(e) => {
-                        setNewCss(e.target.value);
-                        onPreview(e.target.value);
+                        if (!editingTheme?.isPreset) {
+                          setNewCss(e.target.value);
+                          onPreview(e.target.value);
+                        }
                     }}
                   />
+                  {editingTheme?.isPreset && <p className="text-[10px] text-purple-600 font-bold uppercase tracking-wider">Note: Presets are fixed and cannot be edited</p>}
               </div>
 
               <div className="flex flex-wrap gap-2">
                 {PRESET_THEMES.map(preset => (
                   <button 
                     key={preset.name}
-                    onClick={() => { 
-                      setNewName(preset.name); 
-                      setNewCss(preset.css); 
-                      onPreview(preset.css); 
-                    }}
-                    className="text-[10px] bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full hover:bg-foreground hover:text-background font-bold transition-all"
+                    onClick={() => handleSelectForEdit(preset)}
+                    className={`text-[10px] px-3 py-1.5 rounded-full font-bold transition-all ${newName === preset.name ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-foreground hover:text-background'}`}
                   >
                     {preset.name}
                   </button>
@@ -200,20 +334,70 @@ h1, h2, h3 { color: #89b4fa !important; font-weight: 700; }
 
               <button 
                 onClick={handleSave}
-                className="w-full bg-foreground text-background font-black py-4 rounded-xl hover:opacity-90 transition-all shadow-lg shadow-gray-200 active:scale-[0.98]"
+                disabled={editingTheme?.isPreset}
+                className="w-full bg-foreground text-background font-black py-4 rounded-xl hover:opacity-90 transition-all shadow-lg shadow-gray-200 active:scale-[0.98] disabled:opacity-50"
               >
-                SAVE & ADD TO SELECTOR
+                {editingTheme?.isPreset ? 'PRESET MODE ACTIVE (READ-ONLY)' : 'SAVE & ADD TO SELECTOR'}
               </button>
             </div>
 
-            <div className="bg-gray-900 rounded-3xl p-8 relative overflow-hidden shadow-2xl flex flex-col justify-center items-center text-center space-y-6">
-              <div className="absolute inset-0 bg-linear-to-br from-purple-500/20 to-blue-500/20 pointer-events-none"></div>
-              <div className="z-10 text-white flex flex-col items-center">
-                <Play size={48} className="text-purple-400 mb-4 animate-pulse" weight="fill" />
-                <p className="text-xs uppercase tracking-[0.3em] font-black text-purple-400 mb-2">Editor Mode: Active</p>
-                <p className="text-sm opacity-80 leading-relaxed px-4">
-                  Changes typed here are <span className="text-purple-300 font-bold underline italic">immediately applied</span> as a temporary preview to the entire console.
-                </p>
+            <div className="bg-[#0a0a0a] rounded-3xl p-8 relative overflow-hidden shadow-2xl flex flex-col justify-start items-center space-y-8 border border-white/5">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0,transparent_100%)] pointer-events-none"></div>
+              
+              <div className="z-10 w-full flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                    <CheckCircle size={18} weight="fill" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest">Live System</p>
+                    <p className="text-sm font-bold text-white">Theme Preview</p>
+                  </div>
+                </div>
+                <div className="px-3 py-1 bg-white/5 rounded-full text-[9px] font-black text-neutral-400 uppercase tracking-tighter shadow-sm border border-white/10 animate-pulse">LIVE</div>
+              </div>
+
+              <div className="z-10 w-full space-y-4">
+                {/* Sample UI 1: Project Card */}
+                <div className="notion-card p-5 border shadow-2xl scale-100 transition-all duration-700 rounded-3xl w-full text-left" style={{ background: 'var(--background)', color: 'var(--foreground)', borderColor: 'var(--border-color)' }}>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-(--theme-primary-bg) text-(--theme-primary) flex items-center justify-center shadow-inner">
+                        <Folder size={20} weight="fill" />
+                      </div>
+                      <div>
+                        <h4 className="font-black text-sm tracking-tight leading-none mb-1">Preview Project</h4>
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                          <span className="text-[9px] uppercase tracking-widest font-bold opacity-50">Active Now</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2 mb-4">
+                     <div className="h-1.5 w-full bg-(--foreground) opacity-10 rounded-full overflow-hidden">
+                       <div className="h-full bg-(--theme-primary) w-[75%] rounded-full"></div>
+                     </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="px-2 py-1 rounded bg-(--theme-primary-bg) text-(--theme-primary) text-[8px] font-black uppercase" style={{ backgroundColor: 'var(--theme-primary-bg)', color: 'var(--theme-primary)' }}>Refactor</div>
+                    <div className="px-2 py-1 rounded bg-(--theme-accent-bg) text-(--theme-accent) text-[8px] font-black uppercase" style={{ backgroundColor: 'var(--theme-accent-bg)', color: 'var(--theme-accent)' }}>UI/UX</div>
+                  </div>
+                </div>
+
+                {/* Sample UI 2: Small Note */}
+                <div className="notion-card p-5 border opacity-90 scale-95 origin-top transition-all duration-700 rounded-3xl w-full text-left" style={{ background: 'var(--background)', color: 'var(--foreground)', borderColor: 'var(--border-color)' }}>
+                   <p className="text-[11px] font-medium leading-relaxed mb-4">
+                     This is how your <span className="text-(--theme-primary) font-black">Colors</span> and <span className="opacity-60 italic">Typography</span> will feel in the actual editor.
+                   </p>
+                   <div className="flex items-center gap-2 pt-2 border-t border-(--border-color) opacity-50 uppercase text-[8px] font-black tracking-widest">
+                      <Clock size={10} /> 2 Minutes Ago
+                   </div>
+                </div>
+              </div>
+
+              <div className="z-10 bg-white/5 px-6 py-3 rounded-2xl backdrop-blur-md border border-white/5 text-[10px] text-neutral-400 font-bold uppercase tracking-[0.2em] shadow-xl">
+                 Real-time Reflecting...
               </div>
             </div>
           </div>

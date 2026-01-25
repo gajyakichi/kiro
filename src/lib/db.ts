@@ -100,8 +100,8 @@ export const reconfigureDb = (config: { STORAGE_MODE: string, VAULT_PATH?: strin
 // Use a Proxy to ensure 'prisma' always points to the latest instance in globalForPrisma
 const prismaProxy = new Proxy({} as PrismaClient, {
   get: (target, prop) => {
-    const current = (globalForPrisma.prisma || prismaInstance) as any;
-    return current[prop];
+    const current = (globalForPrisma.prisma || prismaInstance);
+    return (current as unknown as Record<string | symbol, unknown>)[prop];
   }
 });
 

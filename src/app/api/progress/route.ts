@@ -15,13 +15,13 @@ export async function GET() {
 
     try {
       taskContent = await fs.readFile(taskPath, "utf-8");
-    } catch (e) {
+    } catch {
       taskContent = "task.md not found";
     }
 
     try {
       walkthroughContent = await fs.readFile(walkthroughPath, "utf-8");
-    } catch (e) {
+    } catch {
       walkthroughContent = "walkthrough.md not found";
     }
 

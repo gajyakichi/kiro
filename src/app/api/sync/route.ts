@@ -95,7 +95,7 @@ export async function POST(request: Request) {
           }
         } catch (e: unknown) {
           // Only log error if not file not found
-          if (e instanceof Error && (e as any).code !== 'ENOENT') {
+          if (e instanceof Error && (e as { code?: string }).code !== 'ENOENT') {
             console.error(`${name} Harvest Error:`, e);
           }
         }

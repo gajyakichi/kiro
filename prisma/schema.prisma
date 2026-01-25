@@ -44,6 +44,7 @@ model Theme {
   css       String
   iconSet   String   @default("lucide")
   active    Boolean  @default(false)
+  isPreset  Boolean  @default(false)
   timestamp DateTime @default(now())
 }
 

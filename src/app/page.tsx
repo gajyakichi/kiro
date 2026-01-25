@@ -37,7 +37,7 @@ export default function Home() {
   const [isVaultLoading, setIsVaultLoading] = useState(true);
   const [appLang, setAppLang] = useState("en");
   const [appIconSet, setAppIconSet] = useState("lucide");
-  const [settings, setSettings] = useState<any>(null); // To store full settings object if needed
+  const [settings, setSettings] = useState<Record<string, string | undefined> | null>(null); // To store full settings object if needed
 
   // New Workspace State
   const [isAddingWorkspace, setIsAddingWorkspace] = useState(false);
@@ -301,12 +301,12 @@ export default function Home() {
     }
   };
 
-  const handleSaveTheme = async (name: string, css: string) => {
+  const handleSaveTheme = async (name: string, css: string, active?: boolean, isPreset?: boolean) => {
     try {
       const res = await fetch('/api/themes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, css })
+        body: JSON.stringify({ name, css, active, isPreset })
       });
       if (res.ok) {
         fetchThemes();
@@ -617,7 +617,7 @@ export default function Home() {
             onClick={() => setActiveTab("git")}
             className={`notion-item flex items-center gap-3 ${activeTab === "git" ? "active" : ""}`}
           >
-            <IconRenderer icon="lucide:Scroll" size={16} baseSet={appIconSet} />
+            <IconRenderer icon="Scroll" size={16} baseSet={appIconSet} />
             <span>{t.git_logs}</span>
           </div>
           
@@ -625,7 +625,7 @@ export default function Home() {
             onClick={() => setActiveTab("progress")}
             className={`notion-item flex items-center gap-3 ${activeTab === "progress" ? "active" : ""}`}
           >
-            <IconRenderer icon="lucide:CheckSquare" size={16} baseSet={appIconSet} />
+            <IconRenderer icon="CheckSquare" size={16} baseSet={appIconSet} />
             <span>{t.progress}</span>
           </div>
 
@@ -633,7 +633,7 @@ export default function Home() {
             onClick={() => setActiveTab("daily_notes")}
             className={`notion-item flex items-center gap-3 ${activeTab === "daily_notes" ? "active" : ""}`}
           >
-            <IconRenderer icon="lucide:Sparkles" size={16} baseSet={appIconSet} />
+            <IconRenderer icon="Sparkles" size={16} baseSet={appIconSet} />
             <div className="flex-1 flex justify-between items-center">
               <span>{t.daily_notes}</span>
               {dailyNotes.length > 0 && <span className="text-[10px] bg-(--theme-primary-bg) text-(--theme-primary) px-1.5 rounded-full font-bold">{dailyNotes.length}</span>}
@@ -644,7 +644,7 @@ export default function Home() {
             onClick={() => setActiveTab("suggested_tasks")}
             className={`notion-item flex items-center gap-3 ${activeTab === "suggested_tasks" ? "active" : ""}`}
           >
-            <IconRenderer icon="lucide:Lightbulb" size={16} baseSet={appIconSet} />
+            <IconRenderer icon="Lightbulb" size={16} baseSet={appIconSet} />
             <div className="flex-1 flex justify-between items-center">
               <span>{t.suggestions}</span>
               {suggestedTasks.length > 0 && <span className="text-[10px] bg-(--theme-accent-bg) text-(--theme-accent) px-1.5 rounded-full font-bold">{suggestedTasks.length}</span>}
@@ -655,7 +655,7 @@ export default function Home() {
             onClick={() => setActiveTab("calendar")}
             className={`notion-item flex items-center gap-3 ${activeTab === "calendar" ? "active" : ""}`}
           >
-            <IconRenderer icon="lucide:Calendar" size={16} baseSet={appIconSet} />
+            <IconRenderer icon="Calendar" size={16} baseSet={appIconSet} />
             <span>{t.calendar}</span>
           </div>
 
@@ -663,7 +663,7 @@ export default function Home() {
             onClick={() => setActiveTab("comments")}
             className={`notion-item flex items-center gap-3 ${activeTab === "comments" ? "active" : ""}`}
           >
-            <IconRenderer icon="lucide:SquarePen" size={16} baseSet={appIconSet} />
+            <IconRenderer icon="SquarePen" size={16} baseSet={appIconSet} />
             <div className="flex-1 flex justify-between items-center">
               <span>{t.notes}</span>
               <span className="text-xs notion-text-subtle">{comments.length}</span>
@@ -674,7 +674,7 @@ export default function Home() {
             onClick={() => setActiveTab("themes")}
             className={`notion-item flex items-center gap-3 ${activeTab === "themes" ? "active" : ""}`}
           >
-            <IconRenderer icon="lucide:Palette" size={16} baseSet={appIconSet} className={activeTab === "themes" ? "" : "animate-pulse"} />
+            <IconRenderer icon="Palette" size={16} baseSet={appIconSet} className={activeTab === "themes" ? "" : "animate-pulse"} />
             <span>{t.theme_lab}</span>
           </div>
 
@@ -682,7 +682,7 @@ export default function Home() {
             href="/settings"
             className="notion-item flex items-center gap-3 no-underline text-inherit"
           >
-            <IconRenderer icon="lucide:Settings" size={16} baseSet={appIconSet} />
+            <IconRenderer icon="Settings" size={16} baseSet={appIconSet} />
             <span>{t.settings}</span>
           </Link>
         </nav>
@@ -989,7 +989,7 @@ export default function Home() {
         </footer>
       </main>
 
-      <style key={themes.find(t => t.active)?.id || 'original'} dangerouslySetInnerHTML={{ __html: `
+      <style key={previewCss ? 'preview-active' : (themes.find(t => t.active)?.id || 'original')} dangerouslySetInnerHTML={{ __html: `
         ${previewCss || themes.find(t => t.active)?.css || ''}
         .theme-active body { line-height: 1.6; letter-spacing: 0.015em; -webkit-font-smoothing: subpixel-antialiased; }
         .theme-active .notion-card { box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important; transition: transform 0.2s ease; }

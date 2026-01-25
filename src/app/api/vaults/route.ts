@@ -6,16 +6,23 @@ import { reconfigureDb } from "@/lib/db";
 const VAULTS_FILE = path.join(process.cwd(), "vaults.json");
 const ENV_FILE = path.join(process.cwd(), ".env");
 
-async function readVaults() {
+interface Vault {
+  id: string;
+  name: string;
+  path: string;
+  active: boolean;
+}
+
+async function readVaults(): Promise<Vault[]> {
   try {
     const data = await fs.readFile(VAULTS_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch (e) {
+    return JSON.parse(data) as Vault[];
+  } catch {
     return [];
   }
 }
 
-async function writeVaults(vaults: any[]) {
+async function writeVaults(vaults: Vault[]) {
   await fs.writeFile(VAULTS_FILE, JSON.stringify(vaults, null, 2));
 }
 
@@ -35,8 +42,8 @@ async function updateEnv(vaultPath: string) {
     }
 
     await fs.writeFile(ENV_FILE, newLines.join("\n"));
-  } catch (e) {
-    console.error("Failed to update .env", e);
+  } catch (error) {
+    console.error("Failed to update .env", error);
   }
 }
 
@@ -71,13 +78,13 @@ export async function PATCH(request: Request) {
     const { id } = await request.json();
     const vaults = await readVaults();
     
-    const vault = vaults.find((v: any) => v.id === id);
+    const vault = vaults.find((v: Vault) => v.id === id);
     if (!vault) {
       return NextResponse.json({ error: "Vault not found" }, { status: 404 });
     }
 
     // Switch active status
-    const updatedVaults = vaults.map((v: any) => ({
+    const updatedVaults = vaults.map((v: Vault) => ({
       ...v,
       active: v.id === id
     }));
@@ -105,7 +112,7 @@ export async function DELETE(request: Request) {
     const id = searchParams.get('id');
     const vaults = await readVaults();
     
-    const newVaults = vaults.filter((v: any) => v.id !== id);
+    const newVaults = vaults.filter((v: Vault) => v.id !== id);
     await writeVaults(newVaults);
     
     return NextResponse.json({ success: true });
