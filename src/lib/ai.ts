@@ -230,7 +230,7 @@ export async function suggestTasks(context: string, language: string = 'en'): Pr
 /**
  * Checks which of the active tasks have been completed based on the recent context.
  */
-export async function checkTaskCompletion(context: string, activeTasks: string[]): Promise<string[]> {
+export async function checkTaskCompletion(context: string, activeTasks: { id: number, task: string }[]): Promise<number[]> {
   if (activeTasks.length === 0) return [];
   
   try {
@@ -240,16 +240,17 @@ export async function checkTaskCompletion(context: string, activeTasks: string[]
         content: `You are an intelligent project manager.
         
         Input:
-        1. A list of active TODO tasks.
+        1. A list of active TODO tasks (ID and Description).
         2. Project context (recent Git logs and walkthrough).
 
         Task:
         Identify which of the active tasks have been COMPLETED based on the evidence in the project context.
+        Be generous but accurate. If a Git commit mentions fixing or implementing the task, mark it as completed.
         
         Output:
-        Return a JSON object with a key 'completed_tasks' containing an array of the exact task strings that are completed.
-        Example: { "completed_tasks": ["Fix login bug"] }
-        If no tasks are completed, return { "completed_tasks": [] }.`
+        Return a JSON object with a key 'completed_ids' containing an array of the IDs of the tasks that are completed.
+        Example: { "completed_ids": [101, 105] }
+        If no tasks are completed, return { "completed_ids": [] }.`
       },
       {
         role: "user",
@@ -261,7 +262,7 @@ export async function checkTaskCompletion(context: string, activeTasks: string[]
 
     try {
       const parsed = JSON.parse(content);
-      return Array.isArray(parsed.completed_tasks) ? parsed.completed_tasks : [];
+      return Array.isArray(parsed.completed_ids) ? parsed.completed_ids : [];
     } catch (e) {
       console.warn("Failed to parse checkTaskCompletion JSON", e);
       return [];

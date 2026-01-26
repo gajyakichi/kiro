@@ -14,6 +14,16 @@ const customJestConfig = {
     // Handle module aliases (this will be automatically configured for you soon)
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  collectCoverage: true,
+  coverageDirectory: 'coverage',
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+  },
   coveragePathIgnorePatterns: [
     '/node_modules/',
     '/.next/',

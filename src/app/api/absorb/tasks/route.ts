@@ -19,3 +19,25 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 }
+
+export async function POST(req: NextRequest) {
+  try {
+    const { projectId, task } = await req.json();
+
+    if (!projectId || !task) {
+        return NextResponse.json({ error: 'Project ID and task content are required' }, { status: 400 });
+    }
+
+    const newTask = await db.suggestedTask.create({
+        data: {
+            project_id: Number(projectId),
+            task: task,
+            status: 'added'
+        }
+    });
+
+    return NextResponse.json({ success: true, task: newTask });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
+  }
+}

@@ -7,11 +7,13 @@ interface SuggestedTasksProps {
   onAdd: (task: SuggestedTask) => void;
   onDismiss: (task: SuggestedTask) => void;
   onUpdateStatus?: (task: SuggestedTask, status: string) => void;
+  onManualAdd?: (task: string) => void;
 }
 
-const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss, onUpdateStatus }) => {
+const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss, onUpdateStatus, onManualAdd }) => {
   const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
-  const [activeTab, setActiveTab] = useState<'todo' | 'suggestions' | 'completed'>('todo');
+  const [activeTab, setActiveTab] = useState<'todo' | 'suggestions'>('todo');
+  const [newTaskInput, setNewTaskInput] = useState('');
 
   const handleCopyPrompt = (taskText: string) => {
     const prompt = `Please implement the following task:\n\n${taskText}\n\nContext: Use the existing project structure and conventions.`;
@@ -31,7 +33,20 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
       }
   };
 
-  /* Redesigned Task Row (Todoist-style) */
+  const handleManualSubmit = () => {
+    if (newTaskInput.trim() && onManualAdd) {
+        onManualAdd(newTaskInput.trim());
+        setNewTaskInput('');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+        handleManualSubmit();
+    }
+  }
+
+  /* Redesigned Task Row (Simple & Theme Aware) */
   const renderTaskRow = (task: SuggestedTask, isTodo: boolean = false, isCompleted: boolean = false) => (
     <div key={task.id} className="group flex items-start gap-3 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors px-2 -mx-2 rounded-lg">
         {/* Checkbox / Icon Area */}
@@ -41,12 +56,12 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
         >
             {(isTodo || isCompleted) ? (
                 isCompleted ? (
-                    <CheckCircle size={20} className="text-emerald-500 fill-emerald-50" />
+                    <CheckCircle size={20} className="text-(--theme-primary) fill-gray-50" />
                 ) : (
-                    <div className="w-5 h-5 rounded-full border-2 border-gray-300 hover:border-emerald-500 transition-colors" />
+                    <div className="w-5 h-5 rounded-full border-2 border-gray-300 hover:border-(--theme-primary) transition-colors" />
                 )
             ) : (
-                <Lightbulb size={20} className="text-amber-400" />
+                <Lightbulb size={20} className="text-(--theme-accent)" />
             )}
         </div>
 
@@ -55,14 +70,23 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
             <p className={`text-sm text-gray-700 leading-snug ${isCompleted ? 'line-through text-gray-400' : ''}`}>
                 {task.task}
             </p>
-            {/* Optional Timestamp or metadata could go here */}
         </div>
 
         {/* Actions - Visible on Hover */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {!isTodo && !isCompleted && (
+                <button 
+                    onClick={() => onAdd(task)}
+                    className="p-1.5 text-gray-400 hover:text-(--theme-primary) hover:bg-gray-100 rounded text-xs transition-colors"
+                    title="Add to Todo"
+                >
+                    <Plus size={18} />
+                </button>
+            )}
+            
             <button 
                 onClick={() => handleCopyPrompt(task.task)}
-                className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-200 rounded text-xs transition-colors"
+                className="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded text-xs transition-colors"
                 title="Copy Prompt"
             >
                <Copy size={16} />
@@ -75,54 +99,65 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
             >
                <X size={16} />
             </button>
-
-            {!isTodo && !isCompleted && (
-                <button 
-                    onClick={() => onAdd(task)}
-                    className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 text-gray-600 hover:border-emerald-500 hover:text-emerald-600 rounded text-xs font-medium transition-colors shadow-sm"
-                >
-                    <Plus size={14} />
-                    Add
-                </button>
-            )}
         </div>
     </div>
   );
 
   return (
     <div className="relative space-y-6">
-      <div className="flex gap-4 border-b border-gray-200 pb-2">
+      <div className="flex gap-6 border-b border-gray-200 pb-0">
           <button 
             onClick={() => setActiveTab('todo')}
-            className={`flex items-center gap-2 px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors ${activeTab === 'todo' ? 'text-gray-900 border-b-2 border-gray-900 rounded-none pb-3 -mb-2.5' : 'text-gray-400 hover:text-gray-600'}`}
+            className={`flex items-center gap-2 pb-3 text-sm font-semibold transition-all border-b-2 ${activeTab === 'todo' ? 'text-(--theme-primary) border-(--theme-primary)' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
           >
               Active Todo
-              {activeTasks.length > 0 && <span className="bg-gray-200 text-gray-600 px-1.5 rounded-full text-[10px]">{activeTasks.length}</span>}
+              {activeTasks.length > 0 && <span className={`text-[10px] px-1.5 rounded-full ${activeTab === 'todo' ? 'bg-(--theme-primary)/10 text-(--theme-primary)' : 'bg-gray-100 text-gray-500'}`}>{activeTasks.length}</span>}
           </button>
           <button 
             onClick={() => setActiveTab('suggestions')}
-            className={`flex items-center gap-2 px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors ${activeTab === 'suggestions' ? 'text-amber-600 border-b-2 border-amber-500 rounded-none pb-3 -mb-2.5' : 'text-gray-400 hover:text-gray-600'}`}
+            className={`flex items-center gap-2 pb-3 text-sm font-semibold transition-all border-b-2 ${activeTab === 'suggestions' ? 'text-(--theme-primary) border-(--theme-primary)' : 'text-gray-400 border-transparent hover:text-gray-600'}`}
           >
               Suggestions
-              {proposedTasks.length > 0 && <span className="bg-amber-100 text-amber-600 px-1.5 rounded-full text-[10px]">{proposedTasks.length}</span>}
-          </button>
-          <button 
-            onClick={() => setActiveTab('completed')}
-            className={`flex items-center gap-2 px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors ${activeTab === 'completed' ? 'text-emerald-600 border-b-2 border-emerald-500 rounded-none pb-3 -mb-2.5' : 'text-gray-400 hover:text-gray-600'}`}
-          >
-              Completed
+              {proposedTasks.length > 0 && <span className={`text-[10px] px-1.5 rounded-full ${activeTab === 'suggestions' ? 'bg-(--theme-primary)/10 text-(--theme-primary)' : 'bg-gray-100 text-gray-500'}`}>{proposedTasks.length}</span>}
           </button>
       </div>
 
       <div className="space-y-1 animate-in fade-in duration-300 min-h-[300px]">
         {activeTab === 'todo' && (
-            navCheck(activeTasks.length) ? activeTasks.map(t => renderTaskRow(t, true)) : emptyState("No active tasks. Add suggestions to get started!")
+            <>
+              {onManualAdd && (
+                <div className="flex gap-2 mb-4">
+                    <input 
+                        type="text" 
+                        value={newTaskInput}
+                        onChange={(e) => setNewTaskInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Add a new task..."
+                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-(--theme-primary) focus:ring-1 focus:ring-(--theme-primary)"
+                    />
+                    <button 
+                        onClick={handleManualSubmit}
+                        disabled={!newTaskInput.trim()}
+                        className="px-4 py-2 bg-(--theme-primary) text-white text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                    >
+                        Add
+                    </button>
+                </div>
+              )}
+              {navCheck(activeTasks.length + completedTasks.length) ? (
+                <>
+                    {activeTasks.map(t => renderTaskRow(t, true))}
+                    {completedTasks.length > 0 && (
+                        <div className="pt-4 mt-4 border-t border-gray-100">
+                             {completedTasks.map(t => renderTaskRow(t, false, true))}
+                        </div>
+                    )}
+                </>
+              ) : emptyState("No active tasks. Add suggestions or create one to get started!")}
+            </>
         )}
         {activeTab === 'suggestions' && (
             navCheck(proposedTasks.length) ? proposedTasks.map(t => renderTaskRow(t)) : emptyState("No new suggestions. Click 'Absorb' to analyze.")
-        )}
-        {activeTab === 'completed' && (
-            navCheck(completedTasks.length) ? completedTasks.map(t => renderTaskRow(t, false, true)) : emptyState("No completed tasks yet.")
         )}
       </div>
       
@@ -130,7 +165,7 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
       {toast.show && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
           <div className="bg-neutral-900/90 backdrop-blur text-white px-4 py-2 rounded-full shadow-lg text-xs font-bold flex items-center gap-2">
-            <Copy size={12} className="text-emerald-400" />
+            <Copy size={12} className="text-(--theme-primary)" />
             {toast.message}
           </div>
         </div>

@@ -38,14 +38,12 @@ ${contextData.walkthrough || 'No walkthrough available.'}
         status: { in: ['added', 'proposed'] }
       }
     });
-    const candidateStrings = candidates.map(t => t.task);
-
     // 3. AI Analysis
     // Now running 3 AI jobs in parallel
-    const [summaryObj, tasks, completedTaskStrings] = await Promise.all([
+    const [summaryObj, tasks, completedTaskIds] = await Promise.all([
       generateDailySummary(contextString),
       suggestTasks(contextString, process.env.APP_LANG || 'en'),
-      checkTaskCompletion(contextString, candidateStrings)
+      checkTaskCompletion(contextString, candidates.map(t => ({ id: t.id, task: t.task })))
     ]);
 
     const { en: summaryEn, ja: summaryJa } = summaryObj;
@@ -65,16 +63,12 @@ ${contextData.walkthrough || 'No walkthrough available.'}
           }
         },
         update: { 
-          content: defaultContent,
-          content_en: summaryEn,
-          content_ja: summaryJa
+          content: defaultContent
         },
         create: {
           project_id: Number(projectId),
           date: date,
-          content: defaultContent,
-          content_en: summaryEn,
-          content_ja: summaryJa
+          content: defaultContent
         }
       });
 
@@ -93,26 +87,27 @@ ${contextData.walkthrough || 'No walkthrough available.'}
         });
         
         if (!exists) {
-            // Check if this new suggestion is coincidentally in the completed list (rare edge case)
-            const isCompleted = completedTaskStrings.includes(task);
+            // Check if this new suggestion is coincidentally in the completed list (rare edge case - hard to check by ID since it's new)
+            // Ideally we check by string here if needed, but 'completedTaskIds' are IDs.
+            // Since it's new, it has no ID, so it can't be in completedTaskIds.
             await tx.suggestedTask.create({
                 data: {
                 project_id: Number(projectId),
                 task: task,
-                status: isCompleted ? 'completed' : 'proposed'
+                status: 'proposed'
                 }
             });
         }
       }
 
       // Mark Completed Tasks (from existing DB candidates)
-      for (const t of candidates) {
-        if (completedTaskStrings.includes(t.task)) {
-          await tx.suggestedTask.update({
-             where: { id: t.id },
-             data: { status: 'completed' }
-          });
-        }
+      if (completedTaskIds.length > 0) {
+        await tx.suggestedTask.updateMany({
+            where: {
+                id: { in: completedTaskIds }
+            },
+            data: { status: 'completed' }
+        });
       }
     });
 
@@ -122,7 +117,7 @@ ${contextData.walkthrough || 'No walkthrough available.'}
       summary_en: summaryEn,
       summary_ja: summaryJa,
       tasks,
-      completedTasks: completedTaskStrings
+      completedTaskIds: completedTaskIds
     });
 
   } catch (error: unknown) {

@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState, useCallback } from 'react';
-import { Settings, Database, Server, Save, RotateCcw, ArrowLeft, Cloud, ShieldCheck, AlertTriangle, RefreshCw, Plus, X, Folder, LayoutGrid } from 'lucide-react';
+import { Settings, Database, Server, Save, RotateCcw, ArrowLeft, Cloud, ShieldCheck, AlertTriangle, RefreshCw, Plus, X, Folder, LayoutGrid, Package, Blocks, Languages } from 'lucide-react';
 import Link from 'next/link';
 import { Vault, Theme } from '@/lib/types';
 import { getTranslation } from '@/lib/i18n';
+import { AVAILABLE_PLUGINS } from '@/lib/plugins';
+
 
 const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onVaultSwitch: () => void }) => {
   const [vaults, setVaults] = useState<Vault[]>([]);
@@ -101,7 +103,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
             </button>
             <button 
               onClick={() => setIsAdding(!isAdding)}
-              className="flex items-center gap-2 px-4 py-2 bg-(--theme-primary) text-white rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 bg-(--theme-primary) text-white rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-sm whitespace-nowrap"
             >
               {isAdding ? <X size={14} /> : <Plus size={14} />}
               {isAdding ? t.cancel : t.add_new_vault}
@@ -220,10 +222,13 @@ export default function SettingsPage() {
     AI_PROVIDER: 'openai',
     OLLAMA_BASE_URL: 'http://localhost:11434',
     VAULT_PATH: '',
-    APP_LANG: 'en'
+    APP_LANG: 'en',
+    ENABLED_PLUGINS: ''
   });
   const [themes, setThemes] = useState<Theme[]>([]);
   const [ollamaModels, setOllamaModels] = useState<string[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [customPlugins, setCustomPlugins] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchingModels, setFetchingModels] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -241,6 +246,84 @@ export default function SettingsPage() {
     }
   }, []);
 
+  const fetchCustomPlugins = useCallback(async () => {
+      try {
+          const res = await fetch('/api/plugins');
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            setCustomPlugins(data);
+          }
+      } catch (e) {
+          console.error("Failed to fetch custom plugins", e);
+      }
+  }, []);
+
+  const handlePluginToggle = (pluginId: string) => {
+    const currentPlugins = config.ENABLED_PLUGINS ? config.ENABLED_PLUGINS.split(',') : [];
+    const isEnabled = currentPlugins.includes(pluginId);
+    let newPlugins: string[] = [];
+
+    if (isEnabled) {
+      newPlugins = currentPlugins.filter(p => p !== pluginId);
+    } else {
+      newPlugins = [...currentPlugins, pluginId];
+    }
+    
+    setConfig(prev => ({ ...prev, ENABLED_PLUGINS: newPlugins.join(',') }));
+  };
+
+  const handleImportPlugin = async () => {
+      try {
+          const text = await navigator.clipboard.readText();
+          const pluginDef = JSON.parse(text);
+          
+          if (!pluginDef.id || !pluginDef.name) {
+              setMessage({ type: 'error', text: 'Invalid plugin definition in clipboard' });
+              return;
+          }
+
+          const res = await fetch('/api/plugins', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(pluginDef)
+          });
+
+          if (res.ok) {
+              setMessage({ type: 'success', text: `Plugin "${pluginDef.name}" imported!` });
+              fetchCustomPlugins();
+          } else {
+              const err = await res.json();
+              setMessage({ type: 'error', text: err.error || 'Failed to import plugin' });
+          }
+      } catch {
+          setMessage({ type: 'error', text: 'Failed to read from clipboard or parse JSON' });
+      }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleExportPlugin = (plugin: any) => {
+      const json = JSON.stringify(plugin, null, 2);
+      navigator.clipboard.writeText(json);
+      setMessage({ type: 'success', text: `Exported "${plugin.name}" to clipboard` });
+  };
+
+  const handleDeletePlugin = async (id: string, name: string) => {
+      if (!confirm(`Delete plugin "${name}"?`)) return;
+      
+      try {
+          await fetch(`/api/plugins?id=${id}`, { method: 'DELETE' });
+          setMessage({ type: 'success', text: 'Plugin deleted' });
+          fetchCustomPlugins();
+          
+          // Also disable it if enabled
+          if (config.ENABLED_PLUGINS.includes(id)) {
+              handlePluginToggle(id);
+          }
+      } catch {
+          setMessage({ type: 'error', text: 'Failed to delete plugin' });
+      }
+  };
+
   const fetchThemes = useCallback(async () => {
     try {
       const res = await fetch('/api/themes');
@@ -254,7 +337,8 @@ export default function SettingsPage() {
   useEffect(() => {
     fetchSettings();
     fetchThemes();
-  }, [fetchSettings, fetchThemes]);
+    fetchCustomPlugins();
+  }, [fetchSettings, fetchThemes, fetchCustomPlugins]);
 
   useEffect(() => {
     if (config.AI_PROVIDER === 'ollama') {
@@ -414,6 +498,81 @@ export default function SettingsPage() {
             </section>
           )}
 
+          {/* Section: Plugin Management */}
+          <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold flex items-center gap-3">
+                <Package size={22} className="text-(--theme-primary) opacity-40" />
+                Plugins & Extensions
+              </h2>
+              <button 
+                onClick={handleImportPlugin}
+                className="flex items-center gap-2 px-3 py-1.5 bg-neutral-100 text-neutral-600 rounded-lg text-xs font-bold hover:bg-neutral-200 transition-all"
+                title="Import JSON from Clipboard"
+              >
+                <Plus size={14} />
+                Import
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              {[...AVAILABLE_PLUGINS, ...customPlugins].map(plugin => {
+                const isEnabled = config.ENABLED_PLUGINS ? config.ENABLED_PLUGINS.split(',').includes(plugin.id) : false;
+                const isSystem = AVAILABLE_PLUGINS.some(p => p.id === plugin.id);
+
+                return (
+                  <div key={plugin.id} className="group relative flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100 hover:border-neutral-200 transition-all">
+                    <div className="flex items-start gap-4 flex-1">
+                      <div className={`p-3 rounded-xl transition-colors ${isEnabled ? 'bg-(--theme-primary) text-white shadow-md shadow-(--theme-primary)/20' : 'bg-white text-neutral-300'}`}>
+                        <Blocks size={20} />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-sm flex items-center gap-2">
+                          {plugin.name}
+                          <span className="text-[9px] bg-neutral-200 text-neutral-500 px-1.5 py-0.5 rounded font-mono">{plugin.version}</span>
+                          {!isSystem && <span className="text-[9px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded font-bold uppercase">Custom</span>}
+                        </h3>
+                        <p className="text-xs text-neutral-500 mt-1 max-w-sm leading-relaxed">{plugin.description}</p>
+                        <p className="text-[10px] text-neutral-400 mt-1 font-mono opacity-60">ID: {plugin.id} • by {plugin.author}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button 
+                                onClick={() => handleExportPlugin(plugin)}
+                                className="p-2 text-neutral-400 hover:text-(--theme-primary) hover:bg-white rounded-lg transition-all"
+                                title="Export JSON to Clipboard"
+                            >
+                                <Cloud size={16} />
+                            </button>
+                            {!isSystem && (
+                                <button 
+                                    onClick={() => handleDeletePlugin(plugin.id, plugin.name)}
+                                    className="p-2 text-neutral-400 hover:text-red-500 hover:bg-white rounded-lg transition-all"
+                                    title="Delete Plugin"
+                                >
+                                    <X size={16} />
+                                </button>
+                            )}
+                         </div>
+
+                        <button 
+                          onClick={() => handlePluginToggle(plugin.id)}
+                          className={`relative w-12 h-7 rounded-full transition-colors ${isEnabled ? 'bg-(--theme-primary)' : 'bg-neutral-200'}`}
+                        >
+                          <div className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full shadow-sm transition-transform ${isEnabled ? 'translate-x-5' : ''}`}></div>
+                        </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {(AVAILABLE_PLUGINS.length + customPlugins.length) === 0 && (
+                <p className="text-center text-xs text-neutral-400 mt-6 italic">No plugins available.</p>
+            )}
+          </section>
+
           {/* Section: AI Configuration */}
           <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm">
             <div className="flex items-center justify-between mb-8">
@@ -447,27 +606,38 @@ export default function SettingsPage() {
                 </button>
               </div>
 
-              {/* Section: Language */}
-              <div className="space-y-4 pt-4 border-t border-neutral-100">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">{t.language}</label>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setConfig({ ...config, APP_LANG: 'en' })}
-                    className={`flex-1 py-3 rounded-xl text-xs font-black transition-all border-2 ${
-                      config.APP_LANG === 'en' ? 'border-(--theme-primary) bg-(--theme-primary-bg) text-(--theme-primary)' : 'border-neutral-100 bg-white text-neutral-400 hover:border-neutral-200'
-                    }`}
-                  >
-                    {t.english}
-                  </button>
-                  <button
-                    onClick={() => setConfig({ ...config, APP_LANG: 'ja' })}
-                    className={`flex-1 py-3 rounded-xl text-xs font-black transition-all border-2 ${
-                      config.APP_LANG === 'ja' ? 'border-(--theme-primary) bg-(--theme-primary-bg) text-(--theme-primary)' : 'border-neutral-100 bg-white text-neutral-400 hover:border-neutral-200'
-                    }`}
-                  >
-                    {t.japanese}
-                  </button>
-                </div>
+              <div className="space-y-4 animate-fade-in">
+                 <div className="flex items-center gap-2 mb-2">
+                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">{t.language}</label>
+                 </div>
+                 <div className="flex bg-neutral-100 p-1.5 rounded-2xl gap-1.5">
+                    <button 
+                      onClick={() => setConfig({ ...config, APP_LANG: 'en' })}
+                      className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${
+                        config.APP_LANG === 'en' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                      }`}
+                    >
+                      <Languages size={16} />
+                      {t.english}
+                    </button>
+                    {config.ENABLED_PLUGINS?.includes('plugin-jp') ? (
+                      <button 
+                        onClick={() => setConfig({ ...config, APP_LANG: 'ja' })}
+                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${
+                          config.APP_LANG === 'ja' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                        }`}
+                      >
+                        <Languages size={16} />
+                        {t.japanese}
+                      </button>
+                    ) : (
+                      <div className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold text-neutral-300 bg-neutral-50 border border-transparent cursor-not-allowed group relative" title="Enable 'Japanese Language Support' plugin to unlock">
+                         <Languages size={14} />
+                         {t.japanese}
+                         <span className="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-white text-[9px] px-2 py-1 rounded shadow-lg whitespace-nowrap z-10">Plugin Required</span>
+                      </div>
+                    )}
+                 </div>
               </div>
 
               {config.AI_PROVIDER === 'openai' ? (

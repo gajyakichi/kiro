@@ -6,10 +6,19 @@ import { Calendar, Languages } from 'lucide-react';
 
 interface DailyNotesProps {
   notes: DailyNote[];
+  isJapanesePluginEnabled?: boolean;
 }
 
-const DailyNotes: React.FC<DailyNotesProps> = ({ notes }) => {
-  const [language, setLanguage] = useState<'en' | 'ja'>('ja');
+const DailyNotes: React.FC<DailyNotesProps> = ({ notes, isJapanesePluginEnabled = false }) => {
+  const [noteLanguages, setNoteLanguages] = useState<Record<number, 'en' | 'ja'>>({});
+
+  const toggleLanguage = (id: number) => {
+    if (!isJapanesePluginEnabled) return;
+    setNoteLanguages(prev => ({
+      ...prev,
+      [id]: (prev[id] || 'en') === 'en' ? 'ja' : 'en'
+    }));
+  };
 
   if (notes.length === 0) {
     return (
@@ -21,18 +30,9 @@ const DailyNotes: React.FC<DailyNotesProps> = ({ notes }) => {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={() => setLanguage(prev => prev === 'en' ? 'ja' : 'en')}
-          className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-800 bg-gray-100/50 hover:bg-gray-100 rounded-md transition-colors"
-        >
-          <Languages size={14} />
-          {language === 'en' ? 'English' : '日本語'}
-        </button>
-      </div>
-
       {notes.map((note) => {
-        const content = language === 'ja' 
+        const currentLang = noteLanguages[note.id] || 'en';
+        const content = currentLang === 'ja' 
           ? (note.content_ja || note.content) 
           : (note.content_en || note.content);
 
@@ -42,9 +42,21 @@ const DailyNotes: React.FC<DailyNotesProps> = ({ notes }) => {
               <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
             </div>
             
-            <div className="mb-2 flex items-center gap-2">
-              <Calendar size={14} className="text-gray-400" />
-              <span className="text-sm font-semibold text-gray-500">{note.date}</span>
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Calendar size={14} className="text-gray-400" />
+                <span className="text-sm font-semibold text-gray-500">{note.date}</span>
+              </div>
+              {isJapanesePluginEnabled && (
+                <button
+                  onClick={() => toggleLanguage(note.id)}
+                  className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium text-gray-400 hover:text-(--theme-primary) hover:bg-(--theme-primary-bg) rounded transition-colors opacity-0 group-hover:opacity-100"
+                  title="Toggle Language"
+                >
+                  <Languages size={12} />
+                  {currentLang === 'en' ? 'EN' : 'JA'}
+                </button>
+              )}
             </div>
             
             <div className="bg-white notion-card p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">

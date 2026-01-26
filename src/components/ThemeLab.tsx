@@ -13,39 +13,11 @@ interface ThemeLabProps {
   onUpdateIconSet: (set: string) => void;
 }
 
-export const ThemeLab: React.FC<ThemeLabProps> = ({ themes, onSave, onDelete, onToggle, onPreview, appIconSet, onUpdateIconSet }) => {
-  const [newName, setNewName] = useState("");
-  const [newCss, setNewCss] = useState("");
-  const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
-  const [isAdding, setIsAdding] = useState(false);
-  const activeTheme = themes.find(t => t.active) || null;
+const minifyCss = (css: string) => {
+  return css.replace(/\s+/g, ' ').replace(/\/\*.*?\*\//g, '').trim();
+};
 
-  const handleSelectForEdit = (preset: (typeof PRESET_THEMES)[0]) => {
-    setNewName(preset.name);
-    setNewCss(preset.css);
-    setEditingTheme({ id: -1, name: preset.name, css: preset.css, active: false, isPreset: true });
-    onPreview(preset.css);
-  };
-
-  const handleSave = async () => {
-    if (!newName || !newCss) return;
-    await onSave(newName, newCss);
-    setNewName("");
-    setNewCss("");
-    setIsAdding(false);
-    setEditingTheme(null);
-  };
-
-  const handleQuickAdd = async (preset: { name: string, css: string, isPreset?: boolean }) => {
-    const existing = themes.find(t => t.name === preset.name);
-    if (existing) {
-      await onToggle(existing);
-    } else {
-      await onSave(preset.name, preset.css, true, preset.isPreset);
-    }
-  };
-
-  const PRESET_THEMES = [
+const PRESET_THEMES = [
     {
       name: "Nord",
       isPreset: true,
@@ -181,6 +153,44 @@ h1, h2, h3 { color: #0056b3 !important; }
     }
   ];
 
+export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, onDelete, onToggle, onPreview, appIconSet, onUpdateIconSet }) => {
+  const [newName, setNewName] = useState("");
+  const [newCss, setNewCss] = useState("");
+  const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
+  const activeTheme = React.useMemo(() => themes.find(t => t.active) || null, [themes]);
+  
+  const displayedPresets = React.useMemo(() => 
+    PRESET_THEMES.filter(p => !themes.some(t => t.name === p.name)),
+  [themes]);
+
+  const handleSelectForEdit = React.useCallback((preset: (typeof PRESET_THEMES)[0]) => {
+    setNewName(preset.name);
+    const minified = minifyCss(preset.css);
+    setNewCss(minified);
+    setEditingTheme({ id: -1, name: preset.name, css: minified, active: false, isPreset: true });
+    onPreview(minified);
+  }, [onPreview]);
+
+  const handleSave = async () => {
+    if (!newName || !newCss) return;
+    const minified = minifyCss(newCss);
+    await onSave(newName, minified);
+    setNewName("");
+    setNewCss("");
+    setIsAdding(false);
+    setEditingTheme(null);
+  };
+
+  const handleQuickAdd = async (preset: { name: string, css: string, isPreset?: boolean }) => {
+    const existing = themes.find(t => t.name === preset.name);
+    if (existing) {
+      await onToggle(existing);
+    } else {
+      await onSave(preset.name, minifyCss(preset.css), true, preset.isPreset);
+    }
+  };
+
   return (
     <div className="space-y-10 animate-fade-in pb-20">
       {/* Theme Selector Section */}
@@ -240,7 +250,7 @@ h1, h2, h3 { color: #0056b3 !important; }
           </button>
 
           {/* Render Presets that haven't been added yet */}
-          {PRESET_THEMES.filter(p => !themes.some(t => t.name === p.name)).map(preset => (
+          {displayedPresets.map(preset => (
             <button 
               key={preset.name}
               onClick={() => handleQuickAdd(preset)}
@@ -452,4 +462,6 @@ h1, h2, h3 { color: #0056b3 !important; }
       </section>
     </div>
   );
-};
+});
+
+ThemeLab.displayName = 'ThemeLab';

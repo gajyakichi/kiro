@@ -20,7 +20,7 @@ const VaultSwitcher = dynamic(() => import('@/components/VaultSwitcher').then(mo
 const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'));
 const DailyNotes = dynamic(() => import('@/components/DailyNotes'));
 
-import { Sparkles, FileText, Code, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight } from 'lucide-react';
+import { Sparkles, FileText, Code, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2 } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
 
 export default function Home() {
@@ -30,6 +30,39 @@ export default function Home() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [dbLogs, setDbLogs] = useState<DbLog[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const [editingContent, setEditingContent] = useState("");
+  
+  const handleDeleteComment = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this note?")) return;
+    try {
+      await fetch(`/api/comments?id=${id}`, { method: 'DELETE' });
+      if (activeProject) fetchAbsorbData(activeProject.id);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleUpdateComment = async () => {
+    if (!editingCommentId) return;
+    try {
+      await fetch('/api/comments', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: editingCommentId, text: editingContent })
+      });
+      setEditingCommentId(null);
+      setEditingContent("");
+      if (activeProject) fetchAbsorbData(activeProject.id);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const startEditingComment = (id: number, currentText: string) => {
+      setEditingCommentId(id);
+      setEditingContent(currentText);
+  };
   const [activeBlockType, setActiveBlockType] = useState<'markdown' | 'text' | 'code'>('markdown');
   const [activeTab, setActiveTab] = useState("timeline");
   const [mounted, setMounted] = useState(false);
@@ -95,7 +128,9 @@ export default function Home() {
 
   const fetchAbsorbData = useCallback(async (projectId: number) => {
     try {
-      const res = await fetch(`/api/absorb/data?projectId=${projectId}`);
+      const res = await fetch(`/api/absorb/data?projectId=${projectId}&t=${Date.now()}`, {
+         cache: 'no-store'
+      });
       const data = await res.json();
       setDailyNotes(data.dailyNotes || []);
       setSuggestedTasks(data.suggestedTasks || []);
@@ -196,7 +231,7 @@ export default function Home() {
     if (!activeProject) return;
     try {
       const res = await fetch('/api/absorb/tasks', {
-        method: 'POST',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ taskId, status, projectId: activeProject.id, task })
       });
@@ -205,6 +240,22 @@ export default function Home() {
       }
     } catch (e) {
       console.error("Task Update Error:", e);
+    }
+  };
+
+  const handleManualAddTask = async (task: string) => {
+    if (!activeProject) return;
+    try {
+        const res = await fetch('/api/absorb/tasks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ projectId: activeProject.id, task })
+        });
+        if (res.ok) {
+            fetchAbsorbData(activeProject.id);
+        }
+    } catch (e) {
+        console.error("Manual Task Add Error:", e);
     }
   };
 
@@ -276,9 +327,12 @@ export default function Home() {
       });
       if (res.ok) {
         fetchAbsorbData(activeProject.id);
+      } else {
+        throw new Error("Failed to absorb");
       }
     } catch (e) {
       console.error("Absorb Error:", e);
+      alert("Failed to absorb context.");
     }
     setIsAbsorbing(false);
   };
@@ -868,39 +922,79 @@ export default function Home() {
                              </details>
                            ) : (
                              <>
-                               {/* Metadata Header */}
-                               <div className="flex items-center gap-3 mb-2">
-                                 <span className="text-[10px] bg-(--theme-primary) text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm">
-                                   {typeLabel}
-                                 </span>
-                                 <span className="text-[10px] notion-text-subtle font-bold uppercase tracking-widest bg-(--theme-primary-bg) px-2.5 py-1 rounded-lg border border-(--border-color)">
-                                   {timestamp.toLocaleDateString(appLang)} {timestamp.toLocaleTimeString(appLang, { hour: '2-digit', minute: '2-digit' })}
-                                 </span>
-                               </div>
-
-                               {/* Content Area */}
-                               <div className={`mt-3 ${entryType === 'log' && 'py-1'}`}>
-                                 {entryType === 'log' && metadata?.hash ? (
-                                   <div>
-                                     <p className="text-[15px] font-medium leading-relaxed">{content}</p>
-                                     <div className="mt-2 flex items-center gap-2 text-[10px] notion-text-subtle font-mono">
-                                       <span className="bg-(--theme-primary-bg) px-1.5 py-0.5 rounded border border-(--border-color)">
-                                         {metadata.hash.substring(0, 7)}
-                                       </span>
-                                       <span>{metadata.author || 'Unknown'}</span>
-                                     </div>
-                                   </div>
-                                 ) : entryType === 'task' ? (
-                                    <p className={`text-[15px] font-medium leading-relaxed ${// eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    (entry as any).status === 'completed' ? 'line-through opacity-70' : ''}`}>
-                                        {content}
-                                    </p>
-                                 ) : (
-                                   <div className="markdown-content">
-                                     <ReactMarkdown>{content}</ReactMarkdown>
+                               {/* Edit Mode for Comment */}
+                               {entryType === 'comment' && editingCommentId === entry.id ? (
+                                  <div className="mt-2 border border-(--theme-primary) rounded-xl overflow-hidden shadow-sm">
+                                      <NotionEditor 
+                                        value={editingContent}
+                                        iconSet={appIconSet}
+                                        onChange={setEditingContent}
+                                        onSave={handleUpdateComment}
+                                        onCancel={() => {
+                                            setEditingCommentId(null);
+                                            setEditingContent("");
+                                        }}
+                                      />
+                                  </div>
+                               ) : (
+                                  <>
+                                    {/* Metadata Header & Actions */}
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-[10px] bg-(--theme-primary) text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm">
+                                                {typeLabel}
+                                            </span>
+                                            <span className="text-[10px] notion-text-subtle font-bold uppercase tracking-widest bg-(--theme-primary-bg) px-2.5 py-1 rounded-lg border border-(--border-color)">
+                                                {timestamp.toLocaleDateString(appLang)} {timestamp.toLocaleTimeString(appLang, { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        </div>
+                                        
+                                        {/* Actions for Comments */}
+                                        {entryType === 'comment' && (
+                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button 
+                                                    onClick={() => startEditingComment(entry.id, content)}
+                                                    className="p-1.5 text-gray-400 hover:text-(--theme-primary) hover:bg-gray-100 rounded transition-colors"
+                                                    title="Edit"
+                                                >
+                                                    <Edit2 size={14} />
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleDeleteComment(entry.id)}
+                                                    className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-                                 )}
-                               </div>
+
+                                    {/* Content Area */}
+                                    <div className={`mt-3 ${entryType === 'log' && 'py-1'}`}>
+                                    {entryType === 'log' && metadata?.hash ? (
+                                        <div>
+                                        <p className="text-[15px] font-medium leading-relaxed">{content}</p>
+                                        <div className="mt-2 flex items-center gap-2 text-[10px] notion-text-subtle font-mono">
+                                            <span className="bg-(--theme-primary-bg) px-1.5 py-0.5 rounded border border-(--border-color)">
+                                            {metadata.hash.substring(0, 7)}
+                                            </span>
+                                            <span>{metadata.author || 'Unknown'}</span>
+                                        </div>
+                                        </div>
+                                    ) : entryType === 'task' ? (
+                                        <p className={`text-[15px] font-medium leading-relaxed ${// eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                        (entry as any).status === 'completed' ? 'line-through opacity-70' : ''}`}>
+                                            {content}
+                                        </p>
+                                    ) : (
+                                        <div className="markdown-content">
+                                        <ReactMarkdown>{content}</ReactMarkdown>
+                                        </div>
+                                    )}
+                                    </div>
+                                  </>
+                               )}
                              </>
                            )}
                          </div>
@@ -953,7 +1047,10 @@ export default function Home() {
 
           {activeTab === "daily_notes" && (
             <div className="animate-fade-in">
-              <DailyNotes notes={dailyNotes} />
+              <DailyNotes 
+                notes={dailyNotes} 
+                isJapanesePluginEnabled={!!settings?.ENABLED_PLUGINS?.includes('plugin-jp')} 
+              />
             </div>
           )}
 
@@ -964,6 +1061,7 @@ export default function Home() {
                 onAdd={(t) => updateSuggestedTaskStatus(t.id, 'added', t.task)}
                 onDismiss={(t) => updateSuggestedTaskStatus(t.id, 'dismissed')}
                 onUpdateStatus={(t, status) => updateSuggestedTaskStatus(t.id, status, t.task)}
+                onManualAdd={handleManualAddTask}
               />
             </div>
           )}
@@ -993,20 +1091,52 @@ export default function Home() {
                  <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400">Previous Notes</h3>
                  {comments.length === 0 && <p className="text-gray-400 italic text-sm">No notes yet.</p>}
                  {comments.sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).map(c => (
-                    <div key={c.id} className="bg-white p-4 rounded-xl border border-(--border-color) shadow-sm">
-                       <div className="flex justify-between items-center mb-2">
-                          <span className="text-[10px] font-bold bg-gray-100 px-2 py-1 rounded text-gray-500">
-                            {new Date(c.timestamp).toLocaleDateString()}
-                          </span>
-
-                       </div>
-                       <div className="markdown-content text-sm">
-                          {c.type === 'code' ? (
-                             <pre className="bg-neutral-900 text-emerald-400 p-2 rounded"><code>{c.text}</code></pre>
-                          ) : (
-                             <ReactMarkdown>{c.text}</ReactMarkdown>
-                          )}
-                       </div>
+                    <div key={c.id} className="bg-white p-4 rounded-xl border border-(--border-color) shadow-sm group">
+                       {editingCommentId === c.id ? (
+                           <div className="border border-(--theme-primary) rounded-xl overflow-hidden shadow-sm">
+                               <NotionEditor 
+                                 value={editingContent}
+                                 iconSet={appIconSet}
+                                 onChange={setEditingContent}
+                                 onSave={handleUpdateComment}
+                                 onCancel={() => {
+                                     setEditingCommentId(null);
+                                     setEditingContent("");
+                                 }}
+                               />
+                           </div>
+                       ) : (
+                           <>
+                               <div className="flex justify-between items-center mb-2">
+                                  <span className="text-[10px] font-bold bg-gray-100 px-2 py-1 rounded text-gray-500">
+                                    {new Date(c.timestamp).toLocaleDateString()}
+                                  </span>
+                                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button 
+                                            onClick={() => startEditingComment(c.id, c.text)}
+                                            className="p-1.5 text-gray-400 hover:text-(--theme-primary) hover:bg-gray-100 rounded transition-colors"
+                                            title="Edit"
+                                        >
+                                            <Edit2 size={14} />
+                                        </button>
+                                        <button 
+                                            onClick={() => handleDeleteComment(c.id)}
+                                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                                            title="Delete"
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                  </div>
+                               </div>
+                               <div className="markdown-content text-sm">
+                                  {c.type === 'code' ? (
+                                     <pre className="bg-neutral-900 text-emerald-400 p-2 rounded"><code>{c.text}</code></pre>
+                                  ) : (
+                                     <ReactMarkdown>{c.text}</ReactMarkdown>
+                                  )}
+                               </div>
+                           </>
+                       )}
                     </div>
                  ))}
               </div>

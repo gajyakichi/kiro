@@ -16,8 +16,7 @@ export async function GET(req: NextRequest) {
     });
     const suggestedTasks = await db.suggestedTask.findMany({
       where: { 
-        project_id: Number(projectId),
-        status: 'proposed'
+        project_id: Number(projectId)
       },
       orderBy: { timestamp: 'desc' }
     });

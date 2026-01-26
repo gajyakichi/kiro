@@ -13,5 +13,20 @@
     "timestamp": 1769402956382,
     "latencyMs": 274173,
     "content": "{\"completed_tasks\": [\"Configure a GitHub Actions CI pipeline to run linting, unit tests, and build steps on every push and PR.\", \"Set up a CI pipeline that runs linting, tests, and builds for both Electron and web targets.\", \"Electron アプリ起動時に .env から設定を読み込み、即時反映される永続化ロジックを改善する\", \"Theme Lab の CSS エディタにリアルタイムプレビュー機能を実装し、変更が即座に反映されるようにする\", \"GitHub Actions に Lint・テスト・ビルドの自動化パイプラインを構築する\", \"UI/UX：Theme Lab でのテーマプリセットをさらに追加し、プレビュー時のハイライトと切替アニメーションを改良する\", \"ユーザー体験：Vault 選択時に「確認」ダイアログを表示し、必須選択フローをより直感的にする\"]}"
+  },
+  "c076350da4dc42c5a88205d4b28e453be4ccfa332db5abc21bc322762e0cdf8c": {
+    "timestamp": 1769409303969,
+    "latencyMs": 213769,
+    "content": "{\"tasks\":[\"UIのアクセシビリティテストを追加し、スクリーンリーダー対応を検証する\",\"AIプランのエラー処理を強化し、エラーメッセージをユーザーに分かりやすく表示する\",\"新規テーマプリセットをGitHub Actionsで自動生成するスクリプトを作成し、CIに組み込む\",\"マルチプラットフォーム対応のため、Electronビルド構成を分離し、macOS/Linux/Windowsでビルドをテストする\",\"ドキュメントに「テーマLabの使い方」セクションを追加し、サンプルGIFを含める\"]}"
+  },
+  "872e0cd8d91e398db604a41fc35785fa98f88816a88e3f56a668a099e4016060": {
+    "timestamp": 1769409328909,
+    "latencyMs": 238710,
+    "content": "{\"en\":\"2026‑01‑26 – Key deliverables:\\n- Enhanced timeline, refactored tasks UI, and improved AI‑task validation.\\n- Added bilingual daily summary toggle (EN/JA).\\n- Updated Theme Lab with new presets, preview animations, and Jest lint suppression.\\n- Implemented unit tests for AI suggestions; fixed AI provider env handling.\\n- Introduced GitHub Actions pipeline (Lint, Test, Build).\\n- Integrated BlockNote editor; expanded AI‑suggestion language support; added AI prompt copy.\\n- Fixed linting issues in Electron and Theme API; ensured progress save for features/cal‑view.\\n- Migrated sidebar navigation icons to dynamic system; decoupled icon set from theme; added global icon sets.\\n- Completed Japanese localization, workspace management, vault persistence.\\n- Unified Note Timeline blocks, improved UI aesthetics.\\n- Added mandatory vault selection, sidebar switcher, theme sync.\\n- Rebranded to Kiro; added Local AI (Ollama) support; implemented vault storage mode.\\n- Implemented AI‑powered project absorption.\\n- Polished theme readability and contrast.\\n\",\"ja\":\"2026‑01‑26 – 本日の主要成果:\\n- タイムラインの拡張、タスクUIのリファクタリング、AIタスク検証の改善。\\n- バイリンガル日次サマリトグル（EN/JA）を追加。\\n- Theme Labを新プリセット、プレビューアニメーション、Jest lint抑制で更新。\\n- AI提案用ユニットテスト実装とAIプロバイダenv処理の修正。\\n- GitHub Actionsパイプライン（Lint, Test, Build）を導入。\\n- BlockNoteエディタを統合、AI提案言語サポート拡張、AIプロンプトコピー追加。\\n- ElectronとTheme APIのlintエラーを修正し、features/cal‑viewの進捗保存を保証。\\n- サイドバーナビゲーションアイコンをダイナミックシステムへ移行、テーマからアイコンセットを分離、グローバルアイコンセットを追加。\\n- 日本語ローカライズ完了、ワークスペース管理、ボルト永続化を実装。\\n- ノートタイムラインブロックを統一、UI美観を向上。\\n- ボルト選択必須化、サイドバースイッチャー、テーマ同期を追加。\\n- Kiroへリブランド、Local AI（Ollama）サポート追加、ボルトストレージモードを実装。\\n- AI駆動プロジェクト吸収機能を実装。\\n- テーマ可読性とコントラストを最終調整。\"}"
+  },
+  "a410e97bebc4ee4f1f1085a58b1f424ed691f12fb9913c60c6d11703365ade3d": {
+    "timestamp": 1769409345016,
+    "latencyMs": 254815,
+    "content": "{\"completed_ids\":[5,33,35,36]}"
   }
 }
