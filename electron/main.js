@@ -27,6 +27,7 @@ function createWindow() {
     titleBarStyle: 'hiddenInset', // Modern macOS look
     backgroundColor: '#ffffff',
     title: 'Kiro',
+    icon: path.join(__dirname, '../public/icon.png'),
   });
 
   // In development, load from the Next.js dev server

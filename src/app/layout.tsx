@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Kiro",
   description: "Track your development trajectory",
+  icons: { icon: '/icon.png' },
 };
 
 export default function RootLayout({
