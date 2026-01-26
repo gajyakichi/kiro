@@ -53,6 +53,8 @@ model DailyNote {
   project_id Int
   date       String
   content    String
+  content_en String?
+  content_ja String?
   timestamp  DateTime @default(now())
   project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
 

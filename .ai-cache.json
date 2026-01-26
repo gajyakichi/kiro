@@ -8,5 +8,15 @@
     "timestamp": 1769393178517,
     "latencyMs": 48671,
     "content": "エレクトロンアプリのユニットテストと統合テストを追加し、CIでの自動テストを確実にする。  \nWCAG AA基準に準拠するアクセシビリティ向上を実装し、スクリーンリーダー対応を確認する。  \n日本語以外の主要言語（英語・中国語・韓国語）のローカライズを追加し、言語切替機能を改良する。  \nビルドサイズを分析し、コード分割や圧縮を行い起動時間を短縮する。  \nユーザーマニュアルとチュートリアルを作成し、設定画面のヘルプを充実させる。"
+  },
+  "3889b134d104023571ac3da8c5db56c94dc7fc2a16fa81fef612c4e7ada34edb": {
+    "timestamp": 1769400756693,
+    "latencyMs": 42506,
+    "content": "**Daily Development Report – 2026‑01‑26**\n\n| Category | Deliverables & Technical Highlights |\n|----------|-------------------------------------|\n| **Theme Lab** | • Added several new theme presets and introduced preview‑animation hooks.<br>• Suppressed Jest‑config lint errors to keep CI clean.<br>• Improved hover‑UI and animation logic, ensuring real‑time CSS preview. |\n| **Testing** | • Implemented unit tests for AI suggestion generation.<br>• Fixed environment‑variable handling for the AI provider. |\n| **CI/CD** | • Added a GitHub Actions workflow that runs lint, test, and build jobs on every push. |\n| **Editor Integration** | • Integrated the BlockNote editor into the Memo feature.<br>• Extended AI suggestion language support and added an “AI prompt copy” utility. |\n| **Electron / Theme API** | • Resolved remaining linting errors in the Electron build and the Theme API.<br>• Enabled progress persistence for the `features/cal-view` screen. |\n| **Icon & Localization** | • Decoupled icon sets from theme selection, introduced global icon sets in Theme Lab.<br>• Completed Japanese localization, workspace management, and vault persistence. |\n| **UI & UX** | • Unified Note Timeline blocks, refined UI aesthetics, and enhanced note‑timeline interactions. |\n\n**Takeaway**  \nThe day delivered a solid mix of new features, quality‑assurance work, and infrastructure improvements that collectively raise the user experience, developer ergonomics, and project reliability."
+  },
+  "feaa34b63f0dfba1d4c3036444f1016586c5c9ef6355d588db725543cc789830": {
+    "timestamp": 1769400778477,
+    "latencyMs": 64288,
+    "content": "CIにカバレッジレポートを追加し、最低80%を目標にする  \nAI提案UIのエンドツーエンドテストを実装し、エラーハンドリングを検証する  \n日本語以外の主要言語（英語・中国語）のローカライズを追加し、i18nキーを統一する  \nテーマLabのパフォーマンスを向上させ、プリロードキャッシュや最小化を検討する  \nREADMEとドキュメントを更新し、ローカルAI（Ollama）サポートのセットアップ手順を明記する"
   }
 }

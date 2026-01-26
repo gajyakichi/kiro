@@ -51,6 +51,8 @@ export interface DailyNote {
   project_id: number;
   date: string;
   content: string;
+  content_en?: string | null;
+  content_ja?: string | null;
   timestamp: string;
 }
 

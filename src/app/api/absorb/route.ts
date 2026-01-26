@@ -31,10 +31,14 @@ ${contextData.walkthrough || 'No walkthrough available.'}
     `;
 
     // 3. AI Analysis
-    const [summary, tasks] = await Promise.all([
+    const [summaryObj, tasks] = await Promise.all([
       generateDailySummary(contextString),
       suggestTasks(contextString, process.env.APP_LANG || 'en')
     ]);
+
+    const { en: summaryEn, ja: summaryJa } = summaryObj;
+    // Default content to English or APP_LANG preference
+    const defaultContent = process.env.APP_LANG === 'ja' ? summaryJa : summaryEn;
 
     const date = new Date().toISOString().split('T')[0];
 
@@ -48,11 +52,17 @@ ${contextData.walkthrough || 'No walkthrough available.'}
             date: date
           }
         },
-        update: { content: summary },
+        update: { 
+          content: defaultContent,
+          content_en: summaryEn,
+          content_ja: summaryJa
+        },
         create: {
           project_id: Number(projectId),
           date: date,
-          content: summary
+          content: defaultContent,
+          content_en: summaryEn,
+          content_ja: summaryJa
         }
       });
 
@@ -79,7 +89,9 @@ ${contextData.walkthrough || 'No walkthrough available.'}
 
     return NextResponse.json({ 
       success: true, 
-      summary, 
+      summary: defaultContent,
+      summary_en: summaryEn,
+      summary_ja: summaryJa,
       tasks 
     });
 

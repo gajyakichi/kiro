@@ -129,12 +129,12 @@ async function getChatCompletion(messages: Message[]) {
 /**
  * Generates a summary (Daily Note) from Git logs and walkthrough context.
  */
-export async function generateDailySummary(context: string): Promise<string> {
+export async function generateDailySummary(context: string): Promise<{ en: string; ja: string }> {
   try {
     const content = await getChatCompletion([
       {
         role: "system",
-        content: "You are a helpful development assistant. Summarize the provided Git logs and project walkthrough into a concise daily report. Focus on what was accomplished and any significant technical changes. Use a professional, minimalist tone similar to Notion notes. Respond in Japanese if the input is primarily Japanese, otherwise English."
+        content: "You are a helpful development assistant. Summarize the provided Git logs and project walkthrough into a concise daily report. Focus on what was accomplished and any significant technical changes. Use a professional, minimalist tone similar to Notion notes. \n\nYou must return the result as a JSON object with two keys:\n- 'en': The summary in English\n- 'ja': The summary in Japanese\n\nEnsure strict JSON format."
       },
       {
         role: "user",
@@ -142,10 +142,26 @@ export async function generateDailySummary(context: string): Promise<string> {
       }
     ]);
 
-    return content || "Failed to generate summary.";
+    if (!content) throw new Error("No content received from AI");
+
+    // Attempt to parse JSON
+    try {
+      const parsed = JSON.parse(content);
+      return {
+        en: parsed.en || "Summary generation failed (EN)",
+        ja: parsed.ja || "Summary generation failed (JA)"
+      };
+    } catch (e) {
+      console.warn("AI did not return valid JSON, falling back to text", e);
+      // Fallback: treat the whole content as English (or based on detection)
+      // For now, duplicate it or try to split if possible. 
+      // Given the prompt, it usually complies.
+      return { en: content, ja: content };
+    }
   } catch (error) {
     console.error("Error generating AI summary:", error);
-    return `AI Summary unavailable. (${(error as Error).message})`;
+    const msg = `AI Summary unavailable. (${(error as Error).message})`;
+    return { en: msg, ja: msg };
   }
 }
 
