@@ -73,5 +73,40 @@
     "timestamp": 1769423339025,
     "latencyMs": 43885,
     "content": "{ \"completed_ids\": [] }"
+  },
+  "c8aed3f2175a7b8fc7b0aab48223c9440108237624c642072a1ca899f9e77b56": {
+    "timestamp": 1769428252981,
+    "latencyMs": 142120,
+    "content": "{\"tasks\":[\"AI提案履歴機能を実装し、ユーザーが閲覧・編集・削除できるUIを追加する\",\"Theme Labの新プリセットとプレビューアニメーションに対する統合テストを作成する\",\"Electronメイン・レンダラプロセスのパフォーマンスプロファイリングを行い、タイムライン描画の最適化案を策定する\",\"UIに右から左への言語（RTL）サポートを追加し、既存レイアウトを調整する\"]}"
+  },
+  "b3ca6c68e077b85dc3632c04632e5fcf70b9b8b2f52b7775074f40aac5c16652": {
+    "timestamp": 1769428265429,
+    "latencyMs": 154569,
+    "content": "{ \"completed_ids\": [8] }"
+  },
+  "de614787d55777f3a27a3c97b9be79da1ac3d20baa203bdf26d3ef4a6736c70a": {
+    "timestamp": 1769428291206,
+    "latencyMs": 180348,
+    "content": "{\"en\":\"- Jan 26: Resolved lint errors across multiple modules, updated system calendar and UI/UX, added comprehensive unit tests for NotionEditor, SuggestedTasks, AI module, and enhanced CI pipeline with GitHub Actions. Introduced bilingual daily summary toggle (EN/JA), added localization support, and integrated BlockNote editor with improved AI suggestion language handling. Updated Theme Lab with new presets, preview animations, and suppressed Jest lint warnings. Implemented global icon sets, refactored tasks UI, and enhanced AI task checking.\\n- Jan 24: Migrated sidebar navigation icons to a dynamic icon set system and decoupled icon set from theme selection. Fixed settings persistence by reading .env directly and enhanced theme hover UI/animations. Completed Japanese localization, added workspace management, and improved vault persistence. Added global icon sets to Theme Lab.\\n- Jan 23: Implemented mandatory vault selection, sidebar switcher, and UI theme synchronization. Rebranded to Kiro, added Local AI (Ollama) support, and introduced Vault storage mode.\\n\\nKey achievements: comprehensive lint cleanup, robust testing, CI/CD pipeline, localization, AI integration, icon system overhaul, and foundational vault architecture changes.\",\"ja\":\"- 1月26日：複数モジュールのリンティングエラーを修正し、システムカレンダーとUI/UXを更新。NotionEditor、SuggestedTasks、AIモジュールの包括的単体テストを追加し、GitHub ActionsでCIパイプラインを強化。バイリンガル日次サマリー切替（EN/JA）を導入し、ローカリゼーションを追加。BlockNoteエディタ統合とAI提案言語処理の改善。Theme Labを新プリセットとプレビューアニメーションに更新し、Jestのリンティング警告を抑制。全体アイコンセットを実装し、タスクUIをリファクタリング、AIタスクチェックを強化。\\n- 1月24日：サイドバーアイコンを動的アイコンセットシステムへ移行し、テーマ選択から分離。設定永続化を.envから直接読み込むよう修正し、テーマホバーUI/アニメーションを改善。日本語ローカリゼーションを完成させ、ワークスペース管理とボルト永続化を向上。Theme Labに全体アイコンセットを追加。\\n- 1月23日：必須ボルト選択、サイドバー切替、UIテーマ同期を実装。Kiroへリブランドし、Local AI（Ollama）サポートを追加、ボルトストレージモードを導入。\\n\\n主要成果：包括的リンティング修正、堅牢なテスト、CI/CDパイプライン、ローカリゼーション、AI統合、アイコンシステム刷新、基盤ボルトアーキテクチャの変更。\"}"
+  },
+  "bfd5860607411aa8379d938784fb54b53373286615646ade514d82b5c803bcf2": {
+    "timestamp": 1769428525009,
+    "latencyMs": 93607,
+    "content": "{\n  \"completed_ids\": []\n}"
+  },
+  "68554cb6f84aa07be35144983ec2e88511436fa6785ce5b3f286c5486bda1d25": {
+    "timestamp": 1769428889496,
+    "latencyMs": 152815,
+    "content": "{\"tasks\":[\"主要機能の統合テストを追加し、CIで自動実行する\",\"モバイルデバイス向けのレスポンシブデザインを最適化する\",\"ビルドサイズとロード時間のベンチマークを実施し、パフォーマンスを最小化する\",\"LighthouseでWCAG AA基準を再度監査し、残るアクセシビリティ問題を修正する\",\"GitHub Actionsで本番環境へのデプロイパイプラインを構築し、環境変数管理を整備する\"]}"
+  },
+  "7eac88c56f6be41a66787dc9e691ddeed34c838966495061d017ff911a484e02": {
+    "timestamp": 1769428919264,
+    "latencyMs": 182586,
+    "content": "{\"en\":\"- 2026‑01‑26: Completed major accessibility audit, adding WCAG‑AA compliant semantics and aria‑labels.\\n- Resolved all lint errors across page.tsx, Electron, and Theme API.\\n- Updated system calendar to align with timeline design and included every activity type.\\n- Added unit tests for NotionEditor, SuggestedTasks, and AI modules, improving test coverage.\\n- Introduced UI/UX enhancements, full localization support (EN/JA) with toggle, and refined CI pipeline.\\n- Refactored timeline and tasks UI, strengthened AI task‑checking logic.\\n- Implemented bilingual daily summary feature.\\n- Expanded Theme Lab with new presets, preview animations, and lint suppression.\\n- Fixed AI provider environment handling and added AI suggestion tests.\\n- Added GitHub Actions for lint, test, and build.\\n- Integrated BlockNote editor for memo, added AI prompt copy, and broadened language support.\\n- Migrated sidebar icons to a dynamic icon‑set system, decoupled icon set from theme selection, and added global icon sets in Theme Lab.\\n- Completed Japanese localization, workspace management, and improved vault persistence.\\n- Unified Note Timeline blocks and enhanced UI aesthetics.\\n- 2026‑01‑24: Resolved settings persistence by reading .env directly, refined theme hover UI, and fixed settings‑save logic.\\n- 2026‑01‑23: Mandated vault selection, added sidebar switcher, and synchronized UI theme across the app.\",\"ja\":\"- 2026‑01‑26: WCAG‑AA に準拠したセマンティクスと aria‑label を追加し、アクセシビリティを大幅に向上。\\n- page.tsx、Electron、Theme API 全体のリントエラーを解消。\\n- システムカレンダーをタイムラインデザインに合わせ、全活動種別を含めて更新。\\n- NotionEditor、SuggestedTasks、AI モジュールのユニットテストを追加し、テスト網羅性を向上。\\n- UI/UX 改善、完全なローカリゼーション（EN/JA）と切替機能を導入、CI パイプラインを洗練。\\n- タイムラインとタスク UI をリファクタリングし、AI タスクチェックロジックを強化。\\n- バイリンガル日次サマリー機能を実装。\\n- Theme Lab に新プリセットとプレビューアニメーションを追加、リント抑制を実装。\\n- AI プロバイダー環境処理を修正し、AI 推奨テストを追加。\\n- GitHub Actions でリント・テスト・ビルドを自動化。\\n- BlockNote エディタ（メモ）を統合、AI プロンプトコピーを追加、言語サポートを拡充。\\n- サイドバーナビゲーションアイコンを動的アイコンセットに移行、テーマ選択から切り離し、Theme Lab にグローバルアイコンセットを追加。\\n- 日本語ローカリゼーションを完了、ワークスペース管理とボールト永続化を改善。\\n- ノートタイムラインブロックを統一し、UI の美観を向上。\\n- 2026‑01‑24: .env から直接読み込むことで設定永続化を解決、テーマホバー UI と設定保存ロジックを改善。\\n- 2026‑01‑23: ボールト選択を必須化、サイドバー切替を追加、UI テーマを統一。\"}"
+  },
+  "345f0e56cb9fb4567c43a4c69748a6355d7ab1bfbe5c7152999777359a8f00ad": {
+    "timestamp": 1769428931116,
+    "latencyMs": 194435,
+    "content": "{ \"completed_ids\": [7, 12, 18, 22] }"
   }
 }

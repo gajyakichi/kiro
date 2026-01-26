@@ -20,7 +20,7 @@ const VaultSwitcher = dynamic(() => import('@/components/VaultSwitcher').then(mo
 const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'));
 const DailyNotes = dynamic(() => import('@/components/DailyNotes'));
 
-import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, PanelBottom, X } from 'lucide-react';
+import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, PanelBottom, X, Check, AlertTriangle } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
 
 export default function Home() {
@@ -28,6 +28,7 @@ export default function Home() {
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [progress, setProgress] = useState<Progress | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [dialogState, setDialogState] = useState<{ open: boolean; title: string; message: string; type: 'success' | 'error' }>({ open: false, title: "", message: "", type: 'success' });
   const [dbLogs, setDbLogs] = useState<DbLog[]>([]);
   const [newComment, setNewComment] = useState("");
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
@@ -361,13 +362,23 @@ export default function Home() {
       });
       if (res.ok) {
         await fetchAbsorbData(activeProject.id);
-        alert("Absorbが完了しました");
+        setDialogState({
+          open: true,
+          title: "完了",
+          message: "Absorbが完了しました",
+          type: 'success'
+        });
       } else {
         throw new Error("Absorbに失敗しました");
       }
     } catch (e) {
       console.error("Absorb Error:", e);
-      alert(`エラー: ${(e as Error).message}`);
+      setDialogState({
+        open: true,
+        title: "エラー",
+        message: `エラー: ${(e as Error).message}`,
+        type: 'error'
+      });
     }
     setIsAbsorbing(false);
   };
@@ -1355,6 +1366,27 @@ export default function Home() {
                 </div>
             </div>
         )}
+      {/* Custom Dialog */}
+      {dialogState.open && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in zoom-in-95 duration-200 border border-neutral-100">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${dialogState.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+              <Check size={24} className={dialogState.type === 'success' ? 'block' : 'hidden'} />
+              <AlertTriangle size={24} className={dialogState.type === 'error' ? 'block' : 'hidden'} />
+            </div>
+            <h3 className="text-lg font-bold text-neutral-900 mb-2">{dialogState.title}</h3>
+            <p className="text-sm text-neutral-600 mb-6 leading-relaxed whitespace-pre-wrap">
+              {dialogState.message}
+            </p>
+            <button
+              onClick={() => setDialogState(prev => ({ ...prev, open: false }))}
+              className="w-full py-2.5 bg-neutral-900 text-white rounded-xl font-bold text-sm hover:bg-neutral-800 transition-colors"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
       </main>
 
       <style key={previewCss ? 'preview-active' : (themes.find(t => t.active)?.id || 'original')} dangerouslySetInnerHTML={{ __html: `

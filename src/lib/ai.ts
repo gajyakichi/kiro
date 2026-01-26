@@ -45,11 +45,22 @@ const getCache = (): Record<string, CacheEntry> => {
   return {};
 };
 
+const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
 const setCache = (key: string, content: string, latencyMs: number) => {
   try {
     const cache = getCache();
+    const now = Date.now();
+    
+    // Prune old entries to keep file size manageable
+    Object.keys(cache).forEach(k => {
+      if (now - cache[k].timestamp > CACHE_TTL_MS) {
+        delete cache[k];
+      }
+    });
+
     cache[key] = {
-      timestamp: Date.now(),
+      timestamp: now,
       latencyMs,
       content
     };
@@ -79,9 +90,11 @@ export async function getChatCompletion(messages: Message[], options: { json?: b
   // 1. Check Cache
   const cache = getCache();
   if (cache[cacheKey]) {
-    console.log(`[AI Cache Hit] Latency saved: ${cache[cacheKey].latencyMs}ms`);
+    console.log(`[AI Cache Hit] Latency saved: ${cache[cacheKey].latencyMs}ms (Provider: ${AI_PROVIDER})`);
     return cache[cacheKey].content;
   }
+
+  console.log(`[AI] Cache Miss. Processing via ${AI_PROVIDER} (${model})...`);
 
   const startTime = performance.now();
   let content = "";
