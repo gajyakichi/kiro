@@ -20,7 +20,7 @@ const VaultSwitcher = dynamic(() => import('@/components/VaultSwitcher').then(mo
 const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'));
 const DailyNotes = dynamic(() => import('@/components/DailyNotes'));
 
-import { Sparkles, FileText, Code, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, PanelBottom, X } from 'lucide-react';
+import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, PanelBottom, X } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
 
 export default function Home() {
@@ -496,7 +496,12 @@ export default function Home() {
       return 'bg-(--theme-primary) border border-(--theme-primary)';
     };
 
-    const weeks = [];
+    type ContributionDay = {
+       date: Date;
+       dateStr: string;
+       data: ActivityEntry[];
+    };
+    const weeks: ContributionDay[][] = [];
     const current = new Date(startDate);
 
     for (let i = 0; i < 53; i++) {
