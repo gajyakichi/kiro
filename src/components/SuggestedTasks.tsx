@@ -1,6 +1,6 @@
 import React from 'react';
 import { SuggestedTask } from '@/lib/types';
-import { Lightbulb, Plus, X } from 'lucide-react';
+import { Lightbulb, Plus, X, Copy } from 'lucide-react';
 
 interface SuggestedTasksProps {
   tasks: SuggestedTask[];
@@ -9,6 +9,11 @@ interface SuggestedTasksProps {
 }
 
 const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss }) => {
+  const handleCopyPrompt = (taskText: string) => {
+    const prompt = `Please implement the following task:\n\n${taskText}\n\nContext: Use the existing project structure and conventions.`;
+    navigator.clipboard.writeText(prompt);
+  };
+
   if (tasks.filter(t => t.status === 'proposed').length === 0) {
     return (
       <div className="text-center py-12 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
@@ -31,6 +36,14 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
           </div>
           
           <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+            <button 
+              onClick={() => handleCopyPrompt(task.task)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-md text-xs font-semibold transition-all mr-auto"
+              title="Copy Prompt for AI Agent"
+            >
+              <Copy size={14} />
+              AI Prompt
+            </button>
             <button 
               onClick={() => onDismiss(task)}
               className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-neutral-100 rounded-md transition-colors"

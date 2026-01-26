@@ -77,12 +77,13 @@ export async function generateDailySummary(context: string): Promise<string> {
 /**
  * Suggests actionable TODO items based on the project context.
  */
-export async function suggestTasks(context: string): Promise<string[]> {
+export async function suggestTasks(context: string, language: string = 'en'): Promise<string[]> {
   try {
+    const langInstruction = language === 'ja' ? "Respond in Japanese." : "Respond in English.";
     const content = await getChatCompletion([
       {
         role: "system",
-        content: "Analyze the project context (Git logs and walkthrough) and suggest 3-5 actionable next steps (TODOs). Each task should be descriptive but concise. Return the tasks as a simple list, one per line, without numbers or bullets."
+        content: `Analyze the project context (Git logs and walkthrough) and suggest 3-5 actionable next steps (TODOs). Each task should be descriptive but concise. Return the tasks as a simple list, one per line, without numbers or bullets. ${langInstruction}`
       },
       {
         role: "user",

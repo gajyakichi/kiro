@@ -7,12 +7,13 @@ import ReactMarkdown from 'react-markdown';
 import { IconRenderer } from '@/components/IconRenderer';
 import { IconPicker } from '@/components/IconPicker';
 import { ThemeLab } from '@/components/ThemeLab';
-import { Sparkles, PenTool, AlignLeft, FileText, Code, ShieldAlert, PlusCircle, Plus, Folder } from 'lucide-react';
+import { Sparkles, PenTool, FileText, Code, ShieldAlert, PlusCircle, Plus, Folder } from 'lucide-react';
 import DailyNotes from '@/components/DailyNotes';
 import SuggestedTasks from '@/components/SuggestedTasks';
-import MarkdownEditor from '@/components/MarkdownEditor';
+import NotionEditor from '@/components/NotionEditor';
+// import MarkdownEditor from '@/components/MarkdownEditor'; // Deprecated
 import { VaultSwitcher } from '@/components/VaultSwitcher';
-import { getTranslation, Translations } from '@/lib/i18n';
+import { getTranslation } from '@/lib/i18n';
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -534,7 +535,7 @@ export default function Home() {
       )}
 
       {/* Notion Sidebar */}
-      <aside className="w-64 notion-sidebar flex flex-col pt-8 pb-4 px-3 sticky top-0 h-screen overflow-y-auto">
+      <aside className="w-80 notion-sidebar flex flex-col pt-8 pb-4 px-3 sticky top-0 h-screen overflow-y-auto">
         <div className="mb-6">
           <div className="px-2 mt-4">
             <div className="flex items-center justify-between mb-2">
@@ -695,49 +696,17 @@ export default function Home() {
           <VaultSwitcher appLang={appLang} onSwitch={fetchProjects} className="px-2" />
         </div>
 
-        <div className="mt-auto px-2 pt-4 border-t border-(--border-color)">
-          <div className="flex items-center justify-between mb-3">
-            <div className="font-bold text-[10px] text-gray-500 uppercase tracking-widest bg-gray-100/50 w-fit px-2 py-0.5 rounded">{t.quick_note}</div>
-            <div className="flex gap-1.5 bg-gray-100/30 p-1 rounded-lg border border-gray-100/50">
-              <button 
-                onClick={() => setActiveBlockType('text')}
-                className={`p-1 rounded transition-all ${activeBlockType === 'text' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
-                title="Text"
-              >
-                <AlignLeft size={12} />
-              </button>
-              <button 
-                onClick={() => setActiveBlockType('markdown')}
-                className={`p-1 rounded transition-all ${activeBlockType === 'markdown' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
-                title="Markdown"
-              >
-                <FileText size={12} />
-              </button>
-              <button 
-                onClick={() => setActiveBlockType('code')}
-                className={`p-1 rounded transition-all ${activeBlockType === 'code' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
-                title="Code"
-              >
-                <Code size={12} />
-              </button>
-            </div>
+          {/* Quick Note Replaced by Block Editor */}
+          <div className="h-48 border border-(--border-color) rounded-xl overflow-hidden bg-white flex flex-col">
+            <NotionEditor 
+              value={newComment}
+              iconSet={appIconSet}
+              compact={true}
+              onChange={setNewComment}
+              onSave={handleAddComment}
+              onCancel={() => setNewComment("")} // "Cancel" now clears the note
+            />
           </div>
-          <textarea 
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            className="w-full bg-white border border-(--border-color) rounded-md p-2 text-sm focus:outline-none focus:border-gray-400 h-20 mb-2 resize-none text-neutral-800 placeholder:text-neutral-400 font-medium"
-            placeholder={activeBlockType === 'code' ? t.placeholder_code : activeBlockType === 'markdown' ? t.placeholder_markdown : t.placeholder_text}
-          />
-          <button 
-            onClick={handleAddComment}
-            className="w-full bg-foreground text-background hover:opacity-90 font-medium py-1.5 rounded-md transition-colors text-xs flex items-center justify-center gap-2"
-          >
-            {activeBlockType === 'code' && <Code size={12} />}
-            {activeBlockType === 'markdown' && <FileText size={12} />}
-            {activeBlockType === 'text' && <AlignLeft size={12} />}
-            {t.add_block.replace('{type}', (t[`type_${activeBlockType}` as keyof Translations] as string) || activeBlockType)}
-          </button>
-        </div>
       </aside>
 
       <main className="flex-1 h-full overflow-y-auto p-12 lg:px-20 xl:px-40">
@@ -874,8 +843,9 @@ export default function Home() {
               </div>
 
               {isFullEditorOpen ? (
-                <MarkdownEditor 
+                <NotionEditor 
                   value={newComment}
+                  iconSet={appIconSet}
                   onChange={setNewComment}
                   onCancel={() => setIsFullEditorOpen(false)}
                   onSave={() => {
@@ -910,7 +880,7 @@ export default function Home() {
                               {type === 'walkthrough' && <span>✨</span>}
                               {type === 'markdown' && <FileText size={16} />}
                               {type === 'code' && <Code size={16} />}
-                              {type === 'text' && <AlignLeft size={16} />}
+                              {type === 'text' && <FileText size={16} />}
                               {(!type || type === 'unknown' || type === 'note') && <span className="text-[10px] font-bold">{t.entry_marker}</span>}
                             </div>
 

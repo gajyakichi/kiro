@@ -33,7 +33,7 @@ ${contextData.walkthrough || 'No walkthrough available.'}
     // 3. AI Analysis
     const [summary, tasks] = await Promise.all([
       generateDailySummary(contextString),
-      suggestTasks(contextString)
+      suggestTasks(contextString, process.env.APP_LANG || 'en')
     ]);
 
     const date = new Date().toISOString().split('T')[0];
