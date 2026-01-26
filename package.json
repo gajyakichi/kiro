@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "echo 'No tests yet' && exit 0",
     "electron:dev": "electron .",
     "app": "concurrently \"npm run dev -- -p 3005\" \"wait-on http://localhost:3005 && npm run electron:dev\""
   },
