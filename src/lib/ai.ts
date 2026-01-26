@@ -63,7 +63,7 @@ const setCache = (key: string, content: string, latencyMs: number) => {
  * Unified Chat Completion function with Caching & Latency Measurement
  */
 // Update signature
-async function getChatCompletion(messages: Message[], options: { json?: boolean } = {}) {
+export async function getChatCompletion(messages: Message[], options: { json?: boolean } = {}) {
   const AI_PROVIDER = process.env.AI_PROVIDER || 'openai';
   const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
   const model = process.env.AI_MODEL || (AI_PROVIDER === 'openai' ? 'gpt-4o-mini' : 'llama3');

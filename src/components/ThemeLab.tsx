@@ -201,17 +201,17 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
         </div>
 
         {/* Global Icon Settings Row */}
-        <div className="mb-8 p-6 bg-neutral-50 rounded-2xl border border-neutral-100 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
-          <div className="flex items-center gap-5 w-full md:w-auto">
+        <div className="mb-8 p-6 bg-neutral-50 rounded-2xl border border-neutral-100 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm overflow-hidden">
+          <div className="flex items-center gap-5 w-full md:w-auto overflow-hidden">
              <div className="w-12 h-12 shrink-0 rounded-xl bg-white border border-neutral-200 flex items-center justify-center shadow-xs">
                 <IconRenderer icon="Settings" size={24} className="text-neutral-500" baseSet={appIconSet} />
              </div>
              <div className="min-w-0">
-                <p className="text-[15px] font-black text-gray-800 tracking-tight">Global Icon Set</p>
-                <p className="text-[11px] text-neutral-400 font-bold uppercase tracking-widest whitespace-nowrap">Selected style applies everywhere</p>
+                <p className="text-[15px] font-black text-gray-800 tracking-tight truncate">Global Icon Set</p>
+                <p className="text-[11px] text-neutral-400 font-bold uppercase tracking-widest whitespace-nowrap truncate">Selected style applies everywhere</p>
              </div>
           </div>
-          <div className="flex bg-white p-1.5 rounded-xl border border-neutral-200 gap-1 w-full md:w-auto shrink-0 shadow-inner group">
+          <div className="flex bg-white p-1.5 rounded-xl border border-neutral-200 gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
              <button 
                 onClick={() => onUpdateIconSet('lucide')}
                 className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'lucide' ? 'bg-foreground text-background shadow-lg shadow-neutral-300 ring-2 ring-foreground/5' : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'}`}

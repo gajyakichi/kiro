@@ -28,5 +28,50 @@
     "timestamp": 1769409345016,
     "latencyMs": 254815,
     "content": "{\"completed_ids\":[5,33,35,36]}"
+  },
+  "49fcd77539ae5f3cb605f4c77f1eed471553823a8ac63aab03b2af6541890678": {
+    "timestamp": 1769420890327,
+    "latencyMs": 135207,
+    "content": "{ \"completed_ids\": [10, 25, 27, 30, 43] }"
+  },
+  "5cda2baf768981391bae93d43b55de99d1dd75c5483073525658376447f4c487": {
+    "timestamp": 1769420904767,
+    "latencyMs": 149649,
+    "content": "{\"en\":\"January 26, 2026: Completed extensive unit testing for core modules, improved UI/UX with localization and dynamic icon system, added bilingual daily summary toggle, enhanced Theme Lab presets and preview animations, introduced GitHub Actions CI pipeline, integrated BlockNote editor and local AI (Ollama) support, resolved linting issues, and refined AI suggestion handling. Previous days: migrated sidebar icons, fixed settings persistence, unified timeline UI, added Japanese localization, rebranded to Kiro, and introduced vault‑based workspace management.\",\"ja\":\"2026年1月26日：NotionEditor、SuggestedTasks、AIモジュールの包括的単体テストを追加し、UI/UXを改善、ローカリゼーションと動的アイコンシステムを導入、日次サマリの英日切替を実装、Theme Labのプリセットとプレビューアニメーションを拡張、GitHub ActionsのCIパイプラインを構築、BlockNoteエディタとローカルAI（Ollama）を統合、Lintエラーを修正、AI提案の環境ハンドリングを改善しました。前日以降の作業では、サイドバーアイコンの移行、設定永続化の修正、タイムラインUIの統一、日本語ローカリゼーション、Kiroへのリブランド、ボリュームベースのワークスペース管理を追加しました。\"}"
+  },
+  "7503f2d1c83cac39a5db326908d19be31bcd46552a5e5193cc2e0179f4be144f": {
+    "timestamp": 1769420914570,
+    "latencyMs": 159450,
+    "content": "{\"tasks\":[\"ユーザーエクスペリエンスを向上させるため、キーボードナビゲーションとARIA属性を追加し、アクセシビリティテストを実装する。\",\"AI提案機能を拡張し、Ollamaに加えてOpenAI GPT‑4を統合し、言語サポートを多言語化する。\",\"アプリケーションのパフォーマンスを向上させるために、遅延ロードとコード分割を導入し、バンドルサイズを最小化する。\",\"ユーザーデータのエクスポート/インポート機能を実装し、バックアップと移行を可能にする。\",\"CI/CDパイプラインにE2Eテストを追加し、主要なユーザーフローが常に正しく動作するように保証する。\"]}"
+  },
+  "7cb1f253229d3ed31e1321e08d35ef7e2b6f24a7eaae04baf2574079cf98ec4f": {
+    "timestamp": 1769421106136,
+    "latencyMs": 23584,
+    "content": "# Kiro プロジェクトタスク\n\n## フェーズ 4：デスクトップ体験\n\n- [x] シングルウィンドウレイアウトに変更\n  - [x] ルートコンテナをビューポート高さに制限\n  - [x] サイドバーとメインコンテンツを独立したスクロールで実装\n  - [x] 「アプリ風」感覚と遷移を洗練\n- [ ] モダンなアプリアイコン生成\n\n## フェーズ 5：国際化 (i18n)\n\n- [x] 日本語ローカライズを実装\n  - [x] `APP_LANG`を設定インフラに追加\n  - [x] 翻訳ライブラリ（`lib/i18n.ts`）を作成\n  - [x] 設定ページをローカライズ\n  - [x] メインダッシュボードUIをローカライズ\n  - [x] 設定で言語切替をサポート\n\n---"
+  },
+  "e9eacca1276c8f936af0d1f30b023b939086a8e9a081247ac35e890e36ce7dec": {
+    "timestamp": 1769421245116,
+    "latencyMs": 159437,
+    "content": "{ \"completed_ids\": [20, 50] }"
+  },
+  "d1d10071cd9a5e741021bb4bc2167d07c46fcd8b76eaa0e2666e88516b1a5e99": {
+    "timestamp": 1769421502068,
+    "latencyMs": 67850,
+    "content": "{\"completed_ids\": []}"
+  },
+  "c2a64eadc9c1457e64094ce377e3b6ddd2823de383de83201758a33f0f01f157": {
+    "timestamp": 1769422949103,
+    "latencyMs": 129213,
+    "content": "{\"completed_ids\":[34]}"
+  },
+  "6dc5d4e0775b2a14da8c66b9321f8283012327d005c582cb33788c692fd859a8": {
+    "timestamp": 1769423262670,
+    "latencyMs": 96020,
+    "content": "{ \"completed_ids\": [48] }"
+  },
+  "b3e329ade1477e94568734861542aa77fa20e48b3f54c6164ca7d4a39990bb9c": {
+    "timestamp": 1769423339025,
+    "latencyMs": 43885,
+    "content": "{ \"completed_ids\": [] }"
   }
 }

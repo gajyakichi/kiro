@@ -22,6 +22,40 @@ export async function POST(req: NextRequest) {
 
     // 2. Extract context
     const contextData = getProjectContext(project.git_path || '', project.artifact_path || '');
+
+    // Persist Git Logs to DB for Timeline/Calendar
+    if (contextData.recentLogs.length > 0) {
+      // Find existing logs to avoid duplicates
+      const existingLogs = await db.log.findMany({
+         where: { project_id: Number(projectId), type: 'git' },
+         select: { metadata: true }
+      });
+      const seenHashes = new Set<string>();
+      existingLogs.forEach((l: { metadata: string | null }) => {
+         if (l.metadata) {
+             try {
+                 const m = JSON.parse(l.metadata);
+                 if (m.hash) seenHashes.add(m.hash);
+             } catch {}
+         }
+      });
+      
+      const newLogs = contextData.recentLogs.filter(l => !seenHashes.has(l.hash));
+      
+      if (newLogs.length > 0) {
+           // Use createMany for efficiency
+           await db.log.createMany({
+               data: newLogs.map(log => ({
+                   project_id: Number(projectId),
+                   type: 'git',
+                   content: log.message,
+                   timestamp: new Date(log.date).toISOString(),
+                   metadata: JSON.stringify({ hash: log.hash, author: log.author })
+               }))
+           });
+      }
+    }
+
     const contextString = `
 GIT LOGS:
 ${contextData.recentLogs.map(l => `${l.date} [${l.hash}] ${l.message} (${l.author})`).join('\n')}

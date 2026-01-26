@@ -1,7 +1,5 @@
-"use client";
-
 import { useEffect, useState } from 'react';
-import { Database, ShieldCheck, ChevronRight, Check } from 'lucide-react';
+import { Database, ShieldCheck, ChevronRight, Check, AlertTriangle } from 'lucide-react';
 import { Vault } from '@/lib/types';
 
 import { getTranslation } from '@/lib/i18n';
@@ -16,6 +14,7 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
   const [vaults, setVaults] = useState<Vault[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+  const [targetVault, setTargetVault] = useState<Vault | null>(null);
 
   const t = getTranslation(appLang);
 
@@ -86,9 +85,8 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
               <button
                 key={vault.id}
                 onClick={() => {
-                   if (confirm(t.confirm_vault_switch || "Switching vaults will reload the application. Continue?")) {
-                       handleSwitch(vault.id);
-                   }
+                   if (vault.id === activeVault?.id) return;
+                   setTargetVault(vault);
                 }}
                 className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors ${
                   vault.active ? 'bg-(--theme-primary-bg) cursor-default' : 'hover:bg-neutral-50'
@@ -119,6 +117,50 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
               {t.manage_vaults}
             </a>
           </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {targetVault && (
+        <div className="fixed inset-0 z-9999 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full border border-(--border-color) overflow-hidden animate-in zoom-in-95 duration-200">
+                <div className="p-6 text-center">
+                    <div className="w-12 h-12 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <AlertTriangle size={24} />
+                    </div>
+                    <h3 className="text-lg font-bold mb-2">Switch Vault?</h3>
+                    <p className="text-xs text-gray-500 mb-6 leading-relaxed">
+                        {t.confirm_vault_switch || "Switching vaults will reload the application. Current session states might be reset."}
+                    </p>
+                    
+                    <div className="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100 flex items-center justify-between">
+                        <div className="text-left">
+                           <div className="text-[10px] font-bold text-gray-400 uppercase">From</div>
+                           <div className="text-xs font-bold text-gray-700">{activeVault?.name}</div>
+                        </div>
+                        <ChevronRight size={16} className="text-gray-300" />
+                        <div className="text-right">
+                           <div className="text-[10px] font-bold text-(--theme-primary) uppercase">To</div>
+                           <div className="text-xs font-bold text-(--theme-primary)">{targetVault.name}</div>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                        <button 
+                            onClick={() => setTargetVault(null)}
+                            className="flex-1 py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            onClick={() => handleSwitch(targetVault.id)}
+                            className="flex-1 py-2.5 rounded-xl bg-(--theme-primary) text-white text-xs font-bold hover:opacity-90 transition-opacity shadow-lg shadow-(--theme-primary)/20"
+                        >
+                            Confirm Switch
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
       )}
     </div>

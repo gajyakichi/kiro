@@ -5,8 +5,11 @@ import { promisify } from "util";
 import fs from "fs/promises";
 import { GitLog } from "@/lib/types";
 import path from "path";
+import os from "os";
 
 import { Prisma } from "@prisma/client";
+
+export const dynamic = 'force-dynamic';
 
 const execPromise = promisify(exec);
 
@@ -25,14 +28,22 @@ export async function POST(request: Request) {
 
     console.log(`Syncing project: ${project.name} (${project.git_path})`);
     
-    const gitPath = project.git_path;
-    const artifactDir = project.artifact_path;
+    const expandPath = (p: string | null) => {
+        if (!p) return null;
+        if (p.startsWith('~/') || p === '~') {
+            return path.join(os.homedir(), p.slice(1));
+        }
+        return p;
+    };
+    
+    const gitPath = expandPath(project.git_path);
+    const artifactDir = expandPath(project.artifact_path);
 
     // 1. Harvest Git Logs
     let gitLogs: GitLog[] = [];
     if (gitPath && gitPath !== "/tmp") { 
       try {
-        const { stdout } = await execPromise(`git -C "${gitPath}" log -n 10 --pretty=format:"%h|%ad|%an|%s" --date=iso`);
+        const { stdout } = await execPromise(`git -C "${gitPath}" log -n 20 --pretty=format:"%h|%ad|%an|%s" --date=iso-strict`);
         gitLogs = stdout.split("\n").filter(l => l.trim()).map((line) => {
           const [hash, date, author, message] = line.split("|");
           return { hash, date, author, message };
@@ -44,27 +55,39 @@ export async function POST(request: Request) {
 
     if (gitLogs.length > 0) {
       await db.$transaction(async (tx: Prisma.TransactionClient) => {
-        for (const log of gitLogs) {
-          const metadata = JSON.stringify({ hash: log.hash, author: log.author });
-          const exists = await tx.log.findFirst({
+          // Bulk fetch existing hashes to minimize DB queries and rely on JS for checking
+          const existing = await tx.log.findMany({
             where: {
               project_id: Number(projectId),
-              type: 'git',
-              metadata: { contains: log.hash }
+              type: 'git'
+            },
+            select: { metadata: true }
+          });
+          
+          const seenHashes = new Set<string>();
+          existing.forEach((l: { metadata: string | null }) => {
+            if (l.metadata) {
+              try {
+                const m = JSON.parse(l.metadata);
+                if (m.hash) seenHashes.add(m.hash);
+              } catch {}
             }
           });
-          if (!exists) {
-            await tx.log.create({
-              data: {
-                project_id: Number(projectId),
-                type: 'git',
-                content: log.message,
-                metadata: metadata,
-                timestamp: new Date(log.date)
-              }
-            });
+
+          for (const log of gitLogs) {
+             if (!seenHashes.has(log.hash)) {
+                await tx.log.create({
+                  data: {
+                    project_id: Number(projectId),
+                    type: 'git',
+                    content: log.message,
+                    metadata: JSON.stringify({ hash: log.hash, author: log.author }),
+                    timestamp: new Date(log.date)
+                  }
+                });
+                seenHashes.add(log.hash);
+             }
           }
-        }
       });
     }
 

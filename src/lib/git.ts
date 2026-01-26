@@ -1,6 +1,14 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
+
+function expandPath(p: string): string {
+  if (p.startsWith('~/') || p === '~') {
+    return path.join(os.homedir(), p.slice(1));
+  }
+  return p;
+}
 
 export interface GitCommit {
   hash: string;
@@ -13,10 +21,11 @@ export interface GitCommit {
  * Extracts the git log for a given repository path.
  */
 export function getGitLog(repoPath: string, limit: number = 50): GitCommit[] {
+  const targetPath = expandPath(repoPath);
   try {
     const format = '%h|%ad|%an|%s';
     const output = execSync(
-      `git -C "${repoPath}" log -n ${limit} --date=short --pretty=format:"${format}"`,
+      `git -C "${targetPath}" log -n ${limit} --date=short --pretty=format:"${format}"`,
       { encoding: 'utf8' }
     );
 
@@ -35,7 +44,8 @@ export function getGitLog(repoPath: string, limit: number = 50): GitCommit[] {
  */
 export function getWalkthrough(artifactPath: string): string | null {
   try {
-    const filePath = path.join(artifactPath, 'walkthrough.md');
+    const targetPath = expandPath(artifactPath);
+    const filePath = path.join(targetPath, 'walkthrough.md');
     if (fs.existsSync(filePath)) {
       return fs.readFileSync(filePath, 'utf8');
     }

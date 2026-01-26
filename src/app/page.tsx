@@ -20,7 +20,7 @@ const VaultSwitcher = dynamic(() => import('@/components/VaultSwitcher').then(mo
 const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'));
 const DailyNotes = dynamic(() => import('@/components/DailyNotes'));
 
-import { Sparkles, FileText, Code, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2 } from 'lucide-react';
+import { Sparkles, FileText, Code, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, PanelBottom, X } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
 
 export default function Home() {
@@ -88,6 +88,40 @@ export default function Home() {
 
   // Heatmap State
   const [selectedHeatmapDate, setSelectedHeatmapDate] = useState<string | null>(null);
+
+  // Progress Translation State
+  const [progressLang, setProgressLang] = useState<'en' | 'ja'>('en');
+  const [progressTranslated, setProgressTranslated] = useState<string | null>(null);
+  const [isTranslatingProgress, setIsTranslatingProgress] = useState(false);
+  const [showBottomPane, setShowBottomPane] = useState(true);
+
+  const handleToggleProgressLang = async () => {
+    if (progressLang === 'ja') {
+        setProgressLang('en');
+    } else {
+        if (!progressTranslated && progress?.task) {
+            setIsTranslatingProgress(true);
+            try {
+                const res = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: progress.task, targetLang: 'ja' })
+                });
+                const data = await res.json();
+                if (data.translated) {
+                    setProgressTranslated(data.translated);
+                    setProgressLang('ja');
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                setIsTranslatingProgress(false);
+            }
+        } else if (progressTranslated) {
+            setProgressLang('ja');
+        }
+    }
+  };
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -326,13 +360,14 @@ export default function Home() {
         body: JSON.stringify({ projectId: activeProject.id })
       });
       if (res.ok) {
-        fetchAbsorbData(activeProject.id);
+        await fetchAbsorbData(activeProject.id);
+        alert("Absorbが完了しました");
       } else {
-        throw new Error("Failed to absorb");
+        throw new Error("Absorbに失敗しました");
       }
     } catch (e) {
       console.error("Absorb Error:", e);
-      alert("Failed to absorb context.");
+      alert(`エラー: ${(e as Error).message}`);
     }
     setIsAbsorbing(false);
   };
@@ -440,8 +475,10 @@ export default function Home() {
     startDate.setDate(startDate.getDate() - firstDayOfWeek);
 
     const aggregatedData = [
-      ...dbLogs.map(l => ({ ...l, dateStr: new Date(l.timestamp).toISOString().split('T')[0] })),
-      ...comments.map(c => ({ ...c, dateStr: new Date(c.timestamp).toISOString().split('T')[0], type: 'note' }))
+      ...dbLogs.map(l => ({ ...l, entryType: 'log', dateStr: new Date(l.timestamp).toISOString().split('T')[0] })),
+      ...comments.map(c => ({ ...c, entryType: 'comment', dateStr: new Date(c.timestamp).toISOString().split('T')[0], type: 'note' })),
+      ...dailyNotes.map(n => ({ ...n, entryType: 'daily_note', dateStr: n.date })),
+      ...suggestedTasks.filter(t => t.status === 'completed' || t.status === 'added').map(t => ({ ...t, entryType: 'task', dateStr: new Date(t.timestamp).toISOString().split('T')[0], content: t.task }))
     ];
 
     type ActivityEntry = (typeof aggregatedData)[0];
@@ -453,10 +490,10 @@ export default function Home() {
 
     const getColor = (count: number) => {
       if (count === 0) return 'bg-neutral-50 border border-neutral-100/50';
-      if (count <= 2) return 'bg-emerald-100 border border-emerald-200';
-      if (count <= 5) return 'bg-emerald-300 border border-emerald-400';
-      if (count <= 10) return 'bg-emerald-500 border border-emerald-600';
-      return 'bg-emerald-700 border border-emerald-800';
+      if (count <= 2) return 'bg-(--theme-primary)/20 border border-(--theme-primary)/30';
+      if (count <= 5) return 'bg-(--theme-primary)/50 border border-(--theme-primary)/60';
+      if (count <= 10) return 'bg-(--theme-primary)/80 border border-(--theme-primary)/90';
+      return 'bg-(--theme-primary) border border-(--theme-primary)';
     };
 
     const weeks = [];
@@ -494,21 +531,52 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="overflow-x-auto pb-4 custom-scrollbar">
-            <div className="flex gap-1.5 min-w-max">
-              {weeks.map((week, wi) => (
-                <div key={wi} className="flex flex-col gap-1.5">
-                  {week.map((day, di) => (
-                    <button
-                      key={di}
-                      onClick={() => setSelectedHeatmapDate(day.dateStr)}
-                      title={t.activity_level.replace('{count}', day.data.length.toString()).replace('{date}', day.dateStr)}
-                      className={`w-4 h-4 rounded-sm transition-all hover:scale-125 hover:z-10 ${getColor(day.data.length)} ${selectedHeatmapDate === day.dateStr ? 'ring-2 ring-(--theme-primary) ring-offset-2' : ''}`}
-                    />
+          <div className="flex gap-4">
+             {/* Labels Column */}
+             <div className="flex flex-col gap-1.5 pt-[26px] pr-1 select-none">
+                {[0, 1, 2, 3, 4, 5, 6].map(d => (
+                   <div key={d} className="h-4 flex items-center text-[9px] font-bold text-neutral-300 uppercase leading-none">
+                      {(d === 1 || d === 3 || d === 5) ? t.days_short[d] : ''}
+                   </div>
+                ))}
+             </div>
+
+             {/* Graph Container */}
+             <div className="overflow-x-auto pb-4 custom-scrollbar flex-1">
+                {/* Month Headers */}
+                <div className="flex gap-1.5 min-w-max mb-1.5 h-5 select-none">
+                   {weeks.map((week, wi) => {
+                      const date = week[0].date;
+                      const prevDate = wi > 0 ? weeks[wi-1][0].date : null;
+                      const showMonth = wi === 0 || (prevDate && date.getMonth() !== prevDate.getMonth());
+                      return (
+                         <div key={wi} className="w-4 flex flex-col justify-end overflow-visible relative">
+                            {showMonth && (
+                               <span className="absolute left-0 bottom-0 text-[10px] font-bold text-neutral-400 whitespace-nowrap">
+                                  {date.toLocaleDateString(appLang, { month: 'short' })}
+                               </span>
+                            )}
+                         </div>
+                      );
+                   })}
+                </div>
+                
+                {/* Heatmap Grid */}
+                <div className="flex gap-1.5 min-w-max">
+                  {weeks.map((week, wi) => (
+                    <div key={wi} className="flex flex-col gap-1.5">
+                      {week.map((day, di) => (
+                        <button
+                          key={di}
+                          onClick={() => setSelectedHeatmapDate(day.dateStr)}
+                          title={t.activity_level.replace('{count}', day.data.length.toString()).replace('{date}', day.dateStr)}
+                          className={`w-4 h-4 rounded-sm transition-all hover:scale-125 hover:z-10 ${getColor(day.data.length)} ${selectedHeatmapDate === day.dateStr ? 'ring-2 ring-(--theme-primary) ring-offset-2' : ''}`}
+                        />
+                      ))}
+                    </div>
                   ))}
                 </div>
-              ))}
-            </div>
+             </div>
           </div>
         </div>
 
@@ -524,33 +592,83 @@ export default function Home() {
                </span>
             </div>
             
-            <div className="space-y-4">
-              {(activityMap[selectedHeatmapDate] || []).map((entry, idx) => (
-                <div key={idx} className="bg-white p-5 rounded-2xl border border-(--border-color) shadow-xs flex gap-5 group hover:shadow-md transition-all">
-                   <div className="shrink-0 w-10 h-10 rounded-xl bg-neutral-50 border border-neutral-100 flex items-center justify-center text-neutral-400 group-hover:bg-(--theme-primary-bg) group-hover:text-(--theme-primary) transition-colors">
-                      {'type' in entry && entry.type === 'git' ? <Code size={18} /> : <FileText size={18} />}
-                   </div>
-                   <div className="flex-1 min-w-0">
-                      <div className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1">
-                        {('type' in entry && entry.type === 'git') ? t.type_git : t.type_note}
+            <div className="space-y-4 relative">
+              {/* Vertical Guide Line */}
+              <div className="absolute left-[12px] top-4 bottom-4 w-px bg-(--border-color) opacity-50 z-0"></div>
+
+              {(activityMap[selectedHeatmapDate] || []).map((entry, idx) => {
+                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                 const anyEntry = entry as any;
+                 const entryType = anyEntry.entryType || ('type' in entry && entry.type === 'git' ? 'log' : 'comment');
+                 const ICON_SIZE = 12;
+                 
+                 let icon = <IconRenderer icon="FileText" size={ICON_SIZE} baseSet={appIconSet} />;
+                 let typeLabel = "note";
+                 let content = "";
+                 let badgeBg = "bg-(--theme-primary)";
+                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                 let metadata: any = null;
+
+                 if (entryType === 'log') {
+                     const l = anyEntry;
+                     icon = l.type === 'git' ? 
+                         <IconRenderer icon="Code" size={ICON_SIZE} baseSet={appIconSet} /> : 
+                         <IconRenderer icon="FileText" size={ICON_SIZE} baseSet={appIconSet} />;
+                     typeLabel = l.type; 
+                     content = l.content;
+                     try { metadata = l.metadata ? JSON.parse(l.metadata) : null; } catch {}
+                 } else if (entryType === 'comment') {
+                     typeLabel = anyEntry.type || 'note';
+                     content = anyEntry.text;
+                 } else if (entryType === 'daily_note') {
+                     icon = <IconRenderer icon="Sparkles" size={ICON_SIZE} className="text-(--theme-accent)" baseSet={appIconSet} />;
+                     typeLabel = "Daily Summary";
+                     content = anyEntry.content;
+                     badgeBg = "bg-(--theme-accent)";
+                 } else if (entryType === 'task') {
+                     icon = anyEntry.status === 'completed' ? 
+                         <IconRenderer icon="CheckCircle" size={ICON_SIZE} className="text-(--theme-primary)" baseSet={appIconSet} /> : 
+                         <IconRenderer icon="ListTodo" size={ICON_SIZE} className="text-(--theme-primary)/70" baseSet={appIconSet} />;
+                     typeLabel = anyEntry.status === 'completed' ? 'Task Completed' : 'Task Added';
+                     content = anyEntry.task || anyEntry.content;
+                 }
+
+                 return (
+                   <div key={idx} className="group relative">
+                      <div className="flex gap-4 items-start py-4 -mx-2 px-2 hover:bg-white/50 rounded-2xl transition-all">
+                         {/* Marker */}
+                         <div className="shrink-0 w-6 h-6 rounded-full bg-white border-2 border-(--theme-primary-bg) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 group-hover:border-(--theme-primary) transition-all z-10">
+                            {icon}
+                         </div>
+                         
+                         <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                               <span className={`text-[10px] ${badgeBg} text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm`}>
+                                  {typeLabel}
+                               </span>
+                            </div>
+                            
+                            <div className="text-sm text-neutral-700 leading-relaxed markdown-content">
+                               <ReactMarkdown>{content}</ReactMarkdown>
+                            </div>
+
+                            {/* Git Metadata */}
+                            {metadata && (
+                               <div className="mt-2 flex items-center gap-2 text-[10px] font-mono text-neutral-400">
+                                  <span className="bg-white border border-neutral-100 px-1.5 py-0.5 rounded uppercase tracking-tighter">
+                                     {metadata.hash?.substring(0, 7) || '---'}
+                                  </span>
+                                  <span>•</span>
+                                  <span>{metadata.author || t.unknown_author}</span>
+                               </div>
+                            )}
+                         </div>
                       </div>
-                      <div className="text-[15px] font-medium leading-relaxed">
-                        {'content' in entry ? entry.content : 'text' in entry ? entry.text : ''}
-                      </div>
-                      {('metadata' in entry && entry.metadata) && (
-                        <div className="mt-3 flex items-center gap-2 text-[10px] font-mono text-neutral-400">
-                          <span className="bg-neutral-100 px-1.5 py-0.5 rounded uppercase tracking-tighter">
-                            {JSON.parse(entry.metadata as string).hash?.substring(0, 7) || '---'}
-                          </span>
-                          <span>•</span>
-                          <span>{JSON.parse(entry.metadata as string).author || t.unknown_author}</span>
-                        </div>
-                      )}
                    </div>
-                </div>
-              ))}
-              {(activityMap[selectedHeatmapDate]?.length === 0) && (
-                <div className="py-12 text-center">
+                 );
+              })}
+              {(!activityMap[selectedHeatmapDate] || activityMap[selectedHeatmapDate].length === 0) && (
+                <div className="py-12 text-center relative z-10">
                   <p className="text-sm text-neutral-400 italic">{t.no_activity}</p>
                 </div>
               )}
@@ -759,26 +877,30 @@ export default function Home() {
 
         {renderMiniCalendar()}
 
+        {/* Layout Controls */}
+        <div className="mt-8 px-2">
+             <div className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest mb-2 px-1">Layout</div>
+             <button 
+                onClick={() => setShowBottomPane(!showBottomPane)}
+                className={`w-full flex items-center gap-3 p-2 rounded-lg transition-colors text-xs font-semibold ${showBottomPane ? 'bg-(--theme-primary-bg) text-(--theme-primary)' : 'text-neutral-500 hover:bg-neutral-100'}`}
+             >
+                <PanelBottom size={16} />
+                <span>Bottom Note</span>
+                <span className={`ml-auto w-8 h-4 rounded-full flex items-center p-0.5 transition-colors ${showBottomPane ? 'bg-(--theme-primary)' : 'bg-neutral-300'}`}>
+                    <span className={`w-3 h-3 bg-white rounded-full shadow-sm transition-transform ${showBottomPane ? 'translate-x-4' : ''}`} />
+                </span>
+             </button>
+        </div>
+
         {/* Vault Switcher Integration */}
-        <div className="mt-8 pt-4 border-t border-(--border-color)">
+        <div className="mt-4 pt-4 border-t border-(--border-color)">
           <div className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest px-2 mb-2">{t.active_storage}</div>
           <VaultSwitcher appLang={appLang} onSwitch={fetchProjects} className="px-2" />
         </div>
-
-          {/* Quick Note Replaced by Block Editor */}
-          <div className="h-48 border border-(--border-color) rounded-xl overflow-hidden bg-white flex flex-col">
-            <NotionEditor 
-              value={newComment}
-              iconSet={appIconSet}
-              compact={true}
-              onChange={setNewComment}
-              onSave={handleAddComment}
-              onCancel={() => setNewComment("")} // "Cancel" now clears the note
-            />
-          </div>
       </aside>
 
-      <main className="flex-1 h-full overflow-y-auto p-12 lg:px-20 xl:px-40">
+      <main className="flex-1 flex flex-col h-full overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-12 lg:px-20 xl:px-40 custom-scrollbar">
         <header className="mb-12 animate-fade-in relative z-50">
           <h1 className="group relative flex items-center text-4xl font-bold tracking-tight mb-2">
             <div className="relative mr-4">
@@ -810,7 +932,7 @@ export default function Home() {
               {activeTab === "progress" && t.dev_progress}
               {activeTab === "daily_notes" && t.daily_notes}
               {activeTab === "suggested_tasks" && t.ai_suggestions}
-            {activeTab === "comments" && t.dev_notes}
+              {activeTab === "comments" && t.dev_notes}
               {activeTab === "calendar" && t.system_calendar}
               {activeTab === "timeline" && "Project Timeline"}
             </span>
@@ -843,72 +965,77 @@ export default function Home() {
         </header>
 
         <section className="animate-fade-in">
-          {activeTab === "timeline" && (
-            <div className="relative">
-               {/* Vertical Timeline Guide */}
-               <div className="absolute left-[18px] top-6 bottom-6 w-px bg-(--border-color) opacity-50 z-0"></div>
+           {activeTab === "timeline" && (
+             <div className="relative">
+                {/* Vertical Timeline Guide */}
+                <div className="absolute left-[12px] top-6 bottom-6 w-px bg-(--border-color) opacity-50 z-0"></div>
 
-               <div className="space-y-0 relative z-10">
-                 {[
-                   ...dbLogs.map(l => ({ ...l, entryType: 'log' as const })),
-                   ...comments.map(c => ({ ...c, entryType: 'comment' as const })),
-                   ...dailyNotes.map(n => ({ ...n, entryType: 'daily_note' as const, timestamp: n.timestamp || new Date().toISOString() })),
-                   ...suggestedTasks.filter(t => t.status === 'completed' || t.status === 'added').map(t => ({
-                      id: t.id,
-                      entryType: 'task' as const,
-                      content: t.task,
-                      type: 'task',
-                      timestamp: t.timestamp,
-                      status: t.status
-                   }))
-                 ]
-                 .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-                 .map((entry) => {
-                   const entryType = entry.entryType;
-                   const timestamp = new Date(entry.timestamp);
-                   let icon = <FileText size={16} />;
-                   let typeLabel = "Note";
-                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                   let content: any = "";
-                   let metadata = null;
+                <div className="space-y-0 relative z-10">
+                  {[
+                    ...dbLogs.map(l => ({ ...l, entryType: 'log' as const })),
+                    ...comments.map(c => ({ ...c, entryType: 'comment' as const })),
+                    ...dailyNotes.map(n => ({ ...n, entryType: 'daily_note' as const, timestamp: n.timestamp || new Date().toISOString() })),
+                    ...suggestedTasks.filter(t => t.status === 'completed' || t.status === 'added').map(t => ({
+                       id: t.id,
+                       entryType: 'task' as const,
+                       content: t.task,
+                       type: 'task',
+                       timestamp: t.timestamp,
+                       status: t.status
+                    }))
+                  ]
+                  .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                  .map((entry) => {
+                    const entryType = entry.entryType;
+                    const timestamp = new Date(entry.timestamp);
+                    const ICON_SIZE = 12;
+                    let icon = <IconRenderer icon="FileText" size={ICON_SIZE} baseSet={appIconSet} />;
+                    let typeLabel = "Note";
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    let content: any = "";
+                    let metadata = null;
 
-                   if (entryType === 'log') {
-                      const l = entry as DbLog;
-                      icon = l.type === 'git' ? <Code size={16} /> : <FileText size={16} />;
-                      typeLabel = l.type;
-                      content = l.content;
-                      metadata = l.metadata ? JSON.parse(l.metadata) : null;
-                   } else if (entryType === 'comment') {
-                      const c = entry as Comment;
-                      typeLabel = c.type || 'note';
-                      content = c.text;
-                      if (c.type === 'code') icon = <Code size={16} />;
-                   } else if (entryType === 'task') {
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      const tEntry = entry as any;
-                      icon = tEntry.status === 'completed' ? <span className="text-emerald-500">✅</span> : <span className="text-blue-500">📝</span>;
-                      typeLabel = tEntry.status === 'completed' ? 'Task Completed' : 'Task Added';
-                      content = tEntry.content;
-                   } else if (entryType === 'daily_note') {
-                      icon = <Sparkles size={16} className="text-amber-500" />;
-                      typeLabel = "Daily Summary";
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      content = (entry as any).content;
-                   }
+                    if (entryType === 'log') {
+                       const l = entry as DbLog;
+                       icon = l.type === 'git' ? 
+                           <IconRenderer icon="Code" size={ICON_SIZE} baseSet={appIconSet} /> : 
+                           <IconRenderer icon="FileText" size={ICON_SIZE} baseSet={appIconSet} />;
+                       typeLabel = l.type;
+                       content = l.content;
+                       metadata = l.metadata ? JSON.parse(l.metadata) : null;
+                    } else if (entryType === 'comment') {
+                       const c = entry as Comment;
+                       typeLabel = c.type || 'note';
+                       content = c.text;
+                       if (c.type === 'code') icon = <IconRenderer icon="Code" size={ICON_SIZE} baseSet={appIconSet} />;
+                    } else if (entryType === 'task') {
+                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                       const tEntry = entry as any;
+                       icon = tEntry.status === 'completed' ? 
+                           <IconRenderer icon="CheckCircle" size={ICON_SIZE} className="text-(--theme-primary)" baseSet={appIconSet} /> : 
+                           <IconRenderer icon="ListTodo" size={ICON_SIZE} className="text-(--theme-primary)/70" baseSet={appIconSet} />;
+                       typeLabel = tEntry.status === 'completed' ? 'Task Completed' : 'Task Added';
+                       content = tEntry.content;
+                    } else if (entryType === 'daily_note') {
+                       icon = <IconRenderer icon="Sparkles" size={ICON_SIZE} className="text-(--theme-accent)" baseSet={appIconSet} />;
+                       typeLabel = "Daily Summary";
+                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                       content = (entry as any).content;
+                    }
 
-                   return (
-                     <div key={`${entryType}-${entry.id}`} className="group relative">
-                       <div className="flex gap-6 items-start py-6 -mx-4 px-4 hover:bg-gray-50/50 rounded-2xl transition-all">
-                         {/* Marker Icon */}
-                         <div className="shrink-0 w-9 h-9 rounded-xl bg-(--theme-primary-bg) border border-(--border-color) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 transition-transform">
-                           {icon}
-                         </div>
+                    return (
+                      <div key={`${entryType}-${entry.id}`} className="group relative">
+                        <div className="flex gap-4 items-start py-6 -mx-4 px-4 hover:bg-gray-50/50 rounded-2xl transition-all">
+                          {/* Marker Icon */}
+                          <div className="shrink-0 w-6 h-6 rounded-full bg-white border-2 border-(--theme-primary-bg) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 group-hover:border-(--theme-primary) transition-all z-10">
+                            {icon}
+                          </div>
 
                          <div className="flex-1 min-w-0">
                            {entryType === 'daily_note' ? (
                              <details className="group/details">
                                <summary className="list-none cursor-pointer flex items-center gap-3 mb-2 focus:outline-none select-none">
-                                 <span className="text-[10px] bg-amber-500 text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm flex items-center gap-1 hover:bg-amber-600 transition-colors">
+                                 <span className="text-[10px] bg-(--theme-accent) text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm flex items-center gap-1 hover:opacity-90 transition-opacity">
                                    {typeLabel}
                                    <ChevronRight size={10} className="group-open/details:rotate-90 transition-transform" />
                                  </span>
@@ -916,7 +1043,7 @@ export default function Home() {
                                    {timestamp.toLocaleDateString(appLang)}
                                  </span>
                                </summary>
-                               <div className="mt-4 markdown-content pl-2 border-l-2 border-amber-200 animate-in slide-in-from-top-2 duration-300">
+                               <div className="mt-4 markdown-content pl-2 border-l-2 border-(--theme-accent)/30 animate-in slide-in-from-top-2 duration-300">
                                   <ReactMarkdown>{content}</ReactMarkdown>
                                </div>
                              </details>
@@ -1034,11 +1161,38 @@ export default function Home() {
           )}
 
           {activeTab === "progress" && (
-            <div key="progress-content" className="prose prose-slate max-w-none">
-              <div className="markdown-content">
-                <ReactMarkdown>
-                  {progress?.task || t.loading_progress}
-                </ReactMarkdown>
+            <div className="animate-fade-in space-y-6">
+              <div className="group relative pl-6 border-l-2 border-(--theme-primary-bg) hover:border-(--theme-primary) transition-colors">
+                 <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-(--theme-primary-bg) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
+                 </div>
+                 
+                 <div className="mb-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-gray-500 uppercase tracking-widest">Current Status</span>
+                    </div>
+                    {settings?.ENABLED_PLUGINS?.includes('plugin-jp') && (
+                        <button
+                          onClick={handleToggleProgressLang}
+                          disabled={isTranslatingProgress}
+                          className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium text-gray-400 hover:text-(--theme-primary) hover:bg-(--theme-primary-bg) rounded transition-colors"
+                          title="Toggle Language"
+                        >
+                          {isTranslatingProgress ? <Loader2 size={12} className="animate-spin" /> : <Languages size={12} />}
+                          {progressLang === 'en' ? 'EN' : 'JA'}
+                        </button>
+                    )}
+                 </div>
+                 
+                 <div className="bg-white notion-card p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <article className="prose prose-slate max-w-none text-gray-700 leading-relaxed">
+                       <div className="markdown-content">
+                          <ReactMarkdown>
+                            {progressLang === 'ja' ? (progressTranslated || "翻訳中...") : (progress?.task || t.loading_progress)}
+                          </ReactMarkdown>
+                       </div>
+                    </article>
+                 </div>
               </div>
             </div>
           )}
@@ -1160,6 +1314,24 @@ export default function Home() {
           <span>{activeProject?.name || t.ready}</span>
           <span>{t.status_online}</span>
         </footer>
+        </div>
+        {showBottomPane && (
+            <div className="h-72 border-t border-(--border-color) bg-white shrink-0 flex flex-col animate-in slide-in-from-bottom-5 duration-300 shadow-2xl relative z-40">
+                <div className="flex items-center justify-between px-6 py-2 border-b border-(--border-color) bg-neutral-50/50">
+                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Quick Note / Scratchpad</span>
+                    <button onClick={() => setShowBottomPane(false)} className="text-neutral-400 hover:text-neutral-600"><X size={14}/></button>
+                </div>
+                <div className="flex-1 overflow-hidden flex flex-col">
+                    <NotionEditor 
+                      value={newComment}
+                      iconSet={appIconSet}
+                      onChange={setNewComment}
+                      onSave={handleAddComment}
+                      onCancel={() => setNewComment("")}
+                    />
+                </div>
+            </div>
+        )}
       </main>
 
       <style key={previewCss ? 'preview-active' : (themes.find(t => t.active)?.id || 'original')} dangerouslySetInnerHTML={{ __html: `
