@@ -20,7 +20,7 @@ const VaultSwitcher = dynamic(() => import('@/components/VaultSwitcher').then(mo
 const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'));
 const DailyNotes = dynamic(() => import('@/components/DailyNotes'));
 
-import { Sparkles, PenTool, FileText, Code, ShieldAlert, PlusCircle, Plus, Folder } from 'lucide-react';
+import { Sparkles, FileText, Code, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
 
 export default function Home() {
@@ -31,7 +31,7 @@ export default function Home() {
   const [dbLogs, setDbLogs] = useState<DbLog[]>([]);
   const [newComment, setNewComment] = useState("");
   const [activeBlockType, setActiveBlockType] = useState<'markdown' | 'text' | 'code'>('markdown');
-  const [activeTab, setActiveTab] = useState("git");
+  const [activeTab, setActiveTab] = useState("timeline");
   const [mounted, setMounted] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [iconPickerTarget, setIconPickerTarget] = useState<string | null>(null); // 'add' | 'header'
@@ -40,7 +40,6 @@ export default function Home() {
   const [dailyNotes, setDailyNotes] = useState<DailyNote[]>([]);
   const [suggestedTasks, setSuggestedTasks] = useState<SuggestedTask[]>([]);
   const [isAbsorbing, setIsAbsorbing] = useState(false);
-  const [isFullEditorOpen, setIsFullEditorOpen] = useState(false);
   
   const [vaults, setVaults] = useState<Vault[]>([]);
   const [isVaultLoading, setIsVaultLoading] = useState(true);
@@ -669,6 +668,14 @@ export default function Home() {
           </div>
 
           <div 
+            onClick={() => setActiveTab("timeline")}
+            className={`notion-item flex items-center gap-3 ${activeTab === "timeline" ? "active" : ""}`}
+          >
+            <IconRenderer icon="History" size={16} baseSet={appIconSet} />
+            <span>Timeline</span>
+          </div>
+
+          <div 
             onClick={() => setActiveTab("comments")}
             className={`notion-item flex items-center gap-3 ${activeTab === "comments" ? "active" : ""}`}
           >
@@ -749,8 +756,9 @@ export default function Home() {
               {activeTab === "progress" && t.dev_progress}
               {activeTab === "daily_notes" && t.daily_notes}
               {activeTab === "suggested_tasks" && t.ai_suggestions}
-              {activeTab === "comments" && t.dev_notes}
+            {activeTab === "comments" && t.dev_notes}
               {activeTab === "calendar" && t.system_calendar}
+              {activeTab === "timeline" && "Project Timeline"}
             </span>
             {activeProject && <span className="text-lg ml-4 opacity-30 font-normal">/ {activeProject.name}</span>}
             
@@ -776,10 +784,137 @@ export default function Home() {
             {activeTab === "suggested_tasks" && t.suggestions_desc}
             {activeTab === "comments" && t.notes_desc}
             {activeTab === "calendar" && t.calendar_desc}
+            {activeTab === "timeline" && "A chronological view of all activities."}
           </p>
         </header>
 
         <section className="animate-fade-in">
+          {activeTab === "timeline" && (
+            <div className="relative">
+               {/* Vertical Timeline Guide */}
+               <div className="absolute left-[18px] top-6 bottom-6 w-px bg-(--border-color) opacity-50 z-0"></div>
+
+               <div className="space-y-0 relative z-10">
+                 {[
+                   ...dbLogs.map(l => ({ ...l, entryType: 'log' as const })),
+                   ...comments.map(c => ({ ...c, entryType: 'comment' as const })),
+                   ...dailyNotes.map(n => ({ ...n, entryType: 'daily_note' as const, timestamp: n.timestamp || new Date().toISOString() })),
+                   ...suggestedTasks.filter(t => t.status === 'completed' || t.status === 'added').map(t => ({
+                      id: t.id,
+                      entryType: 'task' as const,
+                      content: t.task,
+                      type: 'task',
+                      timestamp: t.timestamp,
+                      status: t.status
+                   }))
+                 ]
+                 .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                 .map((entry) => {
+                   const entryType = entry.entryType;
+                   const timestamp = new Date(entry.timestamp);
+                   let icon = <FileText size={16} />;
+                   let typeLabel = "Note";
+                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                   let content: any = "";
+                   let metadata = null;
+
+                   if (entryType === 'log') {
+                      const l = entry as DbLog;
+                      icon = l.type === 'git' ? <Code size={16} /> : <FileText size={16} />;
+                      typeLabel = l.type;
+                      content = l.content;
+                      metadata = l.metadata ? JSON.parse(l.metadata) : null;
+                   } else if (entryType === 'comment') {
+                      const c = entry as Comment;
+                      typeLabel = c.type || 'note';
+                      content = c.text;
+                      if (c.type === 'code') icon = <Code size={16} />;
+                   } else if (entryType === 'task') {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      const tEntry = entry as any;
+                      icon = tEntry.status === 'completed' ? <span className="text-emerald-500">✅</span> : <span className="text-blue-500">📝</span>;
+                      typeLabel = tEntry.status === 'completed' ? 'Task Completed' : 'Task Added';
+                      content = tEntry.content;
+                   } else if (entryType === 'daily_note') {
+                      icon = <Sparkles size={16} className="text-amber-500" />;
+                      typeLabel = "Daily Summary";
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      content = (entry as any).content;
+                   }
+
+                   return (
+                     <div key={`${entryType}-${entry.id}`} className="group relative">
+                       <div className="flex gap-6 items-start py-6 -mx-4 px-4 hover:bg-gray-50/50 rounded-2xl transition-all">
+                         {/* Marker Icon */}
+                         <div className="shrink-0 w-9 h-9 rounded-xl bg-(--theme-primary-bg) border border-(--border-color) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 transition-transform">
+                           {icon}
+                         </div>
+
+                         <div className="flex-1 min-w-0">
+                           {entryType === 'daily_note' ? (
+                             <details className="group/details">
+                               <summary className="list-none cursor-pointer flex items-center gap-3 mb-2 focus:outline-none select-none">
+                                 <span className="text-[10px] bg-amber-500 text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm flex items-center gap-1 hover:bg-amber-600 transition-colors">
+                                   {typeLabel}
+                                   <ChevronRight size={10} className="group-open/details:rotate-90 transition-transform" />
+                                 </span>
+                                 <span className="text-[10px] notion-text-subtle font-bold uppercase tracking-widest bg-(--theme-primary-bg) px-2.5 py-1 rounded-lg border border-(--border-color)">
+                                   {timestamp.toLocaleDateString(appLang)}
+                                 </span>
+                               </summary>
+                               <div className="mt-4 markdown-content pl-2 border-l-2 border-amber-200 animate-in slide-in-from-top-2 duration-300">
+                                  <ReactMarkdown>{content}</ReactMarkdown>
+                               </div>
+                             </details>
+                           ) : (
+                             <>
+                               {/* Metadata Header */}
+                               <div className="flex items-center gap-3 mb-2">
+                                 <span className="text-[10px] bg-(--theme-primary) text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm">
+                                   {typeLabel}
+                                 </span>
+                                 <span className="text-[10px] notion-text-subtle font-bold uppercase tracking-widest bg-(--theme-primary-bg) px-2.5 py-1 rounded-lg border border-(--border-color)">
+                                   {timestamp.toLocaleDateString(appLang)} {timestamp.toLocaleTimeString(appLang, { hour: '2-digit', minute: '2-digit' })}
+                                 </span>
+                               </div>
+
+                               {/* Content Area */}
+                               <div className={`mt-3 ${entryType === 'log' && 'py-1'}`}>
+                                 {entryType === 'log' && metadata?.hash ? (
+                                   <div>
+                                     <p className="text-[15px] font-medium leading-relaxed">{content}</p>
+                                     <div className="mt-2 flex items-center gap-2 text-[10px] notion-text-subtle font-mono">
+                                       <span className="bg-(--theme-primary-bg) px-1.5 py-0.5 rounded border border-(--border-color)">
+                                         {metadata.hash.substring(0, 7)}
+                                       </span>
+                                       <span>{metadata.author || 'Unknown'}</span>
+                                     </div>
+                                   </div>
+                                 ) : entryType === 'task' ? (
+                                    <p className={`text-[15px] font-medium leading-relaxed ${// eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    (entry as any).status === 'completed' ? 'line-through opacity-70' : ''}`}>
+                                        {content}
+                                    </p>
+                                 ) : (
+                                   <div className="markdown-content">
+                                     <ReactMarkdown>{content}</ReactMarkdown>
+                                    </div>
+                                 )}
+                               </div>
+                             </>
+                           )}
+                         </div>
+                       </div>
+                     </div>
+                   );
+                 })}
+                 
+                 {dbLogs.length === 0 && comments.length === 0 && suggestedTasks.length === 0 && dailyNotes.length === 0 && (
+                    <div className="py-20 text-center text-gray-400 italic">No activity yet.</div>
+                 )}
+               </div>
+            </div>
+          )}
           {activeTab === "git" && (
             <div className="space-y-6">
               {dbLogs.filter(log => log.type === "git").map((log, i) => (
@@ -828,123 +963,53 @@ export default function Home() {
                 tasks={suggestedTasks} 
                 onAdd={(t) => updateSuggestedTaskStatus(t.id, 'added', t.task)}
                 onDismiss={(t) => updateSuggestedTaskStatus(t.id, 'dismissed')}
+                onUpdateStatus={(t, status) => updateSuggestedTaskStatus(t.id, status, t.task)}
               />
             </div>
           )}
 
+
+
           {activeTab === "comments" && (
-            <div className="space-y-6">
-              <div className="flex justify-between items-end mb-4">
-                <div>
-                  <h2 className="text-2xl font-bold tracking-tight">{t.project_timeline}</h2>
-                  <p className="text-sm text-gray-500">{t.timeline_desc}</p>
+            <div className="space-y-6 h-full flex flex-col">
+              <div className="flex-1 flex flex-col">
+                <h2 className="text-2xl font-bold tracking-tight mb-4">{t.dev_notes}</h2>
+                <div className="flex-1 border border-(--border-color) rounded-xl overflow-hidden bg-white flex flex-col shadow-sm min-h-[500px]">
+                  <NotionEditor 
+                    value={newComment}
+                    iconSet={appIconSet}
+                    onChange={setNewComment}
+                    onSave={() => {
+                      handleAddComment();
+                      // Optional: Toast or feedback
+                    }}
+                    onCancel={() => setNewComment("")} // Clear
+                  />
                 </div>
-                {!isFullEditorOpen && (
-                  <button 
-                    onClick={() => setIsFullEditorOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-white border border-(--border-color) rounded-xl text-xs font-bold hover:bg-gray-50 transition-all shadow-sm group"
-                  >
-                    <PenTool size={14} className="text-blue-500 group-hover:rotate-12 transition-transform" />
-                    {t.add_note}
-                  </button>
-                )}
               </div>
 
-              {isFullEditorOpen ? (
-                <NotionEditor 
-                  value={newComment}
-                  iconSet={appIconSet}
-                  onChange={setNewComment}
-                  onCancel={() => setIsFullEditorOpen(false)}
-                  onSave={() => {
-                    handleAddComment();
-                    setIsFullEditorOpen(false);
-                  }}
-                />
-              ) : (
-                <div key="unified-timeline" className="relative">
-                  {/* Vertical Timeline Guide */}
-                  <div className="absolute left-[18px] top-6 bottom-6 w-px bg-(--border-color) opacity-50 z-0"></div>
+              {/* Past Notes List - Simplified */}
+              <div className="space-y-4">
+                 <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400">Previous Notes</h3>
+                 {comments.length === 0 && <p className="text-gray-400 italic text-sm">No notes yet.</p>}
+                 {comments.sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).map(c => (
+                    <div key={c.id} className="bg-white p-4 rounded-xl border border-(--border-color) shadow-sm">
+                       <div className="flex justify-between items-center mb-2">
+                          <span className="text-[10px] font-bold bg-gray-100 px-2 py-1 rounded text-gray-500">
+                            {new Date(c.timestamp).toLocaleDateString()}
+                          </span>
 
-                  <div className="space-y-0 relative z-10">
-                    {[
-                      ...dbLogs.map(l => ({ ...l, entryType: 'log' as const })),
-                      ...comments.map(c => ({ ...c, entryType: 'comment' as const }))
-                    ]
-                    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-                    .map((entry) => {
-                      const isLog = entry.entryType === 'log';
-                      const type = isLog ? (entry as DbLog).type : (entry as Comment).type;
-                      const content = isLog ? (entry as DbLog).content : (entry as Comment).text;
-                      const timestamp = new Date(entry.timestamp);
-
-                      return (
-                        <div key={`${entry.entryType}-${entry.id}`} className="group relative">
-                          <div className="flex gap-6 items-start py-6 -mx-4 px-4 hover:bg-gray-50/50 rounded-2xl transition-all">
-                            {/* Marker Icon */}
-                            <div className="shrink-0 w-9 h-9 rounded-xl bg-(--theme-primary-bg) border border-(--border-color) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 transition-transform">
-                              {type === 'git' && <Code size={16} />}
-                              {type === 'task' && <span>✅</span>}
-                              {type === 'walkthrough' && <span>✨</span>}
-                              {type === 'markdown' && <FileText size={16} />}
-                              {type === 'code' && <Code size={16} />}
-                              {type === 'text' && <FileText size={16} />}
-                              {(!type || type === 'unknown' || type === 'note') && <span className="text-[10px] font-bold">{t.entry_marker}</span>}
-                            </div>
-
-                            <div className="flex-1 min-w-0">
-                              {/* Metadata Header */}
-                              <div className="flex items-center gap-3 mb-2">
-                                <span className="text-[10px] bg-(--theme-primary) text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm">
-                                  {type === 'git' ? t.type_git : 
-                                   type === 'task' ? t.type_task : 
-                                   type === 'walkthrough' ? t.type_walkthrough : 
-                                   type === 'code' ? t.type_code : 
-                                   type === 'markdown' ? t.type_markdown : t.type_note}
-                                </span>
-                                <span className="text-[10px] notion-text-subtle font-bold uppercase tracking-widest bg-(--theme-primary-bg) px-2.5 py-1 rounded-lg border border-(--border-color)">
-                                  {timestamp.toLocaleDateString(appLang)} {timestamp.toLocaleTimeString(appLang, { hour: '2-digit', minute: '2-digit' })}
-                                </span>
-                              </div>
-
-                              {/* Content Area - WordPress Block Style */}
-                              <div className={`mt-3 ${type === 'git' ? 'py-1' : ''}`}>
-                                {type === 'git' ? (
-                                  <div>
-                                    <p className="text-[15px] font-medium leading-relaxed">{content}</p>
-                                    <div className="mt-2 flex items-center gap-2 text-[10px] notion-text-subtle font-mono">
-                                      <span className="bg-(--theme-primary-bg) px-1.5 py-0.5 rounded border border-(--border-color)">
-                                        {JSON.parse((entry as DbLog).metadata || '{}').hash?.substring(0, 7) || '---'}
-                                      </span>
-                                      <span>{JSON.parse((entry as DbLog).metadata || '{}').author || t.unknown_author}</span>
-                                    </div>
-                                  </div>
-                                ) : type === 'code' ? (
-                                  <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-2xl shadow-inner my-2">
-                                    <pre className="text-sm font-mono text-emerald-400 overflow-x-auto p-0 m-0 bg-transparent border-none">
-                                      <code>{content}</code>
-                                    </pre>
-                                  </div>
-                                ) : (
-                                  <div className="markdown-content">
-                                    <ReactMarkdown>
-                                      {content}
-                                    </ReactMarkdown>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                    {comments.length === 0 && dbLogs.length === 0 && (
-                      <p className="notion-text-subtle italic text-center py-20">{t.no_activity}</p>
-                    )}
-                  </div>
-                </div>
-              )}
+                       </div>
+                       <div className="markdown-content text-sm">
+                          {c.type === 'code' ? (
+                             <pre className="bg-neutral-900 text-emerald-400 p-2 rounded"><code>{c.text}</code></pre>
+                          ) : (
+                             <ReactMarkdown>{c.text}</ReactMarkdown>
+                          )}
+                       </div>
+                    </div>
+                 ))}
+              </div>
             </div>
           )}
 

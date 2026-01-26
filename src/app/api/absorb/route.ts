@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getProjectContext } from '@/lib/git';
-import { generateDailySummary, suggestTasks } from '@/lib/ai';
+import { generateDailySummary, suggestTasks, checkTaskCompletion } from '@/lib/ai';
 import { Prisma } from '@prisma/client';
 
 export async function POST(req: NextRequest) {
@@ -30,10 +30,22 @@ WALKTHROUGH:
 ${contextData.walkthrough || 'No walkthrough available.'}
     `;
 
+    // 2.5 Fetch Active & Proposed Tasks for Completion Check
+    // We treat 'added' and 'proposed' as candidates for completion.
+    const candidates = await db.suggestedTask.findMany({
+      where: {
+        project_id: Number(projectId),
+        status: { in: ['added', 'proposed'] }
+      }
+    });
+    const candidateStrings = candidates.map(t => t.task);
+
     // 3. AI Analysis
-    const [summaryObj, tasks] = await Promise.all([
+    // Now running 3 AI jobs in parallel
+    const [summaryObj, tasks, completedTaskStrings] = await Promise.all([
       generateDailySummary(contextString),
-      suggestTasks(contextString, process.env.APP_LANG || 'en')
+      suggestTasks(contextString, process.env.APP_LANG || 'en'),
+      checkTaskCompletion(contextString, candidateStrings)
     ]);
 
     const { en: summaryEn, ja: summaryJa } = summaryObj;
@@ -66,22 +78,39 @@ ${contextData.walkthrough || 'No walkthrough available.'}
         }
       });
 
-      // Save Suggested Tasks
+      // Save Suggested Tasks (New ones)
+      // Check if newly suggested task is actually one of the ones detected as completed (unlikely but possible)
       for (const task of tasks) {
+        // If the AI suggests a task that it simultaneously says is completed, avoid proposing it or mark completed immediately?
+        // Usually suggestion logic shouldn't suggest completed things.
+        // We'll stick to standard saving.
+        
         const exists = await tx.suggestedTask.findFirst({
           where: {
             project_id: Number(projectId),
-            task: task,
-            status: 'proposed'
+            task: task
           }
         });
+        
         if (!exists) {
-          await tx.suggestedTask.create({
-            data: {
-              project_id: Number(projectId),
-              task: task,
-              status: 'proposed'
-            }
+            // Check if this new suggestion is coincidentally in the completed list (rare edge case)
+            const isCompleted = completedTaskStrings.includes(task);
+            await tx.suggestedTask.create({
+                data: {
+                project_id: Number(projectId),
+                task: task,
+                status: isCompleted ? 'completed' : 'proposed'
+                }
+            });
+        }
+      }
+
+      // Mark Completed Tasks (from existing DB candidates)
+      for (const t of candidates) {
+        if (completedTaskStrings.includes(t.task)) {
+          await tx.suggestedTask.update({
+             where: { id: t.id },
+             data: { status: 'completed' }
           });
         }
       }
@@ -92,7 +121,8 @@ ${contextData.walkthrough || 'No walkthrough available.'}
       summary: defaultContent,
       summary_en: summaryEn,
       summary_ja: summaryJa,
-      tasks 
+      tasks,
+      completedTasks: completedTaskStrings
     });
 
   } catch (error: unknown) {

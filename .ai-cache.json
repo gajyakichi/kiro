@@ -1,22 +1,17 @@
 {
-  "489877ccabad59a752aea38efa8b439a06097b8d17919b760535c7a7bf9b9f48": {
-    "timestamp": 1769393157139,
-    "latencyMs": 27295,
-    "content": "**Daily Development Report – 26 Jan 2026**\n\n| Category | Highlights |\n|---|---|\n| **CI/CD** | • Added a GitHub Actions workflow to run lint, tests, and build steps automatically. |\n| **Editor & AI** | • Integrated BlockNote editor for memo functionality. <br>• Enhanced AI‑suggestion language support and added an “AI prompt copy” button. |\n| **Electron & Theme API** | • Fixed linting errors in Electron integration and theme API. |\n| **UI / Navigation** | • Migrated sidebar navigation icons to a dynamic icon‑set system.<br>• Decoupled icon set from theme selection and introduced global icon sets in Theme Lab. |\n| **Settings / Persistence** | • Resolved settings persistence by reading from `.env` and fixed settings‑save logic.<br>• Improved theme‑hover UI/animations. |\n| **Localization** | • Completed Japanese localization. |\n| **Vault & Workspace** | • Implemented mandatory vault selection, workspace management, and vault‑storage mode.<br>• Added sidebar switcher and UI theme synchronization. |\n| **Theme Lab** | • Added popular theme presets (Catppuccin, Monokai, Solarized Light).<br>• Finalized readability and contrast polish across all theme presets.<br>• Added real‑time CSS preview and ensured reliable theme selection. |\n| **Miscellaneous** | • Unified Note Timeline blocks and enhanced overall UI aesthetics. |\n| **AI Features** | • Introduced AI‑powered project absorption for daily notes and task suggestions. |\n\n**Key Takeaways**\n\n- The project now has a fully automated CI pipeline.\n- Core editor functionality and AI integration have been significantly expanded.\n- Theme and icon handling has been modularized, improving maintainability.\n- Localization and workspace features are now complete, positioning the app for broader user adoption."
+  "ccb63e606fe63ae1b784a3018aa5404f08bea462706b927372a518c5ca100b7a": {
+    "timestamp": 1769402926820,
+    "latencyMs": 244612,
+    "content": "{\n  \"tasks\": [\n    \"カレンダービューのUIテストを追加し、予定のドラッグ＆ドロップや表示切替が正しく機能することを確認する。\",\n    \"AIプロバイダ切替機能を実装し、ローカルOllamaとクラウドサービスの切り替えをUIで行えるようにする。\",\n    \"多言語サポートを拡張し、スペイン語とフランス語のローカリゼーションファイルを作成し、アプリ内で選択可能にする。\",\n    \"ブロックノートエディタのパフォーマンスを改善し、1000ブロック以上のノートロード時にUIが固まらないようにする。\",\n    \"GitHub Actionsに自動デプロイジョブを追加し、mainブランチへマージ時にビルド・テストを通過したらステージング環境へデプロイする。\"\n  ]\n}"
   },
-  "501bdb138d1b823438da481bc441e193b731235c981343568e056c86f5d48109": {
-    "timestamp": 1769393178517,
-    "latencyMs": 48671,
-    "content": "エレクトロンアプリのユニットテストと統合テストを追加し、CIでの自動テストを確実にする。  \nWCAG AA基準に準拠するアクセシビリティ向上を実装し、スクリーンリーダー対応を確認する。  \n日本語以外の主要言語（英語・中国語・韓国語）のローカライズを追加し、言語切替機能を改良する。  \nビルドサイズを分析し、コード分割や圧縮を行い起動時間を短縮する。  \nユーザーマニュアルとチュートリアルを作成し、設定画面のヘルプを充実させる。"
+  "df7532177a346109d3a01c771f0ec4b85e8376d9c6f6256e455ce4e1b1ecd57c": {
+    "timestamp": 1769402938331,
+    "latencyMs": 256124,
+    "content": "{\"en\":\"2026‑01‑26 – Implemented bilingual daily summary toggle (EN/JA). Enhanced Theme Lab with new presets, preview animations, and lint‑error suppression. Added unit tests for AI suggestions, fixed AI provider environment handling, and integrated BlockNote editor with expanded language support and prompt copy. Created a GitHub Actions pipeline for lint, test, and build. Resolved linting errors in Electron and Theme API, ensured feature progress persistence, and improved settings persistence and hover UI in Theme Lab.\",\"ja\":\"2026‑01‑26 – バイリンガルデイリーサマリー切替（EN/JA）を実装。Theme Labを新プリセットとプレビューアニメーションで拡張、Jest設定のリンティングエラーを抑制。AI提案のユニットテスト追加、AIプロバイダ環境処理を修正し、BlockNoteエディタを統合、言語サポートとプロンプトコピーを強化。GitHub Actionsパイプライン（Lint・Test・Build）を作成。ElectronとTheme APIのリンティングエラーを解消し、Feature進捗の永続化、設定永続化、Theme LabのホバーUIを改善。\"}"
   },
-  "3889b134d104023571ac3da8c5db56c94dc7fc2a16fa81fef612c4e7ada34edb": {
-    "timestamp": 1769400756693,
-    "latencyMs": 42506,
-    "content": "**Daily Development Report – 2026‑01‑26**\n\n| Category | Deliverables & Technical Highlights |\n|----------|-------------------------------------|\n| **Theme Lab** | • Added several new theme presets and introduced preview‑animation hooks.<br>• Suppressed Jest‑config lint errors to keep CI clean.<br>• Improved hover‑UI and animation logic, ensuring real‑time CSS preview. |\n| **Testing** | • Implemented unit tests for AI suggestion generation.<br>• Fixed environment‑variable handling for the AI provider. |\n| **CI/CD** | • Added a GitHub Actions workflow that runs lint, test, and build jobs on every push. |\n| **Editor Integration** | • Integrated the BlockNote editor into the Memo feature.<br>• Extended AI suggestion language support and added an “AI prompt copy” utility. |\n| **Electron / Theme API** | • Resolved remaining linting errors in the Electron build and the Theme API.<br>• Enabled progress persistence for the `features/cal-view` screen. |\n| **Icon & Localization** | • Decoupled icon sets from theme selection, introduced global icon sets in Theme Lab.<br>• Completed Japanese localization, workspace management, and vault persistence. |\n| **UI & UX** | • Unified Note Timeline blocks, refined UI aesthetics, and enhanced note‑timeline interactions. |\n\n**Takeaway**  \nThe day delivered a solid mix of new features, quality‑assurance work, and infrastructure improvements that collectively raise the user experience, developer ergonomics, and project reliability."
-  },
-  "feaa34b63f0dfba1d4c3036444f1016586c5c9ef6355d588db725543cc789830": {
-    "timestamp": 1769400778477,
-    "latencyMs": 64288,
-    "content": "CIにカバレッジレポートを追加し、最低80%を目標にする  \nAI提案UIのエンドツーエンドテストを実装し、エラーハンドリングを検証する  \n日本語以外の主要言語（英語・中国語）のローカライズを追加し、i18nキーを統一する  \nテーマLabのパフォーマンスを向上させ、プリロードキャッシュや最小化を検討する  \nREADMEとドキュメントを更新し、ローカルAI（Ollama）サポートのセットアップ手順を明記する"
+  "cd57d768b6bcdc21f9412fcf41e7bd1887b9f3b77395bec6bdaf537c9236342c": {
+    "timestamp": 1769402956382,
+    "latencyMs": 274173,
+    "content": "{\"completed_tasks\": [\"Configure a GitHub Actions CI pipeline to run linting, unit tests, and build steps on every push and PR.\", \"Set up a CI pipeline that runs linting, tests, and builds for both Electron and web targets.\", \"Electron アプリ起動時に .env から設定を読み込み、即時反映される永続化ロジックを改善する\", \"Theme Lab の CSS エディタにリアルタイムプレビュー機能を実装し、変更が即座に反映されるようにする\", \"GitHub Actions に Lint・テスト・ビルドの自動化パイプラインを構築する\", \"UI/UX：Theme Lab でのテーマプリセットをさらに追加し、プレビュー時のハイライトと切替アニメーションを改良する\", \"ユーザー体験：Vault 選択時に「確認」ダイアログを表示し、必須選択フローをより直感的にする\"]}"
   }
 }

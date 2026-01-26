@@ -60,7 +60,7 @@ export interface SuggestedTask {
   id: number;
   project_id: number;
   task: string;
-  status: 'proposed' | 'added' | 'dismissed';
+  status: 'proposed' | 'added' | 'dismissed' | 'completed';
   timestamp: string;
 }
 
