@@ -147,6 +147,37 @@ h1, h2, h3 { color: #268bd2 !important; }
 .notion-item:hover, .notion-item.active { background: #4e5254 !important; color: #cc7832 !important; }
 h1, h2, h3 { color: #cc7832 !important; }
 :root { --theme-primary: #cc7832; --theme-primary-bg: rgba(204, 120, 50, 0.15); --theme-accent: #cc7832; }`
+    },
+    {
+      name: "Synthwave '84",
+      isPreset: true,
+      css: `body { background: #2b213a !important; color: #fff !important; font-weight: 450; background: linear-gradient(to bottom, #2b213a 0%, #241b35 100%) fixed !important; }
+.notion-sidebar { background: #241b35 !important; border-right: 1px solid #fff2 !important; }
+.notion-card { background: #2b213a !important; border: 1px solid #ff7edb !important; box-shadow: 0 0 10px rgba(255, 126, 219, 0.2) !important; color: #fff !important; }
+.notion-item:hover, .notion-item.active { background: #34294f !important; color: #f97e72 !important; text-shadow: 0 0 5px rgba(249, 126, 114, 0.6); }
+h1, h2, h3 { color: #fe4450 !important; text-shadow: 0 0 10px rgba(254, 68, 80, 0.5); }
+:root { --theme-primary: #ff7edb; --theme-primary-bg: rgba(255, 126, 219, 0.2); --theme-accent: #36f9f6; --theme-accent-bg: rgba(54, 249, 246, 0.2); }
+.notion-text-subtle { color: #72f1b8 !important; }`
+    },
+    {
+      name: "GitHub Dimmed",
+      isPreset: true,
+      css: `body { background: #22272e !important; color: #adbac7 !important; font-weight: 450; }
+.notion-sidebar { background: #1c2128 !important; border-right: 1px solid #444c56 !important; }
+.notion-card { background: #2d333b !important; border: 1px solid #444c56 !important; color: #adbac7 !important; }
+.notion-item:hover, .notion-item.active { background: #444c56 !important; color: #539bf5 !important; }
+h1, h2, h3 { color: #539bf5 !important; }
+:root { --theme-primary: #539bf5; --theme-primary-bg: rgba(83, 155, 245, 0.15); --theme-accent: #768390; }`
+    },
+    {
+      name: "Winter Blue",
+      isPreset: true,
+      css: `body { background: #f0f8ff !important; color: #2c3e50 !important; font-weight: 450; }
+.notion-sidebar { background: #e6f2ff !important; border-right: 1px solid #cce4ff !important; }
+.notion-card { background: #ffffff !important; border: 1px solid #d6eaff !important; color: #2c3e50 !important; }
+.notion-item:hover, .notion-item.active { background: #cce4ff !important; color: #007bff !important; }
+h1, h2, h3 { color: #0056b3 !important; }
+:root { --theme-primary: #007bff; --theme-primary-bg: rgba(0, 123, 255, 0.1); --theme-accent: #17a2b8; }`
     }
   ];
 
@@ -341,25 +372,26 @@ h1, h2, h3 { color: #cc7832 !important; }
               </button>
             </div>
 
-            <div className="bg-[#0a0a0a] rounded-3xl p-8 relative overflow-hidden shadow-2xl flex flex-col justify-start items-center space-y-8 border border-white/5">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0,transparent_100%)] pointer-events-none"></div>
+            <div className="bg-[#0a0a0a] rounded-3xl p-8 relative overflow-hidden shadow-2xl flex flex-col justify-start items-center space-y-8 border border-white/5 transition-colors duration-700 ease-in-out" style={newCss && editingTheme === null && !activeTheme ? {} : { transition: 'background 0.5s', background: 'var(--background)' }}>
+              {/* Overlay for "Original" mode or when no specific theme is active in preview but we want base dark bg */}
+               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0,transparent_100%)] pointer-events-none mix-blend-overlay"></div>
               
               <div className="z-10 w-full flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white">
+                <div className="flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+                  <div className="w-8 h-8 rounded-full bg-(--theme-primary) flex items-center justify-center text-white shadow-lg">
                     <CheckCircle size={18} weight="fill" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest">Live System</p>
-                    <p className="text-sm font-bold text-white">Theme Preview</p>
+                    <p className="text-[10px] opacity-60 font-black uppercase tracking-widest">Live System</p>
+                    <p className="text-sm font-bold">Theme Preview</p>
                   </div>
                 </div>
-                <div className="px-3 py-1 bg-white/5 rounded-full text-[9px] font-black text-neutral-400 uppercase tracking-tighter shadow-sm border border-white/10 animate-pulse">LIVE</div>
+                <div className="px-3 py-1 bg-(--theme-primary) text-white rounded-full text-[9px] font-black uppercase tracking-tighter shadow-sm animate-pulse">LIVE</div>
               </div>
 
               <div className="z-10 w-full space-y-4">
                 {/* Sample UI 1: Project Card */}
-                <div className="notion-card p-5 border shadow-2xl scale-100 transition-all duration-700 rounded-3xl w-full text-left" style={{ background: 'var(--background)', color: 'var(--foreground)', borderColor: 'var(--border-color)' }}>
+                <div className="notion-card p-5 border shadow-2xl scale-100 transition-all duration-500 rounded-3xl w-full text-left" style={{ background: 'var(--background)', color: 'var(--foreground)', borderColor: 'var(--border-color)' }}>
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-2xl bg-(--theme-primary-bg) text-(--theme-primary) flex items-center justify-center shadow-inner">
@@ -368,28 +400,43 @@ h1, h2, h3 { color: #cc7832 !important; }
                       <div>
                         <h4 className="font-black text-sm tracking-tight leading-none mb-1">Preview Project</h4>
                         <div className="flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
                           <span className="text-[9px] uppercase tracking-widest font-bold opacity-50">Active Now</span>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-2 mb-4">
-                     <div className="h-1.5 w-full bg-(--foreground) opacity-10 rounded-full overflow-hidden">
-                       <div className="h-full bg-(--theme-primary) w-[75%] rounded-full"></div>
+                  <div className="space-y-3 mb-4">
+                     <div className="flex justify-between text-[10px] font-bold opacity-60">
+                        <span>Progress</span>
+                        <span>75%</span>
+                     </div>
+                     <div className="h-1.5 w-full bg-black/5 rounded-full overflow-hidden">
+                       <div className="h-full bg-(--theme-primary) w-[75%] rounded-full shadow-[0_0_10px_var(--theme-primary)]"></div>
                      </div>
                   </div>
                   <div className="flex gap-2">
-                    <div className="px-2 py-1 rounded bg-(--theme-primary-bg) text-(--theme-primary) text-[8px] font-black uppercase" style={{ backgroundColor: 'var(--theme-primary-bg)', color: 'var(--theme-primary)' }}>Refactor</div>
-                    <div className="px-2 py-1 rounded bg-(--theme-accent-bg) text-(--theme-accent) text-[8px] font-black uppercase" style={{ backgroundColor: 'var(--theme-accent-bg)', color: 'var(--theme-accent)' }}>UI/UX</div>
+                    <div className="px-2 py-1 rounded bg-(--theme-primary-bg) text-(--theme-primary) text-[8px] font-black uppercase tracking-wider border border-transparent hover:border-(--theme-primary) transition-colors cursor-default">Refactor</div>
+                    <div className="px-2 py-1 rounded bg-(--theme-accent-bg) text-(--theme-accent) text-[8px] font-black uppercase tracking-wider border border-transparent hover:border-(--theme-accent) transition-colors cursor-default">UI/UX</div>
                   </div>
                 </div>
 
                 {/* Sample UI 2: Small Note */}
-                <div className="notion-card p-5 border opacity-90 scale-95 origin-top transition-all duration-700 rounded-3xl w-full text-left" style={{ background: 'var(--background)', color: 'var(--foreground)', borderColor: 'var(--border-color)' }}>
+                <div className="notion-card p-5 border opacity-90 scale-95 origin-top transition-all duration-500 rounded-3xl w-full text-left" style={{ background: 'var(--background)', color: 'var(--foreground)', borderColor: 'var(--border-color)' }}>
                    <p className="text-[11px] font-medium leading-relaxed mb-4">
                      This is how your <span className="text-(--theme-primary) font-black">Colors</span> and <span className="opacity-60 italic">Typography</span> will feel in the actual editor.
                    </p>
+                   {/* Dummy Checklist */}
+                   <div className="space-y-2 mb-4">
+                      <div className="flex items-center gap-2 text-xs">
+                         <div className="w-4 h-4 rounded bg-(--theme-primary) flex items-center justify-center text-white"><CheckCircle size={10} weight="fill" /></div>
+                         <span className="opacity-50 line-through">Completed Task</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                         <div className="w-4 h-4 rounded border border-(--border-color)"></div>
+                         <span>Pending Task</span>
+                      </div>
+                   </div>
                    <div className="flex items-center gap-2 pt-2 border-t border-(--border-color) opacity-50 uppercase text-[8px] font-black tracking-widest">
                       <Clock size={10} /> 2 Minutes Ago
                    </div>
