@@ -441,8 +441,8 @@ export default function Home() {
             {new Intl.DateTimeFormat(appLang, { month: 'short', year: 'numeric' }).format(currentDate)}
           </span>
           <div className="flex gap-1">
-            <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-0.5 hover:bg-gray-100 rounded text-gray-400">‹</button>
-            <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-0.5 hover:bg-gray-100 rounded text-gray-400">›</button>
+            <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-0.5 hover:bg-gray-100 rounded text-gray-400" aria-label="Previous month">‹</button>
+            <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-0.5 hover:bg-gray-100 rounded text-gray-400" aria-label="Next month">›</button>
           </div>
         </div>
         <div className="grid grid-cols-7 gap-px text-[10px] text-center">
@@ -797,79 +797,95 @@ export default function Home() {
           </div>
         </div>
 
-        <nav className="flex-1 space-y-1">
-          <div 
+        <nav className="flex-1 space-y-1" role="tablist">
+          <button 
             onClick={() => setActiveTab("git")}
-            className={`notion-item flex items-center gap-3 ${activeTab === "git" ? "active" : ""}`}
+            className={`w-full notion-item flex items-center gap-3 ${activeTab === "git" ? "active" : ""}`}
+            role="tab"
+            aria-selected={activeTab === "git"}
           >
             <IconRenderer icon="Scroll" size={16} baseSet={appIconSet} />
             <span>{t.git_logs}</span>
-          </div>
+          </button>
           
-          <div 
+          <button 
             onClick={() => setActiveTab("progress")}
-            className={`notion-item flex items-center gap-3 ${activeTab === "progress" ? "active" : ""}`}
+            className={`w-full notion-item flex items-center gap-3 ${activeTab === "progress" ? "active" : ""}`}
+            role="tab"
+            aria-selected={activeTab === "progress"}
           >
             <IconRenderer icon="CheckSquare" size={16} baseSet={appIconSet} />
             <span>{t.progress}</span>
-          </div>
+          </button>
 
-          <div 
+          <button 
             onClick={() => setActiveTab("daily_notes")}
-            className={`notion-item flex items-center gap-3 ${activeTab === "daily_notes" ? "active" : ""}`}
+            className={`w-full notion-item flex items-center gap-3 ${activeTab === "daily_notes" ? "active" : ""}`}
+            role="tab"
+            aria-selected={activeTab === "daily_notes"}
           >
             <IconRenderer icon="Sparkles" size={16} baseSet={appIconSet} />
             <div className="flex-1 flex justify-between items-center">
               <span>{t.daily_notes}</span>
               {dailyNotes.length > 0 && <span className="text-[10px] bg-(--theme-primary-bg) text-(--theme-primary) px-1.5 rounded-full font-bold">{dailyNotes.length}</span>}
             </div>
-          </div>
+          </button>
 
-          <div 
+          <button 
             onClick={() => setActiveTab("suggested_tasks")}
-            className={`notion-item flex items-center gap-3 ${activeTab === "suggested_tasks" ? "active" : ""}`}
+            className={`w-full notion-item flex items-center gap-3 ${activeTab === "suggested_tasks" ? "active" : ""}`}
+            role="tab"
+            aria-selected={activeTab === "suggested_tasks"}
           >
             <IconRenderer icon="Lightbulb" size={16} baseSet={appIconSet} />
             <div className="flex-1 flex justify-between items-center">
               <span>{t.suggestions}</span>
               {suggestedTasks.length > 0 && <span className="text-[10px] bg-(--theme-accent-bg) text-(--theme-accent) px-1.5 rounded-full font-bold">{suggestedTasks.length}</span>}
             </div>
-          </div>
+          </button>
 
-          <div 
+          <button 
             onClick={() => setActiveTab("calendar")}
-            className={`notion-item flex items-center gap-3 ${activeTab === "calendar" ? "active" : ""}`}
+            className={`w-full notion-item flex items-center gap-3 ${activeTab === "calendar" ? "active" : ""}`}
+            role="tab"
+            aria-selected={activeTab === "calendar"}
           >
             <IconRenderer icon="Calendar" size={16} baseSet={appIconSet} />
             <span>{t.calendar}</span>
-          </div>
+          </button>
 
-          <div 
+          <button 
             onClick={() => setActiveTab("timeline")}
-            className={`notion-item flex items-center gap-3 ${activeTab === "timeline" ? "active" : ""}`}
+            className={`w-full notion-item flex items-center gap-3 ${activeTab === "timeline" ? "active" : ""}`}
+            role="tab"
+            aria-selected={activeTab === "timeline"}
           >
             <IconRenderer icon="History" size={16} baseSet={appIconSet} />
             <span>Timeline</span>
-          </div>
+          </button>
 
-          <div 
+          <button 
             onClick={() => setActiveTab("comments")}
-            className={`notion-item flex items-center gap-3 ${activeTab === "comments" ? "active" : ""}`}
+            className={`w-full notion-item flex items-center gap-3 ${activeTab === "comments" ? "active" : ""}`}
+            role="tab"
+            aria-selected={activeTab === "comments"}
           >
             <IconRenderer icon="SquarePen" size={16} baseSet={appIconSet} />
             <div className="flex-1 flex justify-between items-center">
               <span>{t.notes}</span>
               <span className="text-xs notion-text-subtle">{comments.length}</span>
             </div>
-          </div>
+          </button>
 
-          <div 
+          <button 
             onClick={() => setActiveTab("themes")}
-            className={`notion-item flex items-center gap-3 ${activeTab === "themes" ? "active" : ""}`}
+            className={`w-full notion-item flex items-center gap-3 ${activeTab === "themes" ? "active" : ""}`}
+            role="tab"
+            aria-selected={activeTab === "themes"}
           >
             <IconRenderer icon="Palette" size={16} baseSet={appIconSet} className={activeTab === "themes" ? "" : "animate-pulse"} />
             <span>{t.theme_lab}</span>
-          </div>
+          </button>
 
           <Link 
             href="/settings"
@@ -909,8 +925,9 @@ export default function Home() {
         <header className="mb-12 animate-fade-in relative z-50">
           <h1 className="group relative flex items-center text-4xl font-bold tracking-tight mb-2">
             <div className="relative mr-4">
-              <div 
+              <button 
                 onClick={() => setIconPickerTarget('header')}
+                aria-label="Change project icon"
                 className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-gray-100 cursor-pointer transition-colors border border-transparent hover:border-gray-200"
               >
                 {activeProject?.icon ? (
@@ -918,7 +935,7 @@ export default function Home() {
                 ) : (
                     <span className="text-2xl opacity-20">◦</span>
                 )}
-              </div>
+              </button>
               {iconPickerTarget === 'header' && (
                 <div className="absolute left-0 top-full z-100">
                   <IconPicker 
@@ -947,6 +964,7 @@ export default function Home() {
               <button 
                 onClick={handleAbsorb}
                 disabled={isAbsorbing}
+                aria-busy={isAbsorbing}
                 className={`ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   isAbsorbing 
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-100' 
