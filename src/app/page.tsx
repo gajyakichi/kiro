@@ -5,14 +5,22 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { IconRenderer } from '@/components/IconRenderer';
-import { IconPicker } from '@/components/IconPicker';
-import { ThemeLab } from '@/components/ThemeLab';
+import dynamic from 'next/dynamic';
+
+// Dynamic Imports for Code Splitting / Bundle Optimization
+const NotionEditor = dynamic(() => import('@/components/NotionEditor'), { 
+  loading: () => <div className="h-full w-full bg-gray-50 flex items-center justify-center text-xs text-gray-400">Loading Editor...</div>,
+  ssr: false // Editor is client-only usually
+});
+const ThemeLab = dynamic(() => import('@/components/ThemeLab').then(mod => mod.ThemeLab), { 
+  loading: () => <div className="p-4 text-xs text-center text-gray-400">Loading Themes...</div> 
+});
+const IconPicker = dynamic(() => import('@/components/IconPicker').then(mod => mod.IconPicker), { ssr: false });
+const VaultSwitcher = dynamic(() => import('@/components/VaultSwitcher').then(mod => mod.VaultSwitcher), { ssr: false });
+const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'));
+const DailyNotes = dynamic(() => import('@/components/DailyNotes'));
+
 import { Sparkles, PenTool, FileText, Code, ShieldAlert, PlusCircle, Plus, Folder } from 'lucide-react';
-import DailyNotes from '@/components/DailyNotes';
-import SuggestedTasks from '@/components/SuggestedTasks';
-import NotionEditor from '@/components/NotionEditor';
-// import MarkdownEditor from '@/components/MarkdownEditor'; // Deprecated
-import { VaultSwitcher } from '@/components/VaultSwitcher';
 import { getTranslation } from '@/lib/i18n';
 
 export default function Home() {

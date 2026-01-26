@@ -1,8 +1,23 @@
 import type { NextConfig } from "next";
+import bundleAnalyzer from '@next/bundle-analyzer';
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 const nextConfig: NextConfig = {
   /* config options here */
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
+  // Optimization: Split chunks more aggressively if needed, 
+  // but Next.js defaults are usually quite good.
+  experimental: {
+    // If we wanted to really push it:
+    // optimizePackageImports: ['lucide-react', '@mantine/core'],
+    optimizePackageImports: ['lucide-react', '@blocknote/mantine', '@blocknote/react', '@blocknote/core'],
+  },
 };
 
-export default nextConfig;
-// Force reload: Thu Jan 22 11:39:13 JST 2026
+export default withBundleAnalyzer(nextConfig);
+

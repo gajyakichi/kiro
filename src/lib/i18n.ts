@@ -96,6 +96,7 @@ const translations = {
     internal: "Internal",
     storage_vaults: "Storage Vaults",
     manage_vaults: "MANAGE VAULTS IN SETTINGS",
+    confirm_vault_switch: "Switching vaults will reload the application. Continue?",
 
     // Vault Manager (Settings)
     vault_manager_desc: "Manage multiple storage locations (Vaults). Switching vaults changes the active database and file storage.",
@@ -219,6 +220,7 @@ const translations = {
     internal: "内部",
     storage_vaults: "ストレージ・ヴォルト",
     manage_vaults: "設定でヴォルトを管理",
+    confirm_vault_switch: "ヴォルトを切り替えるとアプリケーションが再読み込みされます。続行しますか？",
 
     // Vault Manager (Settings)
     vault_manager_desc: "複数のストレージ場所（ヴォルト）を管理します。ヴォルトを切り替えると、使用するデータベースとファイルストレージが変更されます。",

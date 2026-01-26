@@ -85,7 +85,11 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
             {vaults.map((vault) => (
               <button
                 key={vault.id}
-                onClick={() => handleSwitch(vault.id)}
+                onClick={() => {
+                   if (confirm(t.confirm_vault_switch || "Switching vaults will reload the application. Continue?")) {
+                       handleSwitch(vault.id);
+                   }
+                }}
                 className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors ${
                   vault.active ? 'bg-(--theme-primary-bg) cursor-default' : 'hover:bg-neutral-50'
                 }`}
