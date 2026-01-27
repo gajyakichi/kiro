@@ -108,5 +108,25 @@
     "timestamp": 1769428931116,
     "latencyMs": 194435,
     "content": "{ \"completed_ids\": [7, 12, 18, 22] }"
+  },
+  "3017c1f25d0c199acd39b0c9d8b19416109304ba88c5ccf3e0dbc3473d8493f0": {
+    "timestamp": 1769471472139,
+    "latencyMs": 113754,
+    "content": "{\"en\":\"**Daily Report – 2026-01-26**\\n- Added MIT License, updated README with bilingual content, renamed app to *Kiro*.\\n- Completed calendar UI, introduced AI caching, and updated system calendar design.\\n- Enhanced accessibility: WCAG AA compliance, improved semantics and aria‑labels.\\n- Fixed lint errors in page, Electron, and Theme API.\\n- Added comprehensive unit tests (NotionEditor, SuggestedTasks, AI module, AI suggestions).\\n- Implemented UI/UX enhancements: new app icon, timeline upgrades, task UI refactor, AI task checking.\\n- Added localization support, bilingual daily summary toggle (EN/JA).\\n- Built CI pipeline: GitHub Actions for Lint, Test, Build.\\n- Integrated BlockNote editor (Memo), improved AI suggestions language support, added AI prompt copy.\\n- Updated Theme Lab with new presets, preview animations, and suppressed Jest lint errors.\\n- Migrated sidebar navigation icons to dynamic icon set system (2026‑01‑24). Settings persistence fixed via .env reading, enhanced theme hover UI and animations.\\n\\n**Key Technical Changes**\\n- AI integration and caching.\\n- Accessibility improvements (WCAG AA).\\n- Internationalization (EN/JA).\\n- CI/CD with GitHub Actions.\\n- Modular icon system and settings handling.\\n\\n**Next Steps**\\n- Monitor CI results, refine AI suggestion logic, continue accessibility testing, and plan upcoming feature roadmap.\\n\",\"ja\":\"**デイリーレポート – 2026-01-26**\\n- MITライセンス追加、READMEを英日バイリンガルに更新、アプリ名を *Kiro* に変更。\\n- カレンダーUIを完成、AIキャッシュ導入、システムカレンダー設計を更新。\\n- アクセシビリティ強化：WCAG AA対応、セマンティクスとaria‑labelの改善。\\n- page、Electron、Theme API のリンティングエラーを修正。\\n- NotionEditor、SuggestedTasks、AIモジュール、AI提案の包括的ユニットテストを追加。\\n- UI/UX改良：新アイコン、タイムラインアップグレード、タスクUIリファクタ、AIタスクチェック。\\n- 国際化対応：ローカリゼーション、英日切替可能なデイリーサマリー実装。\\n- CIパイプライン構築：GitHub ActionsでLint・Test・Buildを実行。\\n- BlockNoteエディタ（Memo）統合、AI提案言語サポート強化、AIプロンプトコピー追加。\\n- Theme Labを新プリセットとプレビューアニメーションで更新、Jestリンティングエラー抑制。\\n- サイドバーアイコンを動的アイコンシステムへ移行（2026‑01‑24）。\\n- .env読み込みで設定永続化を修正、テーマホバーUIとアニメーションを強化。\\n\\n**主な技術変更**\\n- AI統合とキャッシュ。\\n- アクセシビリティ（WCAG AA）。\\n- 国際化（英日）。\\n- GitHub ActionsによるCI/CD。\\n- モジュラーアイコンシステムと設定処理。\\n\\n**次のステップ**\\n- CI結果を監視、AI提案ロジックを洗練、アクセシビリティテストを継続、次期機能ロードマップを計画。\"}"
+  },
+  "6ba87cb17344f15e8ed83d233d0f20ccd3ae81e6c546e97c034fbcbdfb96e769": {
+    "timestamp": 1769471479869,
+    "latencyMs": 121480,
+    "content": "{\"tasks\":[\"1. エンドツーエンドテストを追加し、タスク作成・編集・削除のフローをCIで検証する\",\"2. タスクのUI更新をオプティミスティックに実装し、ネットワーク遅延時のレスポンスを改善する\",\"3. ContextProviderをリファクタリングし、不要な再レンダリングを減らすことでパフォーマンスを向上させる\",\"4. ダークモードの切替状態をローカルストレージに永続化し、再起動時も保持する\",\"5. APIエンドポイントやAIプロンプトの使用方法をまとめた開発者向けドキュメントを作成する\"]}"
+  },
+  "14aa5f5ccbfcc0a549b380bae3cd49ce3985b1e2974d97e1387a643a5624e4a8": {
+    "timestamp": 1769471489208,
+    "latencyMs": 130818,
+    "content": "{ \"completed_ids\": [4, 29, 31, 58] }"
+  },
+  "0943c936635beefd7f86bdd481e84e34c2d45d3a9033aeb697b46db92baac7f2": {
+    "timestamp": 1769471726295,
+    "latencyMs": 99452,
+    "content": "{ \"completed_ids\": [70] }"
   }
 }

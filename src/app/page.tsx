@@ -19,6 +19,10 @@ const IconPicker = dynamic(() => import('@/components/IconPicker').then(mod => m
 const VaultSwitcher = dynamic(() => import('@/components/VaultSwitcher').then(mod => mod.VaultSwitcher), { ssr: false });
 const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'));
 const DailyNotes = dynamic(() => import('@/components/DailyNotes'));
+const ActivityHeatmap = dynamic(() => import('@/components/ActivityHeatmap'), {
+  loading: () => <div className="h-64 w-full bg-neutral-50 rounded-3xl border border-dashed border-neutral-200 animate-pulse" />,
+  ssr: false
+});
 
 import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, PanelBottom, X, Check, AlertTriangle } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
@@ -499,102 +503,16 @@ export default function Home() {
       return acc;
     }, {});
 
-    const getColor = (count: number) => {
-      if (count === 0) return 'bg-neutral-50 border border-neutral-100/50';
-      if (count <= 2) return 'bg-(--theme-primary)/20 border border-(--theme-primary)/30';
-      if (count <= 5) return 'bg-(--theme-primary)/50 border border-(--theme-primary)/60';
-      if (count <= 10) return 'bg-(--theme-primary)/80 border border-(--theme-primary)/90';
-      return 'bg-(--theme-primary) border border-(--theme-primary)';
-    };
-
-    type ContributionDay = {
-       date: Date;
-       dateStr: string;
-       data: ActivityEntry[];
-    };
-    const weeks: ContributionDay[][] = [];
-    const current = new Date(startDate);
-
-    for (let i = 0; i < 53; i++) {
-      const days = [];
-      for (let j = 0; j < 7; j++) {
-        const dStr = current.toISOString().split('T')[0];
-        const dayData = activityMap[dStr] || [];
-        days.push({
-          date: new Date(current),
-          dateStr: dStr,
-          data: dayData
-        });
-        current.setDate(current.getDate() + 1);
-      }
-      weeks.push(days);
-    }
-
     return (
       <div className="animate-fade-in space-y-8">
-        <div className="bg-white border border-(--border-color) p-8 rounded-3xl shadow-sm">
-          <div className="flex justify-between items-end mb-6">
-            <div>
-              <h2 className="text-2xl font-black tracking-tight">{t.system_calendar}</h2>
-              <p className="text-sm notion-text-subtle">{t.calendar_desc}</p>
-            </div>
-            <div className="flex items-center gap-4 text-[10px] font-bold text-neutral-400 uppercase tracking-widest bg-neutral-50 px-4 py-2 rounded-xl border border-neutral-100">
-              <span>{t.less}</span>
-              <div className="flex gap-1">
-                {[0, 2, 5, 10, 15].map(v => <div key={v} className={`w-3 h-3 rounded-sm ${getColor(v)}`} />)}
-              </div>
-              <span>{t.more}</span>
-            </div>
-          </div>
 
-          <div className="flex gap-4">
-             {/* Labels Column */}
-             <div className="flex flex-col gap-1.5 pt-[26px] pr-1 select-none">
-                {[0, 1, 2, 3, 4, 5, 6].map(d => (
-                   <div key={d} className="h-4 flex items-center text-[9px] font-bold text-neutral-300 uppercase leading-none">
-                      {(d === 1 || d === 3 || d === 5) ? t.days_short[d] : ''}
-                   </div>
-                ))}
-             </div>
-
-             {/* Graph Container */}
-             <div className="overflow-x-auto pb-4 custom-scrollbar flex-1">
-                {/* Month Headers */}
-                <div className="flex gap-1.5 min-w-max mb-1.5 h-5 select-none">
-                   {weeks.map((week, wi) => {
-                      const date = week[0].date;
-                      const prevDate = wi > 0 ? weeks[wi-1][0].date : null;
-                      const showMonth = wi === 0 || (prevDate && date.getMonth() !== prevDate.getMonth());
-                      return (
-                         <div key={wi} className="w-4 flex flex-col justify-end overflow-visible relative">
-                            {showMonth && (
-                               <span className="absolute left-0 bottom-0 text-[10px] font-bold text-neutral-400 whitespace-nowrap">
-                                  {date.toLocaleDateString(appLang, { month: 'short' })}
-                               </span>
-                            )}
-                         </div>
-                      );
-                   })}
-                </div>
-                
-                {/* Heatmap Grid */}
-                <div className="flex gap-1.5 min-w-max">
-                  {weeks.map((week, wi) => (
-                    <div key={wi} className="flex flex-col gap-1.5">
-                      {week.map((day, di) => (
-                        <button
-                          key={di}
-                          onClick={() => setSelectedHeatmapDate(day.dateStr)}
-                          title={t.activity_level.replace('{count}', day.data.length.toString()).replace('{date}', day.dateStr)}
-                          className={`w-4 h-4 rounded-sm transition-all hover:scale-125 hover:z-10 ${getColor(day.data.length)} ${selectedHeatmapDate === day.dateStr ? 'ring-2 ring-(--theme-primary) ring-offset-2' : ''}`}
-                        />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-             </div>
-          </div>
-        </div>
+        <ActivityHeatmap 
+          activityMap={activityMap}
+          selectedDate={selectedHeatmapDate}
+          onSelectDate={setSelectedHeatmapDate}
+          appLang={appLang}
+          translations={t}
+        />
 
         {selectedHeatmapDate && (
           <div className="bg-neutral-50/50 border border-(--border-color) rounded-3xl p-8 animate-in slide-in-from-bottom-4 duration-500">
@@ -1368,7 +1286,7 @@ export default function Home() {
         )}
       {/* Custom Dialog */}
       {dialogState.open && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in zoom-in-95 duration-200 border border-neutral-100">
             <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${dialogState.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
               <Check size={24} className={dialogState.type === 'success' ? 'block' : 'hidden'} />
