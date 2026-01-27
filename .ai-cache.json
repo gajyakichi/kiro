@@ -128,5 +128,20 @@
     "timestamp": 1769471726295,
     "latencyMs": 99452,
     "content": "{ \"completed_ids\": [70] }"
+  },
+  "594ac606aa032965b67a2c8d5b732ebe2f28b74064d452c770167e56f43c4703": {
+    "timestamp": 1769521577124,
+    "latencyMs": 152238,
+    "content": "{\"en\":\"Jan 27:\\n- Added Import/Export theme support to ThemeLab.\\n- Implemented Playwright E2E tests for the Electron app and CI integration.\\n- Optimized bundle by splitting the heatmap component and using dynamic imports.\\n- Updated README to point DATABASE_URL at vault/kiro.db.\\n\\nJan 26:\\n- Renamed the app to Kiro and added the MIT License.\\n- Finalized the calendar UI, introduced AI caching, and updated the system calendar design.\\n- Improved WCAG AA compliance with semantic enhancements and aria‑labels.\\n- Added an EN/JA toggle for the daily summary.\\n- Refactored the timeline and task UI, and enhanced AI task checking.\\n- Enriched Theme Lab with new presets, preview animations, and suppressed Jest lint errors.\\n- Added comprehensive unit tests for NotionEditor, SuggestedTasks, AI module, and AI suggestions.\\n- Integrated BlockNote (Memo) editor and expanded AI language support.\\n- Set up GitHub Actions for lint, test, and build.\\n- Updated README with bilingual content and app naming origin.\\n- Introduced a minimal geometric icon.\\n- Improved UI/UX, added localization, and increased CI/test coverage.\",\"ja\":\"1月27日:\\n- ThemeLabにテーマのインポート/エクスポート機能を追加。\\n- Electronアプリ用Playwright E2Eテストを実装し、CIと連携。\\n- ヒートマップコンポーネントを分割し、ダイナミックインポートでバンドル最適化。\\n- READMEのDATABASE_URLをvault/kiro.dbに更新。\\n\\n1月26日:\\n- アプリ名をKiroに変更し、MITライセンスを追加。\\n- カレンダーUIを完成させ、AIキャッシュを導入、システムカレンダーのデザインを更新。\\n- WCAG AA準拠をセマンティクスとaria‑labelで向上。\\n- 日報のEN/JAトグルを追加。\\n- タイムラインとタスクUIをリファクタリングし、AIタスクチェックを強化。\\n- Theme Labに新プリセットとプレビューアニメーションを追加し、Jest lintエラーを抑制。\\n- NotionEditor、SuggestedTasks、AIモジュール、AI提案の包括的ユニットテストを追加。\\n- BlockNote（Memo）エディタを統合し、AI言語サポートを拡張。\\n- GitHub ActionsでLint、テスト、ビルドをセットアップ。\\n- READMEにバイリンガルコンテンツとアプリ名の由来を追加。\\n- 最小限の幾何学アイコンを導入。\\n- UI/UXを改善し、ローカリゼーションとCI/テストカバレッジを拡充。\"}"
+  },
+  "38cb7fc4b5385cc32302f30da1668f51ba845ec50dd26869a2971340b2ac31e4": {
+    "timestamp": 1769521587692,
+    "latencyMs": 162805,
+    "content": "{ \"completed_ids\": [1, 61, 62, 67] }"
+  },
+  "7bcf1fd69bbba1148b38f751ce1967d9e25dded1f1d829d0ae2d6eddf704c861": {
+    "timestamp": 1769521595979,
+    "latencyMs": 171088,
+    "content": "{\"tasks\":[\"ユーザーインターフェースを追加し、テーマのインポート/エクスポートを実行できるようにする\",\"無効なテーマファイルがアップロードされた際のバリデーションとエラーメッセージを実装する\",\"インポート/エクスポート機能に対する単体テストとPlaywright E2Eテストを作成する\",\"ドキュメント（README）にインポート/エクスポートの使い方とフォーマット仕様を追記する\",\"テーマのバージョン互換性を確認し、古いテーマフォーマットからのマイグレーションサポートを追加する\"]}"
   }
 }

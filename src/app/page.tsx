@@ -17,6 +17,7 @@ const ThemeLab = dynamic(() => import('@/components/ThemeLab').then(mod => mod.T
 });
 const IconPicker = dynamic(() => import('@/components/IconPicker').then(mod => mod.IconPicker), { ssr: false });
 const VaultSwitcher = dynamic(() => import('@/components/VaultSwitcher').then(mod => mod.VaultSwitcher), { ssr: false });
+const InlineChatBox = dynamic(() => import('@/components/InlineChatBox').then(mod => mod.InlineChatBox), { ssr: false });
 
 import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, PanelBottom, X, Check, AlertTriangle, Search } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
@@ -98,6 +99,16 @@ export default function Home() {
   const [newWName, setNewWName] = useState("");
   const [newWPath, setNewWPath] = useState("");
   const [isCreatingW, setIsCreatingW] = useState(false);
+
+  // AI Chat State
+  const [chatState, setChatState] = useState<{ open: boolean; targetId: string | null; context: string; title: string }>({ open: false, targetId: null, context: "", title: "" });
+
+  const handleOpenChat = (targetId: string, context: string, title: string) => {
+      setChatState(prev => prev.targetId === targetId && prev.open 
+        ? { open: false, targetId: null, context: "", title: "" }
+        : { open: true, targetId, context, title }
+      );
+  };
 
   // Heatmap State
 
@@ -750,9 +761,17 @@ export default function Home() {
                 
                 {/* 1. Current Progress (Pinned) */}
                 <div className="group relative pl-6 border-l-2 border-(--theme-primary-bg) hover:border-(--theme-primary) transition-colors">
-                  <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-(--theme-primary-bg) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={() => handleOpenChat(
+                        'current-status',
+                        `Current Status Task:\n${progress?.task || 'No task set'}`,
+                        "Current Status AI"
+                    )}
+                    className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-(--theme-primary-bg) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center cursor-pointer hover:scale-110 z-10"
+                    title="Ask AI about this status"
+                  >
                     <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
-                  </div>
+                  </button>
                   
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -780,6 +799,15 @@ export default function Home() {
                         </div>
                     </article>
                   </div>
+                  
+                  {/* Inline Chat for Current Status */}
+                  {chatState.open && chatState.targetId === 'current-status' && (
+                    <InlineChatBox 
+                      onClose={() => setChatState(prev => ({ ...prev, open: false, targetId: null }))}
+                      initialContext={chatState.context}
+                      title={chatState.title}
+                    />
+                  )}
                 </div>
 
                 {/* 2. Search & Filter Bar */}
@@ -859,10 +887,21 @@ export default function Home() {
                       return (
                         <div key={`${entryType}-${entry.id}`} className="group relative">
                           <div className="flex gap-4 items-start py-6 -mx-4 px-4 hover:bg-gray-50/50 rounded-2xl transition-all">
-                            {/* Marker Icon */}
-                            <div className="shrink-0 w-6 h-6 rounded-full bg-white border-2 border-(--theme-primary-bg) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 group-hover:border-(--theme-primary) transition-all z-10">
+                            {/* Marker Icon (Clickable for AI Chat) */}
+                            <button 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenChat(
+                                        `${entryType}-${entry.id}`,
+                                        `Entry Type: ${entryType}\nTimestamp: ${timestamp.toLocaleString()}\nContent:\n${content}`,
+                                        `Chat about ${typeLabel}`
+                                    );
+                                }}
+                                className="shrink-0 w-6 h-6 rounded-full bg-white border-2 border-(--theme-primary-bg) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 group-hover:border-(--theme-primary) transition-all z-10 cursor-pointer hover:bg-blue-50"
+                                title="Ask AI about this item"
+                            >
                               {icon}
-                            </div>
+                            </button>
 
                            <div className="flex-1 min-w-0">
                              {entryType === 'daily_note' ? (
@@ -955,15 +994,24 @@ export default function Home() {
                                           </div>
                                       )}
                                       </div>
-                                    </>
-                                 )}
-                               </>
-                             )}
+                                     </>
+                                  )}
+                                </>
+                              )}
+                              
+                              {/* Inline Chat Box */}
+                              {chatState.open && chatState.targetId === `${entryType}-${entry.id}` && (
+                                <InlineChatBox 
+                                  onClose={() => setChatState(prev => ({ ...prev, open: false, targetId: null }))}
+                                  initialContext={chatState.context}
+                                  title={chatState.title}
+                                />
+                              )}
+                            </div>
                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                         </div>
+                       );
+                     })}
                     
                     {filteredTimelineData.length === 0 && (
                        <div className="py-20 text-center text-gray-400 italic">No activity matching your filters.</div>
