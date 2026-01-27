@@ -62,7 +62,7 @@ We removed the "ku" from "Kiroku" to symbolize our mission: **to remove the pain
    Create a `.env` file:
 
    ```env
-   DATABASE_URL="file:./dev.db"
+   DATABASE_URL="file:./vault/kiro.db"
 
    # AI Configuration (Optional)
    AI_PROVIDER="ollama" # or "openai"
@@ -140,7 +140,7 @@ Kiroは、開発者の日々の活動（Gitコミット、コーディング、�
    `.env` ファイルを作成し、必要な設定を行います。
 
    ```env
-   DATABASE_URL="file:./dev.db"
+   DATABASE_URL="file:./vault/kiro.db"
    AI_PROVIDER="ollama"
    OLLAMA_BASE_URL="http://localhost:11434"
    AI_MODEL="llama3"
