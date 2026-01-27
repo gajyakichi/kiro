@@ -1,7 +1,7 @@
 "use client";
 
 import { Progress, Comment, DbLog, Project, Theme, DailyNote, SuggestedTask, Vault } from "@/lib/types";
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { IconRenderer } from '@/components/IconRenderer';
@@ -17,15 +17,19 @@ const ThemeLab = dynamic(() => import('@/components/ThemeLab').then(mod => mod.T
 });
 const IconPicker = dynamic(() => import('@/components/IconPicker').then(mod => mod.IconPicker), { ssr: false });
 const VaultSwitcher = dynamic(() => import('@/components/VaultSwitcher').then(mod => mod.VaultSwitcher), { ssr: false });
-const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'));
-const DailyNotes = dynamic(() => import('@/components/DailyNotes'));
-const ActivityHeatmap = dynamic(() => import('@/components/ActivityHeatmap'), {
-  loading: () => <div className="h-64 w-full bg-neutral-50 rounded-3xl border border-dashed border-neutral-200 animate-pulse" />,
-  ssr: false
-});
 
-import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, PanelBottom, X, Check, AlertTriangle } from 'lucide-react';
+import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, PanelBottom, X, Check, AlertTriangle, Search } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
+
+type TimelineEntry = {
+  id: number;
+  entryType: 'log' | 'comment' | 'task' | 'daily_note';
+  timestamp: string;
+  content: string;
+  metadata?: string;
+  status?: string;
+  type?: string; 
+};
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -37,6 +41,10 @@ export default function Home() {
   const [newComment, setNewComment] = useState("");
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState("");
+  
+  // Timeline State
+  const [timelineFilter, setTimelineFilter] = useState<'all' | 'log' | 'note' | 'task' | 'daily_note'>('all');
+  const [timelineSearch, setTimelineSearch] = useState("");
   
   const handleDeleteComment = async (id: number) => {
     if (!confirm("Are you sure you want to delete this note?")) return;
@@ -92,7 +100,7 @@ export default function Home() {
   const [isCreatingW, setIsCreatingW] = useState(false);
 
   // Heatmap State
-  const [selectedHeatmapDate, setSelectedHeatmapDate] = useState<string | null>(null);
+
 
   // Progress Translation State
   const [progressLang, setProgressLang] = useState<'en' | 'ja'>('en');
@@ -214,6 +222,53 @@ export default function Home() {
     }
   }, []);
 
+  const filteredTimelineData = useMemo(() => {
+    const raw: TimelineEntry[] = [
+      ...dbLogs.map(l => ({ 
+        id: l.id,
+        entryType: 'log' as const,
+        timestamp: new Date(l.timestamp).toISOString(),
+        content: l.content,
+        metadata: l.metadata || undefined,
+        type: l.type
+      })),
+      ...comments.map(c => ({ 
+        id: c.id,
+        entryType: 'comment' as const, 
+        timestamp: new Date(c.timestamp).toISOString(), 
+        content: c.text,
+        type: c.type
+      })),
+      ...dailyNotes.map(n => ({ 
+        id: n.id,
+        entryType: 'daily_note' as const, 
+        timestamp: n.timestamp ? new Date(n.timestamp).toISOString() : new Date().toISOString(),
+        content: n.content
+      })),
+      ...suggestedTasks.filter(t => t.status === 'completed' || t.status === 'added').map(t => ({
+          id: t.id,
+          entryType: 'task' as const,
+          content: t.task,
+          type: 'task',
+          timestamp: t.timestamp ? new Date(t.timestamp).toISOString() : new Date().toISOString(),
+          status: t.status
+      }))
+    ];
+
+    return raw
+      .filter(item => {
+        if (timelineFilter !== 'all' && item.entryType !== timelineFilter) return false;
+        if (timelineSearch) {
+          const searchLower = timelineSearch.toLowerCase();
+          const content = item.content || "";
+          const meta = item.metadata || "";
+          return content.toLowerCase().includes(searchLower) || meta.toLowerCase().includes(searchLower);
+        }
+        return true;
+      })
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }, [dbLogs, comments, dailyNotes, suggestedTasks, timelineFilter, timelineSearch]);
+
   useEffect(() => {
     setMounted(true);
     fetchVaults();
@@ -263,38 +318,6 @@ export default function Home() {
       if (res.ok) fetchThemes();
     } catch (e) {
       console.error("Theme Select Error:", e);
-    }
-  };
-
-  const updateSuggestedTaskStatus = async (taskId: number, status: string, task?: string) => {
-    if (!activeProject) return;
-    try {
-      const res = await fetch('/api/absorb/tasks', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ taskId, status, projectId: activeProject.id, task })
-      });
-      if (res.ok) {
-        fetchAbsorbData(activeProject.id);
-      }
-    } catch (e) {
-      console.error("Task Update Error:", e);
-    }
-  };
-
-  const handleManualAddTask = async (task: string) => {
-    if (!activeProject) return;
-    try {
-        const res = await fetch('/api/absorb/tasks', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ projectId: activeProject.id, task })
-        });
-        if (res.ok) {
-            fetchAbsorbData(activeProject.id);
-        }
-    } catch (e) {
-        console.error("Manual Task Add Error:", e);
     }
   };
 
@@ -479,139 +502,7 @@ export default function Home() {
     );
   };
 
-  const renderContributionGraph = () => {
-    // 1. Generate date range (last 52 weeks)
-    const today = new Date();
-    const startDate = new Date();
-    startDate.setDate(today.getDate() - 364); // One year ago
-    
-    // Adjust to starting the week
-    const firstDayOfWeek = startDate.getDay();
-    startDate.setDate(startDate.getDate() - firstDayOfWeek);
 
-    const aggregatedData = [
-      ...dbLogs.map(l => ({ ...l, entryType: 'log', dateStr: new Date(l.timestamp).toISOString().split('T')[0] })),
-      ...comments.map(c => ({ ...c, entryType: 'comment', dateStr: new Date(c.timestamp).toISOString().split('T')[0], type: 'note' })),
-      ...dailyNotes.map(n => ({ ...n, entryType: 'daily_note', dateStr: n.date })),
-      ...suggestedTasks.filter(t => t.status === 'completed' || t.status === 'added').map(t => ({ ...t, entryType: 'task', dateStr: new Date(t.timestamp).toISOString().split('T')[0], content: t.task }))
-    ];
-
-    type ActivityEntry = (typeof aggregatedData)[0];
-    const activityMap = aggregatedData.reduce((acc: Record<string, ActivityEntry[]>, item) => {
-      if (!acc[item.dateStr]) acc[item.dateStr] = [];
-      acc[item.dateStr].push(item);
-      return acc;
-    }, {});
-
-    return (
-      <div className="animate-fade-in space-y-8">
-
-        <ActivityHeatmap 
-          activityMap={activityMap}
-          selectedDate={selectedHeatmapDate}
-          onSelectDate={setSelectedHeatmapDate}
-          appLang={appLang}
-          translations={t}
-        />
-
-        {selectedHeatmapDate && (
-          <div className="bg-neutral-50/50 border border-(--border-color) rounded-3xl p-8 animate-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between mb-8">
-               <h3 className="text-xl font-bold flex items-center gap-3">
-                 <div className="w-2 h-8 bg-(--theme-primary) rounded-full" />
-                 {new Date(selectedHeatmapDate).toLocaleDateString(appLang, { dateStyle: 'full' })}
-               </h3>
-               <span className="text-xs font-black text-white bg-(--theme-primary) px-3 py-1 rounded-full uppercase tracking-tighter shadow-sm">
-                 {activityMap[selectedHeatmapDate]?.length || 0} {t.entry_marker}s
-               </span>
-            </div>
-            
-            <div className="space-y-4 relative">
-              {/* Vertical Guide Line */}
-              <div className="absolute left-[12px] top-4 bottom-4 w-px bg-(--border-color) opacity-50 z-0"></div>
-
-              {(activityMap[selectedHeatmapDate] || []).map((entry, idx) => {
-                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                 const anyEntry = entry as any;
-                 const entryType = anyEntry.entryType || ('type' in entry && entry.type === 'git' ? 'log' : 'comment');
-                 const ICON_SIZE = 12;
-                 
-                 let icon = <IconRenderer icon="FileText" size={ICON_SIZE} baseSet={appIconSet} />;
-                 let typeLabel = "note";
-                 let content = "";
-                 let badgeBg = "bg-(--theme-primary)";
-                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                 let metadata: any = null;
-
-                 if (entryType === 'log') {
-                     const l = anyEntry;
-                     icon = l.type === 'git' ? 
-                         <IconRenderer icon="Code" size={ICON_SIZE} baseSet={appIconSet} /> : 
-                         <IconRenderer icon="FileText" size={ICON_SIZE} baseSet={appIconSet} />;
-                     typeLabel = l.type; 
-                     content = l.content;
-                     try { metadata = l.metadata ? JSON.parse(l.metadata) : null; } catch {}
-                 } else if (entryType === 'comment') {
-                     typeLabel = anyEntry.type || 'note';
-                     content = anyEntry.text;
-                 } else if (entryType === 'daily_note') {
-                     icon = <IconRenderer icon="Sparkles" size={ICON_SIZE} className="text-(--theme-accent)" baseSet={appIconSet} />;
-                     typeLabel = "Daily Summary";
-                     content = anyEntry.content;
-                     badgeBg = "bg-(--theme-accent)";
-                 } else if (entryType === 'task') {
-                     icon = anyEntry.status === 'completed' ? 
-                         <IconRenderer icon="CheckCircle" size={ICON_SIZE} className="text-(--theme-primary)" baseSet={appIconSet} /> : 
-                         <IconRenderer icon="ListTodo" size={ICON_SIZE} className="text-(--theme-primary)/70" baseSet={appIconSet} />;
-                     typeLabel = anyEntry.status === 'completed' ? 'Task Completed' : 'Task Added';
-                     content = anyEntry.task || anyEntry.content;
-                 }
-
-                 return (
-                   <div key={idx} className="group relative">
-                      <div className="flex gap-4 items-start py-4 -mx-2 px-2 hover:bg-white/50 rounded-2xl transition-all">
-                         {/* Marker */}
-                         <div className="shrink-0 w-6 h-6 rounded-full bg-white border-2 border-(--theme-primary-bg) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 group-hover:border-(--theme-primary) transition-all z-10">
-                            {icon}
-                         </div>
-                         
-                         <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                               <span className={`text-[10px] ${badgeBg} text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm`}>
-                                  {typeLabel}
-                               </span>
-                            </div>
-                            
-                            <div className="text-sm text-neutral-700 leading-relaxed markdown-content">
-                               <ReactMarkdown>{content}</ReactMarkdown>
-                            </div>
-
-                            {/* Git Metadata */}
-                            {metadata && (
-                               <div className="mt-2 flex items-center gap-2 text-[10px] font-mono text-neutral-400">
-                                  <span className="bg-white border border-neutral-100 px-1.5 py-0.5 rounded uppercase tracking-tighter">
-                                     {metadata.hash?.substring(0, 7) || '---'}
-                                  </span>
-                                  <span>•</span>
-                                  <span>{metadata.author || t.unknown_author}</span>
-                               </div>
-                            )}
-                         </div>
-                      </div>
-                   </div>
-                 );
-              })}
-              {(!activityMap[selectedHeatmapDate] || activityMap[selectedHeatmapDate].length === 0) && (
-                <div className="py-12 text-center relative z-10">
-                  <p className="text-sm text-neutral-400 italic">{t.no_activity}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
 
   // Mandatory Vault Check
   const activeVault = vaults.find(v => v.active);
@@ -728,62 +619,6 @@ export default function Home() {
 
         <nav className="flex-1 space-y-1" role="tablist">
           <button 
-            onClick={() => setActiveTab("git")}
-            className={`w-full notion-item flex items-center gap-3 ${activeTab === "git" ? "active" : ""}`}
-            role="tab"
-            aria-selected={activeTab === "git"}
-          >
-            <IconRenderer icon="Scroll" size={16} baseSet={appIconSet} />
-            <span>{t.git_logs}</span>
-          </button>
-          
-          <button 
-            onClick={() => setActiveTab("progress")}
-            className={`w-full notion-item flex items-center gap-3 ${activeTab === "progress" ? "active" : ""}`}
-            role="tab"
-            aria-selected={activeTab === "progress"}
-          >
-            <IconRenderer icon="CheckSquare" size={16} baseSet={appIconSet} />
-            <span>{t.progress}</span>
-          </button>
-
-          <button 
-            onClick={() => setActiveTab("daily_notes")}
-            className={`w-full notion-item flex items-center gap-3 ${activeTab === "daily_notes" ? "active" : ""}`}
-            role="tab"
-            aria-selected={activeTab === "daily_notes"}
-          >
-            <IconRenderer icon="Sparkles" size={16} baseSet={appIconSet} />
-            <div className="flex-1 flex justify-between items-center">
-              <span>{t.daily_notes}</span>
-              {dailyNotes.length > 0 && <span className="text-[10px] bg-(--theme-primary-bg) text-(--theme-primary) px-1.5 rounded-full font-bold">{dailyNotes.length}</span>}
-            </div>
-          </button>
-
-          <button 
-            onClick={() => setActiveTab("suggested_tasks")}
-            className={`w-full notion-item flex items-center gap-3 ${activeTab === "suggested_tasks" ? "active" : ""}`}
-            role="tab"
-            aria-selected={activeTab === "suggested_tasks"}
-          >
-            <IconRenderer icon="Lightbulb" size={16} baseSet={appIconSet} />
-            <div className="flex-1 flex justify-between items-center">
-              <span>{t.suggestions}</span>
-              {suggestedTasks.length > 0 && <span className="text-[10px] bg-(--theme-accent-bg) text-(--theme-accent) px-1.5 rounded-full font-bold">{suggestedTasks.length}</span>}
-            </div>
-          </button>
-
-          <button 
-            onClick={() => setActiveTab("calendar")}
-            className={`w-full notion-item flex items-center gap-3 ${activeTab === "calendar" ? "active" : ""}`}
-            role="tab"
-            aria-selected={activeTab === "calendar"}
-          >
-            <IconRenderer icon="Calendar" size={16} baseSet={appIconSet} />
-            <span>{t.calendar}</span>
-          </button>
-
-          <button 
             onClick={() => setActiveTab("timeline")}
             className={`w-full notion-item flex items-center gap-3 ${activeTab === "timeline" ? "active" : ""}`}
             role="tab"
@@ -879,13 +714,10 @@ export default function Home() {
               )}
             </div>
             <span>
-              {activeTab === "git" && t.git_history}
-              {activeTab === "progress" && t.dev_progress}
-              {activeTab === "daily_notes" && t.daily_notes}
-              {activeTab === "suggested_tasks" && t.ai_suggestions}
               {activeTab === "comments" && t.dev_notes}
-              {activeTab === "calendar" && t.system_calendar}
+
               {activeTab === "timeline" && "Project Timeline"}
+              {activeTab === "themes" && t.theme_lab}
             </span>
             {activeProject && <span className="text-lg ml-4 opacity-30 font-normal">/ {activeProject.name}</span>}
             
@@ -906,220 +738,23 @@ export default function Home() {
             )}
           </h1>
           <p className="text-lg notion-text-subtle">
-            {activeTab === "git" && t.git_desc}
-            {activeTab === "progress" && t.progress_desc}
-            {activeTab === "daily_notes" && t.daily_desc}
-            {activeTab === "suggested_tasks" && t.suggestions_desc}
             {activeTab === "comments" && t.notes_desc}
-            {activeTab === "calendar" && t.calendar_desc}
+
             {activeTab === "timeline" && "A chronological view of all activities."}
           </p>
         </header>
 
         <section className="animate-fade-in">
-           {activeTab === "timeline" && (
-             <div className="relative">
-                {/* Vertical Timeline Guide */}
-                <div className="absolute left-[12px] top-6 bottom-6 w-px bg-(--border-color) opacity-50 z-0"></div>
-
-                <div className="space-y-0 relative z-10">
-                  {[
-                    ...dbLogs.map(l => ({ ...l, entryType: 'log' as const })),
-                    ...comments.map(c => ({ ...c, entryType: 'comment' as const })),
-                    ...dailyNotes.map(n => ({ ...n, entryType: 'daily_note' as const, timestamp: n.timestamp || new Date().toISOString() })),
-                    ...suggestedTasks.filter(t => t.status === 'completed' || t.status === 'added').map(t => ({
-                       id: t.id,
-                       entryType: 'task' as const,
-                       content: t.task,
-                       type: 'task',
-                       timestamp: t.timestamp,
-                       status: t.status
-                    }))
-                  ]
-                  .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-                  .map((entry) => {
-                    const entryType = entry.entryType;
-                    const timestamp = new Date(entry.timestamp);
-                    const ICON_SIZE = 12;
-                    let icon = <IconRenderer icon="FileText" size={ICON_SIZE} baseSet={appIconSet} />;
-                    let typeLabel = "Note";
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    let content: any = "";
-                    let metadata = null;
-
-                    if (entryType === 'log') {
-                       const l = entry as DbLog;
-                       icon = l.type === 'git' ? 
-                           <IconRenderer icon="Code" size={ICON_SIZE} baseSet={appIconSet} /> : 
-                           <IconRenderer icon="FileText" size={ICON_SIZE} baseSet={appIconSet} />;
-                       typeLabel = l.type;
-                       content = l.content;
-                       metadata = l.metadata ? JSON.parse(l.metadata) : null;
-                    } else if (entryType === 'comment') {
-                       const c = entry as Comment;
-                       typeLabel = c.type || 'note';
-                       content = c.text;
-                       if (c.type === 'code') icon = <IconRenderer icon="Code" size={ICON_SIZE} baseSet={appIconSet} />;
-                    } else if (entryType === 'task') {
-                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                       const tEntry = entry as any;
-                       icon = tEntry.status === 'completed' ? 
-                           <IconRenderer icon="CheckCircle" size={ICON_SIZE} className="text-(--theme-primary)" baseSet={appIconSet} /> : 
-                           <IconRenderer icon="ListTodo" size={ICON_SIZE} className="text-(--theme-primary)/70" baseSet={appIconSet} />;
-                       typeLabel = tEntry.status === 'completed' ? 'Task Completed' : 'Task Added';
-                       content = tEntry.content;
-                    } else if (entryType === 'daily_note') {
-                       icon = <IconRenderer icon="Sparkles" size={ICON_SIZE} className="text-(--theme-accent)" baseSet={appIconSet} />;
-                       typeLabel = "Daily Summary";
-                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                       content = (entry as any).content;
-                    }
-
-                    return (
-                      <div key={`${entryType}-${entry.id}`} className="group relative">
-                        <div className="flex gap-4 items-start py-6 -mx-4 px-4 hover:bg-gray-50/50 rounded-2xl transition-all">
-                          {/* Marker Icon */}
-                          <div className="shrink-0 w-6 h-6 rounded-full bg-white border-2 border-(--theme-primary-bg) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 group-hover:border-(--theme-primary) transition-all z-10">
-                            {icon}
-                          </div>
-
-                         <div className="flex-1 min-w-0">
-                           {entryType === 'daily_note' ? (
-                             <details className="group/details">
-                               <summary className="list-none cursor-pointer flex items-center gap-3 mb-2 focus:outline-none select-none">
-                                 <span className="text-[10px] bg-(--theme-accent) text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm flex items-center gap-1 hover:opacity-90 transition-opacity">
-                                   {typeLabel}
-                                   <ChevronRight size={10} className="group-open/details:rotate-90 transition-transform" />
-                                 </span>
-                                 <span className="text-[10px] notion-text-subtle font-bold uppercase tracking-widest bg-(--theme-primary-bg) px-2.5 py-1 rounded-lg border border-(--border-color)">
-                                   {timestamp.toLocaleDateString(appLang)}
-                                 </span>
-                               </summary>
-                               <div className="mt-4 markdown-content pl-2 border-l-2 border-(--theme-accent)/30 animate-in slide-in-from-top-2 duration-300">
-                                  <ReactMarkdown>{content}</ReactMarkdown>
-                               </div>
-                             </details>
-                           ) : (
-                             <>
-                               {/* Edit Mode for Comment */}
-                               {entryType === 'comment' && editingCommentId === entry.id ? (
-                                  <div className="mt-2 border border-(--theme-primary) rounded-xl overflow-hidden shadow-sm">
-                                      <NotionEditor 
-                                        value={editingContent}
-                                        iconSet={appIconSet}
-                                        onChange={setEditingContent}
-                                        onSave={handleUpdateComment}
-                                        onCancel={() => {
-                                            setEditingCommentId(null);
-                                            setEditingContent("");
-                                        }}
-                                      />
-                                  </div>
-                               ) : (
-                                  <>
-                                    {/* Metadata Header & Actions */}
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-[10px] bg-(--theme-primary) text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm">
-                                                {typeLabel}
-                                            </span>
-                                            <span className="text-[10px] notion-text-subtle font-bold uppercase tracking-widest bg-(--theme-primary-bg) px-2.5 py-1 rounded-lg border border-(--border-color)">
-                                                {timestamp.toLocaleDateString(appLang)} {timestamp.toLocaleTimeString(appLang, { hour: '2-digit', minute: '2-digit' })}
-                                            </span>
-                                        </div>
-                                        
-                                        {/* Actions for Comments */}
-                                        {entryType === 'comment' && (
-                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button 
-                                                    onClick={() => startEditingComment(entry.id, content)}
-                                                    className="p-1.5 text-gray-400 hover:text-(--theme-primary) hover:bg-gray-100 rounded transition-colors"
-                                                    title="Edit"
-                                                >
-                                                    <Edit2 size={14} />
-                                                </button>
-                                                <button 
-                                                    onClick={() => handleDeleteComment(entry.id)}
-                                                    className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
-                                                    title="Delete"
-                                                >
-                                                    <Trash2 size={14} />
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Content Area */}
-                                    <div className={`mt-3 ${entryType === 'log' && 'py-1'}`}>
-                                    {entryType === 'log' && metadata?.hash ? (
-                                        <div>
-                                        <p className="text-[15px] font-medium leading-relaxed">{content}</p>
-                                        <div className="mt-2 flex items-center gap-2 text-[10px] notion-text-subtle font-mono">
-                                            <span className="bg-(--theme-primary-bg) px-1.5 py-0.5 rounded border border-(--border-color)">
-                                            {metadata.hash.substring(0, 7)}
-                                            </span>
-                                            <span>{metadata.author || 'Unknown'}</span>
-                                        </div>
-                                        </div>
-                                    ) : entryType === 'task' ? (
-                                        <p className={`text-[15px] font-medium leading-relaxed ${// eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                        (entry as any).status === 'completed' ? 'line-through opacity-70' : ''}`}>
-                                            {content}
-                                        </p>
-                                    ) : (
-                                        <div className="markdown-content">
-                                        <ReactMarkdown>{content}</ReactMarkdown>
-                                        </div>
-                                    )}
-                                    </div>
-                                  </>
-                               )}
-                             </>
-                           )}
-                         </div>
-                       </div>
-                     </div>
-                   );
-                 })}
-                 
-                 {dbLogs.length === 0 && comments.length === 0 && suggestedTasks.length === 0 && dailyNotes.length === 0 && (
-                    <div className="py-20 text-center text-gray-400 italic">No activity yet.</div>
-                 )}
-               </div>
-            </div>
-          )}
-          {activeTab === "git" && (
-            <div className="space-y-6">
-              {dbLogs.filter(log => log.type === "git").map((log, i) => (
-                <div key={i} className="group p-4 -ml-4 rounded-lg hover:bg-gray-100/50 transition-colors">
-                  <div className="flex items-start gap-4">
-                    <div className="text-2xl mt-1 opacity-40">◦</div>
-                    <div>
-                       <div className="font-medium text-[15px] mb-1">{log.content}</div>
-                       <div className="flex items-center gap-2 text-xs notion-text-subtle font-mono">
-                         <span className="bg-gray-200 px-1.5 py-0.5 rounded text-[10px]">{JSON.parse(log.metadata || '{}').hash?.substring(0, 7) || '---'}</span>
-                         <span>{JSON.parse(log.metadata || '{}').author || t.unknown_author}</span>
-                         <span>•</span>
-                         <span>{new Date(log.timestamp).toLocaleDateString(appLang)} {new Date(log.timestamp).toLocaleTimeString(appLang, { hour: '2-digit', minute: '2-digit' })}</span>
-                       </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {dbLogs.filter(log => log.type === "git").length === 0 && (
-                <p className="notion-text-subtle italic">{t.no_git_history}</p>
-              )}
-            </div>
-          )}
-
-          {activeTab === "progress" && (
-            <div className="animate-fade-in space-y-6">
-              <div className="group relative pl-6 border-l-2 border-(--theme-primary-bg) hover:border-(--theme-primary) transition-colors">
-                 <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-(--theme-primary-bg) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center">
+          {activeTab === "timeline" && (
+             <div className="relative animate-fade-in space-y-8">
+                
+                {/* 1. Current Progress (Pinned) */}
+                <div className="group relative pl-6 border-l-2 border-(--theme-primary-bg) hover:border-(--theme-primary) transition-colors">
+                  <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-(--theme-primary-bg) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center">
                     <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
-                 </div>
-                 
-                 <div className="mb-2 flex items-center justify-between">
+                  </div>
+                  
+                  <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold text-gray-500 uppercase tracking-widest">Current Status</span>
                     </div>
@@ -1134,45 +769,209 @@ export default function Home() {
                           {progressLang === 'en' ? 'EN' : 'JA'}
                         </button>
                     )}
-                 </div>
-                 
-                 <div className="bg-white notion-card p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                    <article className="prose prose-slate max-w-none text-gray-700 leading-relaxed">
-                       <div className="markdown-content">
+                  </div>
+                  
+                  <div className="bg-white notion-card p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <article className="prose prose-slate max-w-none text-gray-700 leading-relaxed text-sm">
+                        <div className="markdown-content">
                           <ReactMarkdown>
                             {progressLang === 'ja' ? (progressTranslated || "翻訳中...") : (progress?.task || t.loading_progress)}
                           </ReactMarkdown>
-                       </div>
+                        </div>
                     </article>
-                 </div>
-              </div>
-            </div>
+                  </div>
+                </div>
+
+                {/* 2. Search & Filter Bar */}
+                <div className="flex flex-col md:flex-row gap-4 items-center justify-between sticky top-0 bg-(--background) py-4 z-20 backdrop-blur-sm bg-opacity-90 border-b border-(--border-color)">
+                   <div className="relative w-full md:w-auto md:min-w-[300px]">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                      <input 
+                        type="text" 
+                        placeholder="Search timeline..." 
+                        value={timelineSearch}
+                        onChange={(e) => setTimelineSearch(e.target.value)}
+                        className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20"
+                      />
+                   </div>
+                   <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto no-scrollbar pb-1">
+                      {[
+                        { id: 'all', label: 'All', icon: null },
+                        { id: 'log', label: 'Git', icon: 'Code' },
+                        { id: 'comment', label: 'Notes', icon: 'FileText' },
+                        { id: 'daily_note', label: 'Daily', icon: 'Sparkles' },
+                        { id: 'task', label: 'Tasks', icon: 'CheckCircle' }
+                      ].map(filter => (
+                        <button
+                          key={filter.id}
+                          onClick={() => setTimelineFilter(filter.id as any)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                            timelineFilter === filter.id 
+                              ? 'bg-(--theme-primary) text-white shadow-md' 
+                              : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          {filter.icon && <IconRenderer icon={filter.icon} size={12} baseSet={appIconSet} className={timelineFilter === filter.id ? 'text-white' : 'text-gray-400'} />}
+                          {filter.label}
+                        </button>
+                      ))}
+                   </div>
+                </div>
+
+                {/* 3. Timeline List */}
+                <div className="relative">
+                  {/* Vertical Timeline Guide */}
+                  <div className="absolute left-[12px] top-6 bottom-6 w-px bg-(--border-color) opacity-50 z-0"></div>
+
+                  <div className="space-y-0 relative z-10 pb-20">
+                    {filteredTimelineData.map((entry) => {
+                      const entryType = entry.entryType;
+                      const timestamp = new Date(entry.timestamp);
+                      const ICON_SIZE = 12;
+                      let icon = <IconRenderer icon="FileText" size={ICON_SIZE} baseSet={appIconSet} />;
+                      let typeLabel = "Note";
+                      const content = entry.content;
+                      let metadata: any = null;
+
+                      if (entryType === 'log') {
+                         icon = entry.type === 'git' ? 
+                             <IconRenderer icon="Code" size={ICON_SIZE} baseSet={appIconSet} /> : 
+                             <IconRenderer icon="FileText" size={ICON_SIZE} baseSet={appIconSet} />;
+                         typeLabel = entry.type || 'log';
+                         if (entry.metadata) {
+                             try {
+                                metadata = JSON.parse(entry.metadata);
+                             } catch (e) { /* ignore */ }
+                         }
+                      } else if (entryType === 'comment') {
+                         typeLabel = entry.type || 'note';
+                         if (entry.type === 'code') icon = <IconRenderer icon="Code" size={ICON_SIZE} baseSet={appIconSet} />;
+                      } else if (entryType === 'task') {
+                         icon = entry.status === 'completed' ? 
+                             <IconRenderer icon="CheckCircle" size={ICON_SIZE} className="text-(--theme-primary)" baseSet={appIconSet} /> : 
+                             <IconRenderer icon="ListTodo" size={ICON_SIZE} className="text-(--theme-primary)/70" baseSet={appIconSet} />;
+                         typeLabel = entry.status === 'completed' ? 'Task Completed' : 'Task Added';
+                      } else if (entryType === 'daily_note') {
+                         icon = <IconRenderer icon="Sparkles" size={ICON_SIZE} className="text-(--theme-accent)" baseSet={appIconSet} />;
+                         typeLabel = "Daily Summary";
+                      }
+
+                      return (
+                        <div key={`${entryType}-${entry.id}`} className="group relative">
+                          <div className="flex gap-4 items-start py-6 -mx-4 px-4 hover:bg-gray-50/50 rounded-2xl transition-all">
+                            {/* Marker Icon */}
+                            <div className="shrink-0 w-6 h-6 rounded-full bg-white border-2 border-(--theme-primary-bg) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 group-hover:border-(--theme-primary) transition-all z-10">
+                              {icon}
+                            </div>
+
+                           <div className="flex-1 min-w-0">
+                             {entryType === 'daily_note' ? (
+                               <details className="group/details">
+                                 <summary className="list-none cursor-pointer flex items-center gap-3 mb-2 focus:outline-none select-none">
+                                   <span className="text-[10px] bg-(--theme-accent) text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm flex items-center gap-1 hover:opacity-90 transition-opacity">
+                                     {typeLabel}
+                                     <ChevronRight size={10} className="group-open/details:rotate-90 transition-transform" />
+                                   </span>
+                                   <span className="text-[10px] notion-text-subtle font-bold uppercase tracking-widest bg-(--theme-primary-bg) px-2.5 py-1 rounded-lg border border-(--border-color)">
+                                     {timestamp.toLocaleDateString(appLang)}
+                                   </span>
+                                 </summary>
+                                 <div className="mt-4 markdown-content pl-2 border-l-2 border-(--theme-accent)/30 animate-in slide-in-from-top-2 duration-300">
+                                    <ReactMarkdown>{content}</ReactMarkdown>
+                                 </div>
+                               </details>
+                             ) : (
+                               <>
+                                 {/* Edit Mode for Comment */}
+                                 {entryType === 'comment' && editingCommentId === entry.id ? (
+                                    <div className="mt-2 border border-(--theme-primary) rounded-xl overflow-hidden shadow-sm">
+                                        <NotionEditor 
+                                          value={editingContent}
+                                          iconSet={appIconSet}
+                                          onChange={setEditingContent}
+                                          onSave={handleUpdateComment}
+                                          onCancel={() => {
+                                              setEditingCommentId(null);
+                                              setEditingContent("");
+                                          }}
+                                        />
+                                    </div>
+                                 ) : (
+                                    <>
+                                      {/* Metadata Header & Actions */}
+                                      <div className="flex items-center justify-between mb-2">
+                                          <div className="flex items-center gap-3">
+                                              <span className="text-[10px] bg-(--theme-primary) text-white px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider shadow-sm">
+                                                  {typeLabel}
+                                              </span>
+                                              <span className="text-[10px] notion-text-subtle font-bold uppercase tracking-widest bg-(--theme-primary-bg) px-2.5 py-1 rounded-lg border border-(--border-color)">
+                                                  {timestamp.toLocaleDateString(appLang)} {timestamp.toLocaleTimeString(appLang, { hour: '2-digit', minute: '2-digit' })}
+                                              </span>
+                                          </div>
+                                          
+                                          {/* Actions for Comments */}
+                                          {entryType === 'comment' && (
+                                              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                  <button 
+                                                      onClick={() => startEditingComment(entry.id, content)}
+                                                      className="p-1.5 text-gray-400 hover:text-(--theme-primary) hover:bg-gray-100 rounded transition-colors"
+                                                      title="Edit"
+                                                  >
+                                                      <Edit2 size={14} />
+                                                  </button>
+                                                  <button 
+                                                      onClick={() => handleDeleteComment(entry.id)}
+                                                      className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                                                      title="Delete"
+                                                  >
+                                                      <Trash2 size={14} />
+                                                  </button>
+                                              </div>
+                                          )}
+                                      </div>
+
+                                      {/* Content Area */}
+                                      <div className={`mt-3 ${entryType === 'log' && 'py-1'}`}>
+                                      {entryType === 'log' && metadata?.hash ? (
+                                          <div>
+                                          <p className="text-[15px] font-medium leading-relaxed">{content}</p>
+                                          <div className="mt-2 flex items-center gap-2 text-[10px] notion-text-subtle font-mono">
+                                              <span className="bg-(--theme-primary-bg) px-1.5 py-0.5 rounded border border-(--border-color)">
+                                              {metadata.hash.substring(0, 7)}
+                                              </span>
+                                              <span>{metadata.author || 'Unknown'}</span>
+                                          </div>
+                                          </div>
+                                      ) : entryType === 'task' ? (
+                                          <div className="flex items-center gap-2">
+                                              {entry.status === 'completed' && <Check size={14} className="text-green-500"/>}
+                                              <p className={`text-[15px] font-medium leading-relaxed ${entry.status === 'completed' ? 'line-through opacity-70' : ''}`}>
+                                                {content}
+                                              </p>
+                                          </div>
+                                      ) : (
+                                          <div className="markdown-content">
+                                          <ReactMarkdown>{content}</ReactMarkdown>
+                                          </div>
+                                      )}
+                                      </div>
+                                    </>
+                                 )}
+                               </>
+                             )}
+                           </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    
+                    {filteredTimelineData.length === 0 && (
+                       <div className="py-20 text-center text-gray-400 italic">No activity matching your filters.</div>
+                    )}
+                  </div>
+                </div>
+             </div>
           )}
-
-          {activeTab === "calendar" && renderContributionGraph()}
-
-          {activeTab === "daily_notes" && (
-            <div className="animate-fade-in">
-              <DailyNotes 
-                notes={dailyNotes} 
-                isJapanesePluginEnabled={!!settings?.ENABLED_PLUGINS?.includes('plugin-jp')} 
-              />
-            </div>
-          )}
-
-          {activeTab === "suggested_tasks" && (
-            <div className="animate-fade-in">
-              <SuggestedTasks 
-                tasks={suggestedTasks} 
-                onAdd={(t) => updateSuggestedTaskStatus(t.id, 'added', t.task)}
-                onDismiss={(t) => updateSuggestedTaskStatus(t.id, 'dismissed')}
-                onUpdateStatus={(t, status) => updateSuggestedTaskStatus(t.id, status, t.task)}
-                onManualAdd={handleManualAddTask}
-              />
-            </div>
-          )}
-
-
 
           {activeTab === "comments" && (
             <div className="space-y-6 h-full flex flex-col">
