@@ -73,7 +73,7 @@ export async function DELETE(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const body = await request.json();
-    const { id, text } = body;
+    const { id, text, type } = body;
 
     if (!id || text === undefined) {
         return NextResponse.json({ error: "Missing id or text" }, { status: 400 });
@@ -81,7 +81,10 @@ export async function PATCH(request: Request) {
 
     await db.comment.update({
       where: { id: Number(id) },
-      data: { text }
+      data: { 
+          text,
+          ...(type && { type })
+      }
     });
 
     return NextResponse.json({ success: true });

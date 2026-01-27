@@ -26,6 +26,11 @@ export const IconRenderer: React.FC<IconRendererProps> = ({ icon, className, siz
      if (lower === 'calendar') return <span className={className} style={{ fontSize: `${size}px` }}>📅</span>;
      if (lower === 'squarepen' || lower === 'notepencil' || lower === 'note') return <span className={className} style={{ fontSize: `${size}px` }}>📝</span>;
      if (lower === 'palette') return <span className={className} style={{ fontSize: `${size}px` }}>✨</span>;
+     if (lower === 'history') return <span className={className} style={{ fontSize: `${size}px` }}>🕰️</span>;
+     if (lower === 'code') return <span className={className} style={{ fontSize: `${size}px` }}>💻</span>;
+     if (lower === 'filetext') return <span className={className} style={{ fontSize: `${size}px` }}>📄</span>;
+     if (lower === 'checkcircle') return <span className={className} style={{ fontSize: `${size}px` }}>✅</span>;
+     if (lower === 'listtodo') return <span className={className} style={{ fontSize: `${size}px` }}>📋</span>;
      return <span className={className} style={{ fontSize: `${size}px` }}>{cleanIcon}</span>;
   }
 

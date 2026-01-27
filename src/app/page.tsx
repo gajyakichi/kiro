@@ -21,7 +21,7 @@ const InlineChatBox = dynamic(() => import('@/components/InlineChatBox').then(mo
 const AnnotationMenu = dynamic(() => import('@/components/AnnotationMenu').then(mod => mod.AnnotationMenu), { ssr: false });
 const InlineMemoEditor = dynamic(() => import('@/components/InlineMemoEditor').then(mod => mod.InlineMemoEditor), { ssr: false });
 
-import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, PanelBottom, X, Check, AlertTriangle, Search } from 'lucide-react';
+import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
 
 type TimelineEntry = {
@@ -34,29 +34,71 @@ type TimelineEntry = {
   type?: string; 
 };
 
+type TimelineFilter = 'all' | 'log' | 'comment' | 'task' | 'daily_note';
+
+interface Metadata {
+  hash?: string;
+  author?: string;
+  sourceType?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [progress, setProgress] = useState<Progress | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [dialogState, setDialogState] = useState<{ open: boolean; title: string; message: string; type: 'success' | 'error' }>({ open: false, title: "", message: "", type: 'success' });
+
   const [dbLogs, setDbLogs] = useState<DbLog[]>([]);
   const [newComment, setNewComment] = useState("");
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState("");
+  const [editingType, setEditingType] = useState<'markdown' | 'block'>('markdown');
   
   // Timeline State
-  const [timelineFilter, setTimelineFilter] = useState<'all' | 'log' | 'note' | 'task' | 'daily_note'>('all');
+  const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>('all');
   const [timelineSearch, setTimelineSearch] = useState("");
   
   const handleDeleteComment = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this note?")) return;
-    try {
-      await fetch(`/api/comments?id=${id}`, { method: 'DELETE' });
-      if (activeProject) fetchAbsorbData(activeProject.id);
-    } catch (e) {
-      console.error(e);
-    }
+    setDialogState({
+        open: true,
+        type: 'confirm',
+        title: 'Delete Note',
+        message: 'Are you sure you want to delete this note? This action cannot be undone.',
+        onConfirm: async () => {
+            try {
+              // Optimistic update
+              setComments(prev => prev.filter(c => c.id !== id));
+              
+              const res = await fetch(`/api/comments?id=${id}`, { method: 'DELETE' });
+              if (!res.ok) {
+                throw new Error("Failed to delete");
+              }
+              
+              if (activeProject) {
+                 const commentRes = await fetch(`/api/comments?projectId=${activeProject.id}`);
+                 const commentData = await commentRes.json();
+                 setComments(commentData);
+                 fetchAbsorbData(activeProject.id);
+              }
+            } catch (e) {
+              console.error(e);
+              setDialogState({
+                  open: true,
+                  type: 'error',
+                  title: 'Error',
+                  message: 'Failed to delete note.'
+              });
+              // Rollback
+              if (activeProject) {
+                   fetch(`/api/comments?projectId=${activeProject.id}`)
+                    .then(res => res.json())
+                    .then(data => setComments(data));
+              }
+            }
+        }
+    });
   };
 
   const handleUpdateComment = async () => {
@@ -65,21 +107,23 @@ export default function Home() {
       await fetch('/api/comments', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: editingCommentId, text: editingContent })
+        body: JSON.stringify({ id: editingCommentId, text: editingContent, type: editingType })
       });
       setEditingCommentId(null);
       setEditingContent("");
+      setEditingType('markdown');
       if (activeProject) fetchAbsorbData(activeProject.id);
     } catch (e) {
       console.error(e);
     }
   };
 
-  const startEditingComment = (id: number, currentText: string) => {
+  const startEditingComment = (id: number, currentText: string, type: string | undefined) => {
       setEditingCommentId(id);
       setEditingContent(currentText);
+      setEditingType(type === 'block' ? 'block' : 'markdown');
   };
-  const [activeBlockType, setActiveBlockType] = useState<'markdown' | 'text' | 'code'>('markdown');
+  const [activeBlockType, setActiveBlockType] = useState<'markdown' | 'text' | 'code' | 'block'>('markdown');
   const [activeTab, setActiveTab] = useState("timeline");
   const [mounted, setMounted] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -101,6 +145,15 @@ export default function Home() {
   const [newWName, setNewWName] = useState("");
   const [newWPath, setNewWPath] = useState("");
   const [isCreatingW, setIsCreatingW] = useState(false);
+
+  // Dialog State
+  const [dialogState, setDialogState] = useState<{
+    open: boolean;
+    type: 'success' | 'error' | 'confirm';
+    title: string;
+    message: string;
+    onConfirm?: () => void;
+  }>({ open: false, type: 'success', title: '', message: '' });
 
   // AI Chat State
   const [chatState, setChatState] = useState<{ 
@@ -163,7 +216,7 @@ export default function Home() {
   const [progressLang, setProgressLang] = useState<'en' | 'ja'>('en');
   const [progressTranslated, setProgressTranslated] = useState<string | null>(null);
   const [isTranslatingProgress, setIsTranslatingProgress] = useState(false);
-  const [showBottomPane, setShowBottomPane] = useState(true);
+
 
   const handleToggleProgressLang = async () => {
     if (progressLang === 'ja') {
@@ -719,20 +772,7 @@ export default function Home() {
 
         {renderMiniCalendar()}
 
-        {/* Layout Controls */}
-        <div className="mt-8 px-2">
-             <div className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest mb-2 px-1">Layout</div>
-             <button 
-                onClick={() => setShowBottomPane(!showBottomPane)}
-                className={`w-full flex items-center gap-3 p-2 rounded-lg transition-colors text-xs font-semibold ${showBottomPane ? 'bg-(--theme-primary-bg) text-(--theme-primary)' : 'text-neutral-500 hover:bg-neutral-100'}`}
-             >
-                <PanelBottom size={16} />
-                <span>Bottom Note</span>
-                <span className={`ml-auto w-8 h-4 rounded-full flex items-center p-0.5 transition-colors ${showBottomPane ? 'bg-(--theme-primary)' : 'bg-neutral-300'}`}>
-                    <span className={`w-3 h-3 bg-white rounded-full shadow-sm transition-transform ${showBottomPane ? 'translate-x-4' : ''}`} />
-                </span>
-             </button>
-        </div>
+
 
         {/* Vault Switcher Integration */}
         <div className="mt-4 pt-4 border-t border-(--border-color)">
@@ -895,7 +935,7 @@ export default function Home() {
                       ].map(filter => (
                         <button
                           key={filter.id}
-                          onClick={() => setTimelineFilter(filter.id as any)}
+                          onClick={() => setTimelineFilter(filter.id as TimelineFilter)}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                             timelineFilter === filter.id 
                               ? 'bg-(--theme-primary) text-white shadow-md' 
@@ -922,7 +962,7 @@ export default function Home() {
                       let icon = <IconRenderer icon="FileText" size={ICON_SIZE} baseSet={appIconSet} />;
                       let typeLabel = "Note";
                       const content = entry.content;
-                      let metadata: any = null;
+                      let metadata: Metadata | null = null;
 
                       if (entryType === 'log') {
                          icon = entry.type === 'git' ? 
@@ -932,7 +972,7 @@ export default function Home() {
                          if (entry.metadata) {
                              try {
                                 metadata = JSON.parse(entry.metadata);
-                             } catch (e) { /* ignore */ }
+                              } catch { /* ignore */ }
                          }
                       } else if (entryType === 'comment') {
                          typeLabel = entry.type || 'note';
@@ -941,7 +981,7 @@ export default function Home() {
                              try {
                                 metadata = JSON.parse(entry.metadata);
                                 console.log('Comment metadata parsed:', metadata, 'for entry:', entry.id);
-                             } catch (e) { 
+                             } catch { 
                                 console.log('Failed to parse metadata:', entry.metadata);
                              }
                          } else {
@@ -995,7 +1035,7 @@ export default function Home() {
                              ) : (
                                <>
                                  {/* Edit Mode for Comment */}
-                                 {entryType === 'comment' && editingCommentId === entry.id ? (
+                                  {entryType === 'comment' && editingCommentId === entry.id && editingType === 'block' ? (
                                     <div className="mt-2 border border-(--theme-primary) rounded-xl overflow-hidden shadow-sm">
                                         <NotionEditor 
                                           value={editingContent}
@@ -1007,8 +1047,37 @@ export default function Home() {
                                               setEditingContent("");
                                           }}
                                         />
+                                        <div className="bg-gray-50 border-t border-gray-100 p-2 flex justify-end">
+                                            <button 
+                                                onClick={() => setEditingType('markdown')}
+                                                className="text-[10px] text-gray-500 hover:text-gray-800 underline"
+                                            >
+                                                Switch to Markdown
+                                            </button>
+                                        </div>
                                     </div>
-                                 ) : (
+                                  ) : entryType === 'comment' && editingCommentId === entry.id && editingType === 'markdown' ? (
+                                    <div className="mt-2 border border-(--theme-primary) rounded-xl overflow-hidden shadow-sm bg-white p-3">
+                                        <textarea
+                                            value={editingContent}
+                                            onChange={(e) => setEditingContent(e.target.value)}
+                                            className="w-full text-sm min-h-[100px] outline-none resize-y"
+                                            placeholder="Edit note..."
+                                        />
+                                        <div className="flex justify-between items-center mt-2 border-t pt-2 border-gray-100">
+                                            <button 
+                                                onClick={() => setEditingType('block')}
+                                                className="text-[10px] text-gray-500 hover:text-gray-800 underline"
+                                            >
+                                                Switch to Block Editor
+                                            </button>
+                                            <div className="flex gap-2">
+                                                <button onClick={() => setEditingCommentId(null)} className="text-xs text-gray-500 hover:text-gray-700">Cancel</button>
+                                                <button onClick={handleUpdateComment} className="text-xs bg-black text-white px-3 py-1 rounded-md">Save</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                  ) : (
                                     <>
                                       {/* Metadata Header & Actions */}
                                       <div className="flex items-center justify-between mb-2">
@@ -1025,7 +1094,7 @@ export default function Home() {
                                           {entryType === 'comment' && (
                                               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                   <button 
-                                                      onClick={() => startEditingComment(entry.id, content)}
+                                                      onClick={() => startEditingComment(entry.id, content, entry.type)}
                                                       className="p-1.5 text-gray-400 hover:text-(--theme-primary) hover:bg-gray-100 rounded transition-colors"
                                                       title="Edit"
                                                   >
@@ -1150,18 +1219,51 @@ export default function Home() {
             <div className="space-y-6 h-full flex flex-col">
               <div className="flex-1 flex flex-col">
                 <h2 className="text-2xl font-bold tracking-tight mb-4">{t.dev_notes}</h2>
-                <div className="flex-1 border border-(--border-color) rounded-xl overflow-hidden bg-white flex flex-col shadow-sm min-h-[500px]">
-                  <NotionEditor 
-                    value={newComment}
-                    iconSet={appIconSet}
-                    onChange={setNewComment}
-                    onSave={() => {
-                      handleAddComment();
-                      // Optional: Toast or feedback
-                    }}
-                    onCancel={() => setNewComment("")} // Clear
-                  />
-                </div>
+                  {activeBlockType === 'block' ? (
+                     <div className="flex-1 border border-(--border-color) rounded-xl overflow-hidden bg-white flex flex-col shadow-sm min-h-[500px]">
+                      <NotionEditor 
+                        value={newComment}
+                        iconSet={appIconSet}
+                        onChange={setNewComment}
+                        onSave={() => {
+                          handleAddComment();
+                          // Optional: Toast or feedback
+                        }}
+                        onCancel={() => setNewComment("")} // Clear
+                      />
+                      <div className="bg-gray-50 border-t border-gray-100 p-2 flex justify-end">
+                            <button 
+                                onClick={() => setActiveBlockType('markdown')}
+                                className="text-[10px] text-gray-500 hover:text-gray-800 underline"
+                            >
+                                Switch to Markdown
+                            </button>
+                      </div>
+                    </div>
+                  ) : (
+                     <div className="flex-1 border border-(--border-color) rounded-xl overflow-hidden bg-white flex flex-col shadow-sm min-h-[500px]">
+                         <div className="flex-1 p-4">
+                            <textarea
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                className="w-full h-full outline-none resize-none text-sm"
+                                placeholder="Write a note in Markdown..."
+                            />
+                         </div>
+                         <div className="bg-gray-50 border-t border-gray-100 p-3 flex justify-between items-center">
+                            <button 
+                                onClick={() => setActiveBlockType('block')}
+                                className="text-[10px] text-gray-500 hover:text-gray-800 underline"
+                            >
+                                Switch to Block Editor
+                            </button>
+                            <div className="flex gap-2">
+                                <button onClick={() => setNewComment("")} className="text-xs text-gray-500 hover:text-gray-700">Clear</button>
+                                <button onClick={handleAddComment} disabled={!newComment.trim()} className="text-xs bg-black text-white px-4 py-2 rounded-xl hover:opacity-90 disabled:opacity-30">Save Note</button>
+                            </div>
+                         </div>
+                     </div>
+                  )}
               </div>
 
               {/* Past Notes List - Simplified */}
@@ -1170,7 +1272,7 @@ export default function Home() {
                  {comments.length === 0 && <p className="text-gray-400 italic text-sm">No notes yet.</p>}
                  {comments.sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).map(c => (
                     <div key={c.id} className="bg-white p-4 rounded-xl border border-(--border-color) shadow-sm group">
-                       {editingCommentId === c.id ? (
+                       {editingCommentId === c.id && editingType === 'block' ? (
                            <div className="border border-(--theme-primary) rounded-xl overflow-hidden shadow-sm">
                                <NotionEditor 
                                  value={editingContent}
@@ -1182,7 +1284,36 @@ export default function Home() {
                                      setEditingContent("");
                                  }}
                                />
+                                <div className="bg-gray-50 border-t border-gray-100 p-2 flex justify-end">
+                                    <button 
+                                        onClick={() => setEditingType('markdown')}
+                                        className="text-[10px] text-gray-500 hover:text-gray-800 underline"
+                                    >
+                                        Switch to Markdown
+                                    </button>
+                                </div>
                            </div>
+                       ) : editingCommentId === c.id && editingType === 'markdown' ? (
+                            <div className="border border-(--theme-primary) rounded-xl overflow-hidden shadow-sm bg-white p-3">
+                                <textarea
+                                    value={editingContent}
+                                    onChange={(e) => setEditingContent(e.target.value)}
+                                    className="w-full text-sm min-h-[100px] outline-none resize-y"
+                                    placeholder="Edit note..."
+                                />
+                                <div className="flex justify-between items-center mt-2 border-t pt-2 border-gray-100">
+                                    <button 
+                                        onClick={() => setEditingType('block')}
+                                        className="text-[10px] text-gray-500 hover:text-gray-800 underline"
+                                    >
+                                        Switch to Block Editor
+                                    </button>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => setEditingCommentId(null)} className="text-xs text-gray-500 hover:text-gray-700">Cancel</button>
+                                        <button onClick={handleUpdateComment} className="text-xs bg-black text-white px-3 py-1 rounded-md">Save</button>
+                                    </div>
+                                </div>
+                            </div>
                        ) : (
                            <>
                                <div className="flex justify-between items-center mb-2">
@@ -1191,7 +1322,7 @@ export default function Home() {
                                   </span>
                                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button 
-                                            onClick={() => startEditingComment(c.id, c.text)}
+                                            onClick={() => startEditingComment(c.id, c.text, c.type)}
                                             className="p-1.5 text-gray-400 hover:text-(--theme-primary) hover:bg-gray-100 rounded transition-colors"
                                             title="Edit"
                                         >
@@ -1239,41 +1370,48 @@ export default function Home() {
           <span>{t.status_online}</span>
         </footer>
         </div>
-        {showBottomPane && (
-            <div className="h-72 border-t border-(--border-color) bg-white shrink-0 flex flex-col animate-in slide-in-from-bottom-5 duration-300 shadow-2xl relative z-40">
-                <div className="flex items-center justify-between px-6 py-2 border-b border-(--border-color) bg-neutral-50/50">
-                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Quick Note / Scratchpad</span>
-                    <button onClick={() => setShowBottomPane(false)} className="text-neutral-400 hover:text-neutral-600"><X size={14}/></button>
-                </div>
-                <div className="flex-1 overflow-hidden flex flex-col">
-                    <NotionEditor 
-                      value={newComment}
-                      iconSet={appIconSet}
-                      onChange={setNewComment}
-                      onSave={handleAddComment}
-                      onCancel={() => setNewComment("")}
-                    />
-                </div>
-            </div>
-        )}
+
       {/* Custom Dialog */}
       {dialogState.open && (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in zoom-in-95 duration-200 border border-neutral-100">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${dialogState.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${dialogState.type === 'success' ? 'bg-green-100 text-green-600' : dialogState.type === 'error' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}>
               <Check size={24} className={dialogState.type === 'success' ? 'block' : 'hidden'} />
               <AlertTriangle size={24} className={dialogState.type === 'error' ? 'block' : 'hidden'} />
+              <HelpCircle size={24} className={dialogState.type === 'confirm' ? 'block' : 'hidden'} />
             </div>
             <h3 className="text-lg font-bold text-neutral-900 mb-2">{dialogState.title}</h3>
             <p className="text-sm text-neutral-600 mb-6 leading-relaxed whitespace-pre-wrap">
               {dialogState.message}
             </p>
-            <button
-              onClick={() => setDialogState(prev => ({ ...prev, open: false }))}
-              className="w-full py-2.5 bg-neutral-900 text-white rounded-xl font-bold text-sm hover:bg-neutral-800 transition-colors"
-            >
-              OK
-            </button>
+            <div className="flex gap-3">
+                {dialogState.type === 'confirm' ? (
+                    <>
+                        <button
+                          onClick={() => {
+                              if (dialogState.onConfirm) dialogState.onConfirm();
+                              setDialogState(prev => ({ ...prev, open: false }));
+                          }}
+                          className="flex-1 py-2.5 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-700 transition-colors"
+                        >
+                          Delete
+                        </button>
+                        <button
+                          onClick={() => setDialogState(prev => ({ ...prev, open: false }))}
+                          className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                    </>
+                ) : (
+                    <button
+                      onClick={() => setDialogState(prev => ({ ...prev, open: false }))}
+                      className="w-full py-2.5 bg-neutral-900 text-white rounded-xl font-bold text-sm hover:bg-neutral-800 transition-colors"
+                    >
+                      OK
+                    </button>
+                )}
+            </div>
           </div>
         </div>
       )}
