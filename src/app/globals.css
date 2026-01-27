@@ -96,3 +96,52 @@ html, body {
   color: #37352f !important;
   border: 1px solid var(--border-color);
 }
+
+/* VS Code Skin Overrides - Layout & Density Only */
+[data-skin="vscode"] body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-size: 13px !important;
+  letter-spacing: -0.01em;
+}
+
+[data-skin="vscode"] .notion-sidebar {
+  padding-top: 0 !important;
+  /* Removed background/color overrides to respect theme */
+  border-right-width: 1px !important;
+}
+
+[data-skin="vscode"] .notion-card {
+  border-radius: 0px !important;
+  padding: 8px !important;
+  font-size: 13px;
+  box-shadow: none !important;
+  /* Removed background/color overrides to respect theme */
+}
+
+[data-skin="vscode"] .notion-item {
+  padding: 2px 8px !important;
+  border-radius: 0 !important;
+  margin-bottom: 0 !important;
+  font-size: 13px;
+}
+
+[data-skin="vscode"] .notion-item.active {
+  font-weight: normal !important;
+  border-left: 2px solid var(--theme-primary); /* Use theme variable instead of fixed color */
+  /* Keep background active state but use opacity or theme vars if possible, 
+     but for now relying on theme's active definition might be safer. 
+     If we want 'dense' active style, we can enforce dimensions but let colors be. */
+}
+
+[data-skin="vscode"] .notion-text-subtle {
+  font-size: 11px;
+}
+
+[data-skin="vscode"] h1, [data-skin="vscode"] h2, [data-skin="vscode"] h3 {
+  margin-top: 1em !important;
+  margin-bottom: 0.5em !important;
+  font-weight: 600 !important;
+}
+
+[data-skin="vscode"] h1 { font-size: 1.3em !important; }
+[data-skin="vscode"] h2 { font-size: 1.1em !important; }

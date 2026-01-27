@@ -213,5 +213,20 @@
     "timestamp": 1769526659029,
     "latencyMs": 146903,
     "content": "{\"completed_ids\":[91]}"
+  },
+  "1ef9e763c3bb226e3fd425474d8f6e2b3c2c05342bbdf66174f0087003a9ab1a": {
+    "timestamp": 1769557836721,
+    "latencyMs": 133429,
+    "content": "{\"en\":\"Project progress – 26‑28 Jan 2026\\n- Unified Timeline view with search/filter, inline AI chat, SuggestedTasks restored, icon fixes.\\n- AI caching updated; AI chat for Timeline items & Current Status added.\\n- Performance: heatmap split, dynamic imports, Tailwind v4 migration, lint fixes.\\n- Accessibility: WCAG‑AA compliance, added aria‑labels.\\n- UI/UX: finalized calendar UI, minimal app icon, added localization.\\n- Features: Import/Export themes, ThemeLab, system calendar sync, AI cache persistence.\\n- Documentation: bilingual README, LICENSE added, database URL fixed, app renamed to Kiro.\\n- Testing: Playwright E2E, unit tests for NotionEditor, SuggestedTasks, AI module; CI integration.\\n- Misc: bundle optimization, database update, icon redesign, lint cleanup, calendar sync update.\",\"ja\":\"プロジェクト進捗 – 2026年1月26日〜28日\\n- 検索/フィルタ付き統合タイムラインビューを実装し、SuggestedTasksを復元、アイコンを修正。\\n- AIキャッシュを更新し、タイムラインアイテム・現在状況にインラインAIチャットを追加。\\n- パフォーマンス向上：heatmapを分割、ダイナミックインポート、Tailwind v4への移行、lint修正。\\n- アクセシビリティ：WCAG‑AA 対応、ARIAラベルを追加。\\n- UI/UX：カレンダーUIを完成、ミニマルアイコン、ローカライズ対応。\\n- 機能追加：テーマのインポート/エクスポート、ThemeLab、システムカレンダー同期、AIキャッシュ永続化。\\n- ドキュメント：READMEを日本語・英語両言語化、LICENSEを追加、データベースURLを修正、アプリ名をKiroに変更。\\n- テスト：PlaywrightのE2Eテスト、NotionEditor・SuggestedTasks・AIモジュールの単体テスト、CI統合。\\n- その他：バンドル最適化、データベース更新、アイコンリデザイン、lint徹底、カレンダー同期更新。\"}"
+  },
+  "aa831c99846173bcb3065ecad848741d1732ecf03666b643bd4264572e9f018b": {
+    "timestamp": 1769557846263,
+    "latencyMs": 142969,
+    "content": "{ \"completed_ids\": [] }"
+  },
+  "52e74946d083de46508914bb5d262d5e48a274f8a18beb6c11d758d32ee2211f": {
+    "timestamp": 1769557854205,
+    "latencyMs": 150911,
+    "content": "{\"tasks\":[\"AIレスポンスのオフラインキャッシュを実装し、ネットワーク障害時のフォールバックを提供する\",\"axe-coreを用いた自動アクセシビリティテストをCIに統合し、WCAG AA違反を検出する\",\"テーマラボ用の設定ページを作成し、テーマのカスタマイズや保存・共有を行えるようにする\",\"タイムラインデータの一括インポート/エクスポート機能を追加し、JSON形式でデータ移行を可能にする\",\"未使用コンポーネントの削除と動的インポートをさらに最適化し、バンドルサイズを最大15％削減する\"]}"
   }
 }

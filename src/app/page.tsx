@@ -52,7 +52,7 @@ export default function Home() {
   const [comments, setComments] = useState<Comment[]>([]);
 
   const [dbLogs, setDbLogs] = useState<DbLog[]>([]);
-  const [newComment, setNewComment] = useState("");
+  // Removed unused comment editing state
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState("");
   const [editingType, setEditingType] = useState<'markdown' | 'block'>('markdown');
@@ -124,7 +124,6 @@ export default function Home() {
       setEditingContent(currentText);
       setEditingType(type === 'block' ? 'block' : 'markdown');
   };
-  const [activeBlockType, setActiveBlockType] = useState<'markdown' | 'text' | 'code' | 'block'>('markdown');
   const [activeTab, setActiveTab] = useState("timeline");
   const [mounted, setMounted] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -139,6 +138,7 @@ export default function Home() {
   const [isVaultLoading, setIsVaultLoading] = useState(true);
   const [appLang, setAppLang] = useState("en");
   const [appIconSet, setAppIconSet] = useState("lucide");
+  const [appSkin, setAppSkin] = useState("notion");
   const [settings, setSettings] = useState<Record<string, string | undefined> | null>(null); // To store full settings object if needed
 
   // New Workspace State
@@ -253,7 +253,9 @@ export default function Home() {
       const data = await res.json();
       setSettings(data);
       if (data.APP_LANG) setAppLang(data.APP_LANG);
+      if (data.APP_LANG) setAppLang(data.APP_LANG);
       if (data.APP_ICON_SET) setAppIconSet(data.APP_ICON_SET);
+      if (data.APP_SKIN) setAppSkin(data.APP_SKIN);
     } catch (e) {
       console.error("Settings Fetch Error:", e);
     }
@@ -396,28 +398,7 @@ export default function Home() {
     }
   }, [activeProject, fetchData]);
 
-  const handleAddComment = async () => {
-    if (!newComment.trim() || !activeProject) return;
-    try {
-      const res = await fetch('/api/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          text: newComment, 
-          projectId: activeProject.id,
-          type: activeBlockType
-        })
-      });
-      if (res.ok) {
-        setNewComment("");
-        setActiveBlockType("markdown");
-        fetchData(activeProject.id);
-        setActiveTab("comments");
-      }
-    } catch (e) {
-      console.error("Comment Error:", e);
-    }
-  };
+  /* Removed handleAddComment as it is no longer used */
 
   const handleSelectTheme = async (id: number) => {
     try {
@@ -560,7 +541,9 @@ export default function Home() {
   const handleUpdateSettings = async (newSettings: Partial<Record<string, string>>) => {
     // Optimistic state updates
     if (newSettings.APP_LANG) setAppLang(newSettings.APP_LANG);
+    if (newSettings.APP_LANG) setAppLang(newSettings.APP_LANG);
     if (newSettings.APP_ICON_SET) setAppIconSet(newSettings.APP_ICON_SET);
+    if (newSettings.APP_SKIN) setAppSkin(newSettings.APP_SKIN);
     
     const nextSettings = { ...settings, ...newSettings };
     const oldSettings = settings;
@@ -579,7 +562,9 @@ export default function Home() {
       // Rollback on error
       setSettings(oldSettings);
       if (oldSettings?.APP_LANG) setAppLang(oldSettings.APP_LANG);
+      if (oldSettings?.APP_LANG) setAppLang(oldSettings.APP_LANG);
       if (oldSettings?.APP_ICON_SET) setAppIconSet(oldSettings.APP_ICON_SET);
+      if (oldSettings?.APP_SKIN) setAppSkin(oldSettings.APP_SKIN);
     }
   };
 
@@ -660,7 +645,7 @@ export default function Home() {
   const t = getTranslation(appLang);
 
   return (
-    <div className={`flex h-screen overflow-hidden text-[14px] ${((previewCss || themes.some(t => t.active))) ? 'theme-active' : ''}`}>
+    <div className={`flex h-screen overflow-hidden text-[14px] ${((previewCss || themes.some(t => t.active))) ? 'theme-active' : ''}`} data-skin={appSkin}>
       {/* Mandatory Vault Overlay */}
       {isVaultMandatory && (
         <div className="fixed inset-0 z-9999 bg-(--background)/90 backdrop-blur-md flex items-center justify-center p-6">
@@ -1264,6 +1249,8 @@ export default function Home() {
               onPreview={setPreviewCss}
               appIconSet={appIconSet}
               onUpdateIconSet={(set) => handleUpdateSettings({ APP_ICON_SET: set })}
+              appSkin={appSkin}
+              onUpdateSkin={(skin) => handleUpdateSettings({ APP_SKIN: skin })}
             />
           )}
         </section>

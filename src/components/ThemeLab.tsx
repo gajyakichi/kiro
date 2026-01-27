@@ -11,6 +11,8 @@ interface ThemeLabProps {
   onPreview: (css: string) => void;
   appIconSet: string;
   onUpdateIconSet: (set: string) => void;
+  appSkin: string;
+  onUpdateSkin: (skin: string) => void;
 }
 
 const minifyCss = (css: string) => {
@@ -153,7 +155,7 @@ h1, h2, h3 { color: #0056b3 !important; }
     }
   ];
 
-export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, onDelete, onToggle, onPreview, appIconSet, onUpdateIconSet }) => {
+export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, onDelete, onToggle, onPreview, appIconSet, onUpdateIconSet, appSkin, onUpdateSkin }) => {
   const [newName, setNewName] = useState("");
   const [newCss, setNewCss] = useState("");
   const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
@@ -237,6 +239,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
         </div>
 
         {/* Global Icon Settings Row */}
+        {/* Global Icon Settings Row */}
         <div className="mb-8 p-6 bg-neutral-50 rounded-2xl border border-neutral-100 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm overflow-hidden">
           <div className="flex items-center gap-5 w-full md:w-auto overflow-hidden">
              <div className="w-12 h-12 shrink-0 rounded-xl bg-white border border-neutral-200 flex items-center justify-center shadow-xs">
@@ -265,6 +268,33 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                 className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'original' ? 'bg-foreground text-background shadow-lg shadow-neutral-300 ring-2 ring-foreground/5' : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'}`}
              >
                 ORIGINAL
+             </button>
+          </div>
+        </div>
+
+        {/* Global Skin Settings Row */}
+        <div className="mb-8 p-6 bg-neutral-50 rounded-2xl border border-neutral-100 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm overflow-hidden">
+          <div className="flex items-center gap-5 w-full md:w-auto overflow-hidden">
+             <div className="w-12 h-12 shrink-0 rounded-xl bg-white border border-neutral-200 flex items-center justify-center shadow-xs">
+                <Palette size={24} className="text-neutral-500" weight="fill" />
+             </div>
+             <div className="min-w-0">
+                <p className="text-[15px] font-black text-gray-800 tracking-tight truncate">Display Skin</p>
+                <p className="text-[11px] text-neutral-400 font-bold uppercase tracking-widest whitespace-nowrap truncate">Layout Density & Spacing</p>
+             </div>
+          </div>
+          <div className="flex bg-white p-1.5 rounded-xl border border-neutral-200 gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
+             <button 
+                onClick={() => onUpdateSkin('notion')}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appSkin !== 'vscode' ? 'bg-foreground text-background shadow-lg shadow-neutral-300 ring-2 ring-foreground/5' : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'}`}
+             >
+                NOTION (DEFAULT)
+             </button>
+             <button 
+                onClick={() => onUpdateSkin('vscode')}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appSkin === 'vscode' ? 'bg-foreground text-background shadow-lg shadow-neutral-300 ring-2 ring-foreground/5' : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-50'}`}
+             >
+                VS CODE (DENSE)
              </button>
           </div>
         </div>
