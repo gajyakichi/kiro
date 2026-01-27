@@ -76,13 +76,13 @@ export function ChatDialog({ open, onClose, initialContext, title = "AI Assistan
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-9999 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl h-[600px] flex flex-col border border-gray-200 overflow-hidden animate-in zoom-in-95 duration-200">
         
         {/* Header */}
         <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white">
+            <div className="w-8 h-8 rounded-full bg-linear-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white">
                 <Sparkles size={16} />
             </div>
             <div>

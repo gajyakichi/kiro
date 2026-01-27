@@ -54,6 +54,9 @@ export function InlineChatBox({ onClose, initialContext, title }: InlineChatBoxP
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Don't submit during IME composition (Japanese, Chinese, etc.)
+    if (e.nativeEvent.isComposing) return;
+    
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -63,13 +66,13 @@ export function InlineChatBox({ onClose, initialContext, title }: InlineChatBoxP
   return (
     <div className="mt-4 relative animate-in slide-in-from-top-2 duration-200">
       {/* Connection Line */}
-      <div className="absolute -left-[42px] top-6 w-10 h-[2px] bg-gradient-to-r from-blue-500 to-blue-300 opacity-60"></div>
+      <div className="absolute -left-[42px] top-6 w-10 h-[2px] bg-linear-to-r from-blue-500 to-blue-300 opacity-60"></div>
       
       <div className="ml-4 bg-white rounded-xl border-2 border-blue-200 shadow-lg overflow-hidden">
         {/* Header */}
-        <div className="p-3 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-blue-100 flex items-center justify-between">
+        <div className="p-3 bg-linear-to-r from-blue-50 to-purple-50 border-b border-blue-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-full bg-linear-to-tr from-blue-500 to-purple-500 flex items-center justify-center">
               <Sparkles size={12} className="text-white" />
             </div>
             <span className="text-xs font-bold text-gray-700">{title}</span>

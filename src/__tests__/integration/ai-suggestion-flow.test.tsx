@@ -43,8 +43,8 @@ describe('AI Suggestion UI E2E', () => {
     mockFetch.mockReset();
     
     // Default mocks for page load
-    mockFetch.mockImplementation((url, options) => {
-      const json = (data: any) => Promise.resolve(data);
+    mockFetch.mockImplementation((url) => {
+      const json = (data: unknown) => Promise.resolve(data);
       
       if (url === '/api/settings') return Promise.resolve({ ok: true, json: () => json({}) });
       if (url === '/api/vaults') return Promise.resolve({ ok: true, json: () => json([{ id: 'v1', active: true, path: '/tmp', name: 'Default Vault' }]) });
@@ -77,7 +77,7 @@ describe('AI Suggestion UI E2E', () => {
            });
        }
        // Keep other mocks working as page might re-fetch
-       const json = (data: any) => Promise.resolve(data);
+       const json = (data: unknown) => Promise.resolve(data);
        if (url === '/api/settings') return Promise.resolve({ ok: true, json: () => json({}) });
        if (url === '/api/vaults') return Promise.resolve({ ok: true, json: () => json([{ id: 'v1', active: true, path: '/tmp', name: 'Default Vault' }]) });
        if (url === '/api/projects') return Promise.resolve({ ok: true, json: () => json([{ id: 1, name: 'Test Project' }]) });

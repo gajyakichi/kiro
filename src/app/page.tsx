@@ -18,6 +18,8 @@ const ThemeLab = dynamic(() => import('@/components/ThemeLab').then(mod => mod.T
 const IconPicker = dynamic(() => import('@/components/IconPicker').then(mod => mod.IconPicker), { ssr: false });
 const VaultSwitcher = dynamic(() => import('@/components/VaultSwitcher').then(mod => mod.VaultSwitcher), { ssr: false });
 const InlineChatBox = dynamic(() => import('@/components/InlineChatBox').then(mod => mod.InlineChatBox), { ssr: false });
+const AnnotationMenu = dynamic(() => import('@/components/AnnotationMenu').then(mod => mod.AnnotationMenu), { ssr: false });
+const InlineMemoEditor = dynamic(() => import('@/components/InlineMemoEditor').then(mod => mod.InlineMemoEditor), { ssr: false });
 
 import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, PanelBottom, X, Check, AlertTriangle, Search } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
@@ -101,13 +103,57 @@ export default function Home() {
   const [isCreatingW, setIsCreatingW] = useState(false);
 
   // AI Chat State
-  const [chatState, setChatState] = useState<{ open: boolean; targetId: string | null; context: string; title: string }>({ open: false, targetId: null, context: "", title: "" });
+  const [chatState, setChatState] = useState<{ 
+    open: boolean; 
+    targetId: string | null; 
+    context: string; 
+    title: string;
+    mode: 'menu' | 'ai' | 'memo';
+  }>({ open: false, targetId: null, context: "", title: "", mode: 'menu' });
 
   const handleOpenChat = (targetId: string, context: string, title: string) => {
       setChatState(prev => prev.targetId === targetId && prev.open 
-        ? { open: false, targetId: null, context: "", title: "" }
-        : { open: true, targetId, context, title }
+        ? { open: false, targetId: null, context: "", title: "", mode: 'menu' }
+        : { open: true, targetId, context, title, mode: 'menu' }
       );
+  };
+  
+  const handleSaveMemo = async (content: string, editorType: 'markdown' | 'block') => {
+    if (!activeProject) return;
+    
+    try {
+      // Extract source entry info from chatState.targetId
+      let sourceType = null;
+      let sourceId = null;
+      if (chatState.targetId && chatState.targetId !== 'current-status') {
+        const parts = chatState.targetId.split('-');
+        if (parts.length >= 2) {
+          sourceType = parts[0]; // 'log', 'daily_note', etc.
+          sourceId = parts.slice(1).join('-');
+        }
+      }
+      
+      const response = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          projectId: activeProject.id, 
+          text: content, 
+          type: editorType === 'block' ? 'block' : 'markdown',
+          metadata: sourceType ? JSON.stringify({ sourceType, sourceId }) : null
+        })
+      });
+      if (response.ok) {
+        // Refetch all comments to ensure proper sorting
+        const commentRes = await fetch(`/api/comments?projectId=${activeProject.id}`);
+        const commentData = await commentRes.json();
+        setComments(commentData);
+        
+        setChatState(prev => ({ ...prev, open: false, targetId: null }));
+      }
+    } catch (e) {
+      console.error('Failed to save memo:', e);
+    }
   };
 
   // Heatmap State
@@ -800,13 +846,30 @@ export default function Home() {
                     </article>
                   </div>
                   
-                  {/* Inline Chat for Current Status */}
+                  {/* Inline Annotation for Current Status */}
                   {chatState.open && chatState.targetId === 'current-status' && (
-                    <InlineChatBox 
-                      onClose={() => setChatState(prev => ({ ...prev, open: false, targetId: null }))}
-                      initialContext={chatState.context}
-                      title={chatState.title}
-                    />
+                    <>
+                      {chatState.mode === 'menu' && (
+                        <AnnotationMenu 
+                          onSelectAI={() => setChatState(prev => ({ ...prev, mode: 'ai' }))}
+                          onSelectMemo={() => setChatState(prev => ({ ...prev, mode: 'memo' }))}
+                        />
+                      )}
+                      {chatState.mode === 'ai' && (
+                        <InlineChatBox 
+                          onClose={() => setChatState(prev => ({ ...prev, open: false, targetId: null, mode: 'menu' }))}
+                          initialContext={chatState.context}
+                          title={chatState.title}
+                        />
+                      )}
+                      {chatState.mode === 'memo' && (
+                        <InlineMemoEditor 
+                          onClose={() => setChatState(prev => ({ ...prev, open: false, targetId: null, mode: 'menu' }))}
+                          onSave={handleSaveMemo}
+                          title={chatState.title}
+                        />
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -874,6 +937,16 @@ export default function Home() {
                       } else if (entryType === 'comment') {
                          typeLabel = entry.type || 'note';
                          if (entry.type === 'code') icon = <IconRenderer icon="Code" size={ICON_SIZE} baseSet={appIconSet} />;
+                         if (entry.metadata) {
+                             try {
+                                metadata = JSON.parse(entry.metadata);
+                                console.log('Comment metadata parsed:', metadata, 'for entry:', entry.id);
+                             } catch (e) { 
+                                console.log('Failed to parse metadata:', entry.metadata);
+                             }
+                         } else {
+                            console.log('No metadata for comment:', entry.id);
+                         }
                       } else if (entryType === 'task') {
                          icon = entry.status === 'completed' ? 
                              <IconRenderer icon="CheckCircle" size={ICON_SIZE} className="text-(--theme-primary)" baseSet={appIconSet} /> : 
@@ -988,24 +1061,76 @@ export default function Home() {
                                                 {content}
                                               </p>
                                           </div>
-                                      ) : (
-                                          <div className="markdown-content">
-                                          <ReactMarkdown>{content}</ReactMarkdown>
-                                          </div>
-                                      )}
+                                       ) : entryType === 'comment' ? (
+                                           (() => {
+                                             // Check if this memo was created from Git or Daily Summary
+                                             const shouldToggle = metadata?.sourceType === 'log' || metadata?.sourceType === 'daily_note';
+                                             
+                                             if (shouldToggle) {
+                                               // Toggle display for Git/Daily Summary memos
+                                               return (
+                                                 <details className="group/memo">
+                                                   <summary className="list-none cursor-pointer flex items-center gap-2 mb-2 focus:outline-none select-none">
+                                                     <span className="text-[10px] bg-green-500 text-white px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                                                       Memo
+                                                     </span>
+                                                     {metadata?.sourceType === 'log' && (
+                                                       <span className="text-[9px] text-gray-400">from Git Log</span>
+                                                     )}
+                                                     {metadata?.sourceType === 'daily_note' && (
+                                                       <span className="text-[9px] text-gray-400">from Daily Summary</span>
+                                                     )}
+                                                     <ChevronRight size={10} className="group-open/memo:rotate-90 transition-transform text-gray-400" />
+                                                   </summary>
+                                                   <div className="mt-2 markdown-content pl-3 border-l-2 border-green-500/30 animate-in slide-in-from-top-2 duration-300">
+                                                     <ReactMarkdown>{content}</ReactMarkdown>
+                                                   </div>
+                                                 </details>
+                                               );
+                                             } else {
+                                               // Expanded display for standalone memos
+                                               return (
+                                                 <div className="markdown-content">
+                                                   <ReactMarkdown>{content}</ReactMarkdown>
+                                                 </div>
+                                               );
+                                             }
+                                           })()
+                                       ) : (
+                                           <div className="markdown-content">
+                                           <ReactMarkdown>{content}</ReactMarkdown>
+                                           </div>
+                                       )}
                                       </div>
                                      </>
                                   )}
                                 </>
                               )}
                               
-                              {/* Inline Chat Box */}
+                              {/* Inline Annotation */}
                               {chatState.open && chatState.targetId === `${entryType}-${entry.id}` && (
-                                <InlineChatBox 
-                                  onClose={() => setChatState(prev => ({ ...prev, open: false, targetId: null }))}
-                                  initialContext={chatState.context}
-                                  title={chatState.title}
-                                />
+                                <>
+                                  {chatState.mode === 'menu' && (
+                                    <AnnotationMenu 
+                                      onSelectAI={() => setChatState(prev => ({ ...prev, mode: 'ai' }))}
+                                      onSelectMemo={() => setChatState(prev => ({ ...prev, mode: 'memo' }))}
+                                    />
+                                  )}
+                                  {chatState.mode === 'ai' && (
+                                    <InlineChatBox 
+                                      onClose={() => setChatState(prev => ({ ...prev, open: false, targetId: null, mode: 'menu' }))}
+                                      initialContext={chatState.context}
+                                      title={chatState.title}
+                                    />
+                                  )}
+                                  {chatState.mode === 'memo' && (
+                                    <InlineMemoEditor 
+                                      onClose={() => setChatState(prev => ({ ...prev, open: false, targetId: null, mode: 'menu' }))}
+                                      onSave={handleSaveMemo}
+                                      title={chatState.title}
+                                    />
+                                  )}
+                                </>
                               )}
                             </div>
                            </div>

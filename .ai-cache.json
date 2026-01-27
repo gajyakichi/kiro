@@ -143,5 +143,45 @@
     "timestamp": 1769521595979,
     "latencyMs": 171088,
     "content": "{\"tasks\":[\"ユーザーインターフェースを追加し、テーマのインポート/エクスポートを実行できるようにする\",\"無効なテーマファイルがアップロードされた際のバリデーションとエラーメッセージを実装する\",\"インポート/エクスポート機能に対する単体テストとPlaywright E2Eテストを作成する\",\"ドキュメント（README）にインポート/エクスポートの使い方とフォーマット仕様を追記する\",\"テーマのバージョン互換性を確認し、古いテーマフォーマットからのマイグレーションサポートを追加する\"]}"
+  },
+  "d8ccf9be91e6acf7b1d0cd94b8cbc3c823147d9d52b9c8d6aa688beb64b42248": {
+    "timestamp": 1769522499645,
+    "latencyMs": 62154,
+    "content": "**1月27日〜26日 の開発ログ（daily_note）まとめ**  \n\n---\n\n### 1月27日  \n| 変更点 | 具体的に何をしたか | 目的・効果 |\n|--------|------------------|------------|\n| **ThemeLabのインポート/エクスポート機能追加** | テーマファイルを外部に保存・読み込みできるようにした。 | ユーザーが自作テーマを共有・バックアップできる。 |\n| **Electronアプリ用Playwright E2Eテスト実装** | `playwright` でフルUIテストを書き、CIに組み込んだ。 | 本番ビルド前に UI の不具合を自動検出。 |\n| **ヒートマップコンポーネント分割・ダイナミックインポート** | ヒートマップを別モジュール化し、必要時にのみロード。 | 初回ロード時のバンドルサイズを削減し、起動速度向上。 |\n| **READMEの`DATABASE_URL`を`vault/kiro.db`に更新** | 参考設定を最新のデータベースパスに合わせた。 | 読者が正しい設定をすぐに確認できる。 |\n\n---\n\n### 1月26日  \n| 変更点 | 具体的に何をしたか | 目的・効果 |\n|--------|------------------|------------|\n| **アプリ名をKiroに変更、MITライセンス追加** | 名前変更＆オープンソースライセンスを明示。 | コミュニティでの採用・再利用が促進。 |\n| **カレンダーUI完成 & AIキャッシュ導入** | カレンダー画面をデザインし、AIで生成した情報をキャッシュ。 | UI が完成し、AI応答が高速化。 |\n| **WCAG AA準拠（セマンティクス＋aria-label）** | アクセシビリティ対応。 | 視覚障害者や支援技術を使うユーザーへの配慮。 |\n| **日報のEN/JAトグル追加** | 英日切り替えボタンを実装。 | バイリンガル対応で利用者の拡大。 |\n| **タイムライン・タスクUIリファクタリング** | UIを整理し、AIタスクチェック機能を強化。 | ユーザー体験向上とタスク管理の正確さ。 |\n| **Theme Labにプリセット＋プレビューアニメーション追加** | 事前定義テーマとアニメーションでプレビュー。 | デザイン性向上とエラー抑制。 |\n| **NotionEditor・SuggestedTasks・AIモジュールなどユニットテスト追加** | Jestで各モジュールの単体テストを実装。 | コード品質を担保。 |\n| **BlockNote（Memo）エディタ統合** | ブロックノートを統合し、AI言語サポートを拡張。 | メモ作成がより直感的。 |\n| **GitHub ActionsでLint/テスト/ビルド設定** | CIワークフローを構築。 | コミット時に自動チェックが走る。 |\n| **READMEにバイリンガル内容・アプリ名由来追加** | 補足情報を記載。 | 透明性と利用者への情報提供。 |\n| **最小限の幾何学アイコン導入** | UIに統一感のあるアイコンを追加。 | 視認性向上。 |\n| **UI/UX改良＋ローカリゼーション＋CI/テストカバレッジ拡充** | 全体的なデザイン・多言語対応を進め、CIでのテスト網羅性を高めた。 | アプリの使い勝手・品質を総合的に向上。 |\n\n---\n\n## まとめ\n\n- **機能面**：テーマのインポート/エクスポート、カレンダー、タイムライン、タスク、メモ等の UI が完成し、AI を活用したキャッシュやチェック機能が加わりました。  \n- **品質面**：Playwright E2E、Jest ユニットテスト、Lint でコード品質を確保し、GitHub Actions による自動ビルド・テストが構築されています。  \n- **アクセシビリティ・ローカリゼーション**：WCAG AA 対応、英日トグル、バイリンガル README でユーザー層を広げました。  \n- **運用面**：MIT ライセンス、CI 設定、データベース設定の更新で、外部開発者が参画しやすい環境を整備。  \n\nこれらは、Kiro がより安定し、拡張性のあるオープンソースプロダクトへと成長するための重要なステップです。"
+  },
+  "a24c8d8e18580010fd4cae06bd33d0e308fcc9251cf561d2c4a8f16928f56503": {
+    "timestamp": 1769522640001,
+    "latencyMs": 155516,
+    "content": "{\"tasks\":[\"テーマインポート/エクスポート機能のUIを作成し、エラー処理を追加する\",\"AIチャットのキャッシュを永続化し、アプリ再起動後も保持できるようにする\",\"タイムライン表示で検索/フィルタ機能を拡張し、キーワード検索と期間フィルタを追加する\",\"Playwright E2EテストをCIに統合するため、GitHub Actionsにテストジョブを追加し、レポートを生成する\",\"WCAG AA準拠をさらに向上させるため、ARIA属性とキーボードナビゲーションを検証し、必要な修正を行う\"]}"
+  },
+  "815bdaf14b2f21626c4ea4cd8a6c9525ddd45a6015a19c52a673a96c379a307d": {
+    "timestamp": 1769522667756,
+    "latencyMs": 183276,
+    "content": "{\"en\":\"- 2026‑01‑27: Integrated inline AI chat into Timeline items and Current Status; unified Timeline view with search/filter and removed unused components.\\n- Added theme import/export to ThemeLab.\\n- Fixed README DATABASE_URL to point to vault/kiro.db.\\n- Added Playwright E2E tests for the Electron app and wired them into CI.\\n- Split the heatmap component and enabled dynamic imports for bundle optimisation.\\n- 2026‑01‑26: Added MIT License.\\n- Updated README with bilingual content, renamed the app to Kiro, and updated the icon.\\n- Finalised calendar UI, AI caching, and documentation.\\n- Improved WCAG AA compliance (semantics, aria‑labels).\\n- Resolved lint errors in page.tsx and updated system calendar design.\\n- Added comprehensive unit tests for NotionEditor, SuggestedTasks, and AI modules.\\n- Introduced localisation support and increased CI/test coverage.\\n- Enhanced timeline UI, refactored tasks UI, and improved AI task checking.\\n- Implemented bilingual daily summary with EN/JA toggle.\\n- Enhanced Theme Lab with new presets, preview animations, and suppressed Jest lint errors.\\n- Added unit tests for AI suggestions and fixed AI provider environment handling.\",\"ja\":\"- 2026‑01‑27：タイムライン項目と現在の状態にインラインAIチャットを統合。検索/フィルタ付きの統一タイムラインビューを実装し、未使用コンポーネントを削除。\\n- ThemeLab にテーマのインポート/エクスポート機能を追加。\\n- README の DATABASE_URL を vault/kiro.db に修正。\\n- Electron アプリの Playwright E2E テストを追加し、CI に統合。\\n- ヒートマップコンポーネントを分割し、動的インポートでバンドル最適化を実施。\\n- 2026‑01‑26：MIT ライセンスを追加。\\n- README を二言語化し、アプリ名を Kiro に変更、アイコンを更新。\\n- カレンダー UI、AI キャッシュ、ドキュメントを完成。\\n- WCAG AA（意味的、aria‑label）準拠を改善。\\n- page.tsx の lint エラーを解消し、システムカレンダーのデザインを更新。\\n- NotionEditor、SuggestedTasks、AI モジュールの包括的ユニットテストを追加。\\n- ローカリゼーションサポートを導入し、CI/テストカバレッジを向上。\\n- タイムライン UI を強化し、タスク UI をリファクタリング、AI タスク確認を改善。\\n- EN/JA 切替機能付きバイリンガル日次サマリを実装。\\n- Theme Lab に新プリセットとプレビューアニメーションを追加し、Jest の lint エラーを抑制。\\n- AI 推奨のユニットテストを追加し、AI プロバイダーの環境ハンドリングを修正。\"}"
+  },
+  "fb5b1539eb4949e7021edb60577051e94293ad5c101216a3bcc49cdb2f98c3b0": {
+    "timestamp": 1769522679738,
+    "latencyMs": 195255,
+    "content": "{ \"completed_ids\": [77] }"
+  },
+  "bef6fcaf8f47ad58932881d78375b705940aeb48ba6da689a3ca90063f5c229b": {
+    "timestamp": 1769522700090,
+    "latencyMs": 36658,
+    "content": "「Timeline items（タイムラインの各項目）と Current Status（現在の状態）にインラインAIチャットを追加する」という機能は、以下のような意味です。\n\n1. **タイムラインの各項目に直接チャット機能を配置**  \n   - タイムライン上に表示されるイベントや更新情報の隣に、AIチャットボックスが埋め込まれます。  \n   - その項目に関する質問やコメントを、別のページを開かずにその場で行えるようになります。\n\n2. **Current Status（現在の状態）に対しても同様にチャットを挿入**  \n   - 進捗状況や状態を示すセクションに、AIチャットが連結され、状態に関する疑問や補足情報をリアルタイムで尋ねられます。\n\n3. **メリット**  \n   - **即時回答**：ページ遷移が不要なので、必要な情報をすぐに取得できます。  \n   - **文脈に即した回答**：チャットはその項目や状態の文脈を理解した上で回答するため、より的確な回答が期待できます。  \n   - **操作のシンプル化**：ユーザーが別タブや別ウィンドウを開く手間が省け、作業フローがスムーズになります。\n\n簡単に言うと、**「タイムラインや現在の状態を確認しながら、そこでその内容についてすぐにAIに質問できる機能」**です。これにより、情報の取得・確認がより直感的に行えるようになります。"
+  },
+  "fbd508945fbc26334b6323e4db46c2995dc48a46d95fec426856c2d3b2aad92f": {
+    "timestamp": 1769522762032,
+    "latencyMs": 24335,
+    "content": "## 「Add inline AI chat for Timeline items and Current Status」 とは？\n\nこのログに記載されている機能は、**タイムライン（Timeline）に表示されるアイテムや現在の状態（Current Status）に対して、インラインで AI チャットを利用できるようにする**というものです。\n\n### 具体的に何をするのか？\n\n| 項目 | 何ができるようになるか |\n|------|-----------------------|\n| **タイムラインアイテム** | 例えば「タスクの完了」や「コメント投稿」など、タイムライン上に表示されるイベントにカーソルを合わせると、右側に小さなチャットウィンドウが表示される。そこから AI に質問したり、タスクの詳細・背景・次のステップなどを尋ねることができる。 |\n| **現在の状態（Current Status）** | ダッシュボードやステータスカード上に表示される「進捗率」「期限近いタスク数」などの情報に対して、AI が「この進捗率はどう解釈すべきか？」や「期限が近いタスクは何か？」といった質問にリアルタイムで回答。 |\n\n### 何がメリット？\n\n1. **情報探索がスムーズ**  \n   タイムラインをスクロールしながら詳細を探す手間が省ける。  \n2. **即時に洞察を得られる**  \n   AI が文脈を理解して、必要な情報やアドバイスをその場で提供。  \n3. **チームのコミュニケーションが円滑に**  \n   途中で質問が生じても、チャット形式でその場で解決できる。  \n\n### どうやって使う？\n\n- タイムラインアイテムにカーソルを合わせると、右に小さなチャットアイコン（または小窓）が表示されます。\n- それをクリックすると、AIが自動で質問・回答を始めます。\n- 何か具体的に聞きたいことがある場合は、テキスト入力欄に質問を書いて送信するだけです。\n\n---\n\n### まとめ\n\n「Add inline AI chat for Timeline items and Current Status」は、プロジェクト管理画面やダッシュボードで発生する情報を、インラインで AI が即座に補足・説明する機能です。これにより、情報探索の手間を省き、チーム全体の意思決定をサポートします。"
+  },
+  "fc8371f829a163b4e2dce70c309a814df1c6bcf8f416d11ebedb350388aeb584": {
+    "timestamp": 1769523029041,
+    "latencyMs": 30359,
+    "content": "**Phase 4: デスクトップ体験**\n\n- **シングルウィンドウレイアウトへの移行**（完了）\n  - ルートコンテナをビューポートの高さに固定\n  - サイドバーとメインコンテンツを独立したスクロールに対応\n  - アプリらしい感覚と遷移をさらに洗練\n- **モダンなアプリアイコンの生成**（未完了）\n\n---\n\n**Phase 5: 国際化（i18n）**\n\n- **日本語ローカリゼーションの実装**（完了）\n  - `APP_LANG` を設定インフラに追加\n  - 翻訳ライブラリ（`lib/i18n.ts`）を作成\n  - 設定ページを日本語化\n  - メインダッシュボードUIを日本語化\n  - 設定画面から言語切替を可能に\n\nこれで現在のタスク一覧を少し整理して書き直しました。必要に応じてさらに詳細を追加できますので、遠慮なくお知らせください。"
+  },
+  "91dd78f6b7f8ba558b779a685b431930c210ec4ad5f6b62bd27f08ef012a76f8": {
+    "timestamp": 1769523393303,
+    "latencyMs": 105158,
+    "content": "{ \"completed_ids\": [84, 85, 86] }"
   }
 }
