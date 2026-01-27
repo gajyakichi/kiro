@@ -20,6 +20,7 @@ const VaultSwitcher = dynamic(() => import('@/components/VaultSwitcher').then(mo
 const InlineChatBox = dynamic(() => import('@/components/InlineChatBox').then(mod => mod.InlineChatBox), { ssr: false });
 const AnnotationMenu = dynamic(() => import('@/components/AnnotationMenu').then(mod => mod.AnnotationMenu), { ssr: false });
 const InlineMemoEditor = dynamic(() => import('@/components/InlineMemoEditor').then(mod => mod.InlineMemoEditor), { ssr: false });
+const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'), { ssr: false });
 
 import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
@@ -446,6 +447,42 @@ export default function Home() {
       }
     } catch (e) {
       console.error("Icon Update Error:", e);
+    }
+  };
+
+  const handleTaskStatusUpdate = async (task: SuggestedTask, status: string) => {
+    // Optimistic update
+    const oldTasks = [...suggestedTasks];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setSuggestedTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: status as any } : t));
+
+    try {
+        await fetch('/api/absorb/tasks', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ taskId: task.id, status })
+        });
+    } catch (e) {
+        console.error(e);
+        setSuggestedTasks(oldTasks); // Rollback
+    }
+  };
+
+  const handleManualTaskAdd = async (text: string) => {
+    if (!activeProject) return;
+    try {
+        const res = await fetch('/api/absorb/tasks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ projectId: activeProject.id, task: text })
+        });
+        const data = await res.json();
+        if (data.success && data.task) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           setSuggestedTasks(prev => [data.task as any, ...prev]);
+        }
+    } catch (e) {
+        console.error(e);
     }
   };
 
@@ -911,6 +948,20 @@ export default function Home() {
                       )}
                     </>
                   )}
+                </div>
+
+                {/* 1.5. Suggestions & Tasks */}
+                <div className="bg-white notion-card rounded-xl border border-gray-100 shadow-sm p-6 relative group">
+                   <div className="absolute top-4 right-4 text-gray-300 group-hover:text-gray-400 transition-colors">
+                      <IconRenderer icon="Lightbulb" size={16} baseSet={appIconSet} />
+                   </div>
+                   <SuggestedTasks 
+                      tasks={suggestedTasks}
+                      onAdd={(t) => handleTaskStatusUpdate(t, 'added')}
+                      onDismiss={(t) => handleTaskStatusUpdate(t, 'dismissed')}
+                      onUpdateStatus={(t, s) => handleTaskStatusUpdate(t, s)}
+                      onManualAdd={handleManualTaskAdd}
+                   />
                 </div>
 
                 {/* 2. Search & Filter Bar */}
