@@ -775,18 +775,7 @@ export default function Home() {
             <span>Timeline</span>
           </button>
 
-          <button 
-            onClick={() => setActiveTab("comments")}
-            className={`w-full notion-item flex items-center gap-3 ${activeTab === "comments" ? "active" : ""}`}
-            role="tab"
-            aria-selected={activeTab === "comments"}
-          >
-            <IconRenderer icon="SquarePen" size={16} baseSet={appIconSet} />
-            <div className="flex-1 flex justify-between items-center">
-              <span>{t.notes}</span>
-              <span className="text-xs notion-text-subtle">{comments.length}</span>
-            </div>
-          </button>
+
 
           <button 
             onClick={() => setActiveTab("themes")}
@@ -848,8 +837,6 @@ export default function Home() {
               )}
             </div>
             <span>
-              {activeTab === "comments" && t.dev_notes}
-
               {activeTab === "timeline" && "Project Timeline"}
               {activeTab === "themes" && t.theme_lab}
             </span>
@@ -1266,142 +1253,7 @@ export default function Home() {
              </div>
           )}
 
-          {activeTab === "comments" && (
-            <div className="space-y-6 h-full flex flex-col">
-              <div className="flex-1 flex flex-col">
-                <h2 className="text-2xl font-bold tracking-tight mb-4">{t.dev_notes}</h2>
-                  {activeBlockType === 'block' ? (
-                     <div className="flex-1 border border-(--border-color) rounded-xl overflow-hidden bg-white flex flex-col shadow-sm min-h-[500px]">
-                      <NotionEditor 
-                        value={newComment}
-                        iconSet={appIconSet}
-                        onChange={setNewComment}
-                        onSave={() => {
-                          handleAddComment();
-                          // Optional: Toast or feedback
-                        }}
-                        onCancel={() => setNewComment("")} // Clear
-                      />
-                      <div className="bg-gray-50 border-t border-gray-100 p-2 flex justify-end">
-                            <button 
-                                onClick={() => setActiveBlockType('markdown')}
-                                className="text-[10px] text-gray-500 hover:text-gray-800 underline"
-                            >
-                                Switch to Markdown
-                            </button>
-                      </div>
-                    </div>
-                  ) : (
-                     <div className="flex-1 border border-(--border-color) rounded-xl overflow-hidden bg-white flex flex-col shadow-sm min-h-[500px]">
-                         <div className="flex-1 p-4">
-                            <textarea
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                className="w-full h-full outline-none resize-none text-sm"
-                                placeholder="Write a note in Markdown..."
-                            />
-                         </div>
-                         <div className="bg-gray-50 border-t border-gray-100 p-3 flex justify-between items-center">
-                            <button 
-                                onClick={() => setActiveBlockType('block')}
-                                className="text-[10px] text-gray-500 hover:text-gray-800 underline"
-                            >
-                                Switch to Block Editor
-                            </button>
-                            <div className="flex gap-2">
-                                <button onClick={() => setNewComment("")} className="text-xs text-gray-500 hover:text-gray-700">Clear</button>
-                                <button onClick={handleAddComment} disabled={!newComment.trim()} className="text-xs bg-black text-white px-4 py-2 rounded-xl hover:opacity-90 disabled:opacity-30">Save Note</button>
-                            </div>
-                         </div>
-                     </div>
-                  )}
-              </div>
 
-              {/* Past Notes List - Simplified */}
-              <div className="space-y-4">
-                 <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400">Previous Notes</h3>
-                 {comments.length === 0 && <p className="text-gray-400 italic text-sm">No notes yet.</p>}
-                 {comments.sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).map(c => (
-                    <div key={c.id} className="bg-white p-4 rounded-xl border border-(--border-color) shadow-sm group">
-                       {editingCommentId === c.id && editingType === 'block' ? (
-                           <div className="border border-(--theme-primary) rounded-xl overflow-hidden shadow-sm">
-                               <NotionEditor 
-                                 value={editingContent}
-                                 iconSet={appIconSet}
-                                 onChange={setEditingContent}
-                                 onSave={handleUpdateComment}
-                                 onCancel={() => {
-                                     setEditingCommentId(null);
-                                     setEditingContent("");
-                                 }}
-                               />
-                                <div className="bg-gray-50 border-t border-gray-100 p-2 flex justify-end">
-                                    <button 
-                                        onClick={() => setEditingType('markdown')}
-                                        className="text-[10px] text-gray-500 hover:text-gray-800 underline"
-                                    >
-                                        Switch to Markdown
-                                    </button>
-                                </div>
-                           </div>
-                       ) : editingCommentId === c.id && editingType === 'markdown' ? (
-                            <div className="border border-(--theme-primary) rounded-xl overflow-hidden shadow-sm bg-white p-3">
-                                <textarea
-                                    value={editingContent}
-                                    onChange={(e) => setEditingContent(e.target.value)}
-                                    className="w-full text-sm min-h-[100px] outline-none resize-y"
-                                    placeholder="Edit note..."
-                                />
-                                <div className="flex justify-between items-center mt-2 border-t pt-2 border-gray-100">
-                                    <button 
-                                        onClick={() => setEditingType('block')}
-                                        className="text-[10px] text-gray-500 hover:text-gray-800 underline"
-                                    >
-                                        Switch to Block Editor
-                                    </button>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => setEditingCommentId(null)} className="text-xs text-gray-500 hover:text-gray-700">Cancel</button>
-                                        <button onClick={handleUpdateComment} className="text-xs bg-black text-white px-3 py-1 rounded-md">Save</button>
-                                    </div>
-                                </div>
-                            </div>
-                       ) : (
-                           <>
-                               <div className="flex justify-between items-center mb-2">
-                                  <span className="text-[10px] font-bold bg-gray-100 px-2 py-1 rounded text-gray-500">
-                                    {new Date(c.timestamp).toLocaleDateString()}
-                                  </span>
-                                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button 
-                                            onClick={() => startEditingComment(c.id, c.text, c.type)}
-                                            className="p-1.5 text-gray-400 hover:text-(--theme-primary) hover:bg-gray-100 rounded transition-colors"
-                                            title="Edit"
-                                        >
-                                            <Edit2 size={14} />
-                                        </button>
-                                        <button 
-                                            onClick={() => handleDeleteComment(c.id)}
-                                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
-                                            title="Delete"
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
-                                  </div>
-                               </div>
-                               <div className="markdown-content text-sm">
-                                  {c.type === 'code' ? (
-                                     <pre className="bg-neutral-900 text-emerald-400 p-2 rounded"><code>{c.text}</code></pre>
-                                  ) : (
-                                     <ReactMarkdown>{c.text}</ReactMarkdown>
-                                  )}
-                               </div>
-                           </>
-                       )}
-                    </div>
-                 ))}
-              </div>
-            </div>
-          )}
 
           {activeTab === "themes" && (
             <ThemeLab 

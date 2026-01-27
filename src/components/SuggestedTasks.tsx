@@ -144,14 +144,9 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
                     </button>
                 </div>
               )}
-              {navCheck(activeTasks.length + completedTasks.length) ? (
+              {navCheck(activeTasks.length) ? (
                 <>
                     {activeTasks.map(t => renderTaskRow(t, true))}
-                    {completedTasks.length > 0 && (
-                        <div className="pt-4 mt-4 border-t border-gray-100">
-                             {completedTasks.map(t => renderTaskRow(t, false, true))}
-                        </div>
-                    )}
                 </>
               ) : emptyState("No active tasks. Add suggestions or create one to get started!")}
             </>
