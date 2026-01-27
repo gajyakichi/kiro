@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Theme } from '@/lib/types';
-import { MagicWand, Trash, Palette, CheckCircle, Circle, Folder, Clock } from '@phosphor-icons/react';
+import { MagicWand, Trash, Palette, CheckCircle, Circle, Folder, Clock, DownloadSimple, UploadSimple } from '@phosphor-icons/react';
 import { IconRenderer } from './IconRenderer';
 
 interface ThemeLabProps {
@@ -191,6 +191,42 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
     }
   };
 
+  const handleExport = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(themes.filter(t => !t.isPreset), null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "kiro_themes.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  };
+
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const fileReader = new FileReader();
+    if (event.target.files && event.target.files[0]) {
+      fileReader.readAsText(event.target.files[0], "UTF-8");
+      fileReader.onload = async (e) => {
+        try {
+          if (e.target?.result) {
+            const importedThemes = JSON.parse(e.target.result as string) as Theme[];
+            if (Array.isArray(importedThemes)) {
+              for (const theme of importedThemes) {
+                // Skip if not valid theme object
+                if (!theme.name || !theme.css) continue;
+                // Import as new custom theme
+                await onSave(theme.name, theme.css, false, false);
+              }
+              alert(`Successfully imported ${importedThemes.length} themes!`);
+            }
+          }
+        } catch (error) {
+          console.error("Error importing themes:", error);
+          alert("Failed to import themes. Invalid JSON file.");
+        }
+      };
+    }
+  };
+
   return (
     <div className="space-y-10 animate-fade-in pb-20">
       {/* Theme Selector Section */}
@@ -323,6 +359,23 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
           >
             {isAdding ? "Close Editor" : "Open CSS Editor"}
           </button>
+          
+          <div className="flex gap-2 ml-2">
+             <button
+               onClick={handleExport}
+               title="Export Custom Themes"
+               className="p-2 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-foreground transition-all"
+             >
+                <DownloadSimple size={18} weight="bold" />
+             </button>
+             <label
+               title="Import Themes JSON"
+               className="p-2 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-foreground transition-all cursor-pointer"
+             >
+                <UploadSimple size={18} weight="bold" />
+                <input type="file" accept=".json" onChange={handleImport} className="hidden" />
+             </label>
+          </div>
         </div>
 
         {isAdding && (
