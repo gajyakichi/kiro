@@ -183,5 +183,35 @@
     "timestamp": 1769523393303,
     "latencyMs": 105158,
     "content": "{ \"completed_ids\": [84, 85, 86] }"
+  },
+  "4a527e0d3ef0e7c21a046e215a38af2ab847fce6708a853f5833caa7d26eb50b": {
+    "timestamp": 1769526211741,
+    "latencyMs": 242932,
+    "content": "{\"en\":\"2026-01-27\\n- Updated Tailwind to v4 and resolved lints.\\n- Added inline AI chat for Timeline items and Current Status.\\n- Consolidated features into a unified Timeline view with search/filter; removed unused components.\\n- Implemented Import/Export themes in ThemeLab.\\n- Fixed DATABASE_URL in README.\\n- Added Playwright E2E tests for Electron app; integrated with CI.\\n- Split heatmap component and enabled dynamic imports for bundle optimization.\\n\\n2026-01-26\\n- Added MIT License.\\n- Updated README with bilingual content and app naming origin.\\n- Updated app icon to minimal geometric design.\\n- Renamed application to Kiro.\\n- Finalized calendar UI, AI caching, and documentation.\\n- Improved WCAG AA compliance (semantics, aria-labels).\\n- Fixed lint errors in page.tsx.\\n- Updated system calendar to match timeline design and include all activity types.\\n- Added comprehensive unit tests for NotionEditor, SuggestedTasks and AI module.\\n- Enhanced UI/UX, added localization support, and improved CI/test coverage.\\n- Enhanced timeline, refactored tasks UI, and improved AI task checking.\\n- Implemented bilingual daily summary with toggle (EN/JA).\\n- Enhanced Theme Lab with new presets and preview animations; suppressed Jest config lint errors.\",\"ja\":\"2026-01-27\\n- Tailwind を v4 に更新し、lint エラーを修正。\\n- タイムライン項目と現在の状態にインライン AI チャットを追加。\\n- 機能を統合タイムラインビューにまとめ、検索/フィルタを実装、未使用コンポーネントを削除。\\n- ThemeLab にテーマのインポート/エクスポート機能を実装。\\n- README の DATABASE_URL を vault/kiro.db に修正。\\n- Electron アプリ用の Playwright E2E テストを追加し、CI に統合。\\n- Heatmap コンポーネントを分割し、動的インポートでバンドル最適化を有効化。\\n\\n2026-01-26\\n- MIT ライセンスを追加。\\n- README を二言語対応にし、アプリ名の由来を更新。\\n- アプリアイコンをミニマル幾何デザインに変更。\\n- アプリ名を Kiro に変更。\\n- カレンダー UI を完成させ、AI キャッシュとドキュメントを更新。\\n- WCAG AA 対応を強化（意味論、aria‑label）。\\n- page.tsx の lint エラーを修正。\\n- システムカレンダーをタイムラインデザインに合わせ、全活動種別を含めるよう更新。\\n- NotionEditor、SuggestedTasks、AI モジュールの包括的単体テストを追加。\\n- UI/UX を強化し、ローカリゼーションを追加、CI/テストカバレッジを向上。\\n- タイムラインを拡張、タスク UI をリファクタリング、AI タスクチェックを改善。\\n- 日次サマリーを英日切替で実装。\\n- Theme Lab を新プリセットとプレビューアニメーションで強化し、Jest 設定の lint エラーを抑制。\"}"
+  },
+  "b96478e7a2a559fedada79e1c1827ac10b8a0eb4d5243418fcd8efbc82ba1d59": {
+    "timestamp": 1769526219539,
+    "latencyMs": 250729,
+    "content": "{\"tasks\":[\"READMEにAPI使用例・プラグイン統合・貢献ガイドラインを追加し、ドキュメントを充実させる\",\"すべてのUIコンポーネントに対して国際化のフォールバックを実装し、言語切替動作をテストする\",\"GitHub Actionsで自動デプロイパイプラインを構築し、リリースアーティファクトを生成・配布する\",\"タイムライン項目に追加されたAIチャット機能の単体テストを実装し、CIに統合する\",\"Tailwind設定を見直し、プロダクション時にpurgeを有効化してCSSサイズを削減する\"]}"
+  },
+  "cd02ded89d9921f1fb28f28e3cf917f125fd5f0ff2f2d6390189001b72016211": {
+    "timestamp": 1769526238276,
+    "latencyMs": 189760,
+    "content": "**「タイムライン表示で検索/フィルタ機能を拡張し、キーワード検索と期間フィルタを追加する」**  \nという文は、以下のような意味です。\n\n| 要素 | 内容 |\n|------|------|\n| **タイムライン表示** | あるアプリやシステムで「時間の流れ」を順序付けて表示する画面・ビュー（例：SNSの投稿一覧、ログの履歴、タスクのスケジュールなど）。 |\n| **検索/フィルタ機能を拡張** | 既存の検索・絞り込み機能をより多機能にしたり、使いやすくしたりすること。 |\n| **キーワード検索を追加** | ユーザーが入力した文字列（キーワード）で、タイムラインに表示されている項目を検索できるようにする。例えば「プロジェクト名」「タグ」「作者名」などで絞り込み。 |\n| **期間フィルタを追加** | 日付・時間の範囲で絞り込む機能を導入する。例えば「2024年1月1日〜2024年1月31日」の間に作成された投稿だけを表示する、といった使い方。 |\n\n### まとめ\nこの要件は、タイムライン画面に「キーワード検索」と「期間フィルタ」を加えて、ユーザーが「○○という語を含むもの」か「○月○日から○月○日までのもの」など、より細かくデータを探せるようにする機能拡張を指しています。  \n（例：SNSアプリで、投稿を日時や内容で絞り込めるようにする、という具合です。)"
+  },
+  "1ac71f3c463f4697b5a609770cfe6826eef0c47a65f3af6ef15af7fc7107c1eb": {
+    "timestamp": 1769526254739,
+    "latencyMs": 285924,
+    "content": "{ \"completed_ids\": [2, 60, 82, 83] }"
+  },
+  "dbd57981485cc9ae962ec592eca8fc5e36991d9d9ae4d471c1e72bb695077790": {
+    "timestamp": 1769526348255,
+    "latencyMs": 43047,
+    "content": "**概要**  \nGitHub Actions に Playwright の E2E（End‑to‑End）テストジョブを追加し、テスト実行結果をレポートとして生成・公開する仕組みを構築しました。\n\n---\n\n## 1. 何をしたか（タスクの要点）\n\n| 項目 | 内容 |\n|------|------|\n| **CI ツール** | GitHub Actions |\n| **テストフレームワーク** | Playwright（ブラウザ自動化） |\n| **追加したジョブ** | `e2e-test`（あるいは `playwright-test`） |\n| **実行時トリガー** | `push` / `pull_request` で対象ブランチへのコミットがあった時 |\n| **ジョブの流れ** | 1️⃣ **Checkout**（コード取得）<br>2️⃣ **Setup Node.js**（バージョン指定）<br>3️⃣ **Install Dependencies**（`npm ci`）<br>4️⃣ **Run Playwright Tests**（`npx playwright test`）<br>5️⃣ **Generate Report**（`npx playwright show-report`）<br>6️⃣ **Publish Report**（Artifacts/Pagesとして保存） |\n| **レポート** | Playwright の HTML レポートを作成し、GitHub Actions の Artifacts にアップロード、または GitHub Pages へデプロイしてアクセス可能にしました。 |\n| **成果** | - CI パイプラインに統合された E2E テストでコード品質を保証<br>- レポートを閲覧できるため、失敗箇所をすぐに把握・修正<br>- ブランチごとにテスト結果を確認できる |\n\n---\n\n## 2. 主要な変更点\n\n### ① `playwright.config.js` の更新\n```js\nexport default defineConfig({\n  use: {\n    headless: true,\n    viewport: { width: 1280, height: 720 },\n    video: 'on-first-retry',          // 失敗時にビデオ保存\n    screenshot: 'only-on-failure',   // 失敗時にスクリーンショット\n  },\n  reporter: [\n    ['html', { outputFolder: 'playwright-report', open: 'never' }]\n  ]\n});\n```\n- テスト実行中に必要な設定を追加しました。\n\n### ② GitHub Actions のワークフロー (`.github/workflows/e2e.yml`)\n```yaml\nname: Playwright E2E Tests\n\non:\n  push:\n    branches: [main]\n  pull_request:\n    branches: [main]\n\njobs:\n  test:\n    runs-on: ubuntu-latest\n\n    steps:\n    - uses: actions/checkout@v4\n\n    - name: Use Node.js 20\n      uses: actions/setup-node@v4\n      with:\n        node-version: 20\n\n    - name: Install dependencies\n      run: npm ci\n\n    - name: Install Playwright browsers\n      run: npx playwright install --with-deps\n\n    - name: Run Playwright tests\n      run: npx playwright test --reporter=html\n\n    - name: Upload Playwright report\n      uses: actions/upload-artifact@v4\n      with:\n        name: playwright-report\n        path: playwright-report\n```\n\n### ③ レポートの閲覧\n- **Artifacts** からダウンロードしてローカルで確認可能  \n- さらに `actions/upload-pages-artifact` と `actions/deploy-pages` を組み合わせれば、レポートを GitHub Pages に自動公開できます。\n\n---\n\n## 3. 今後の利用方法\n\n1. **Pull Request で確認**  \n   PR 作成時に自動でテストが走り、失敗した場合はビデオ・スクリーンショット付きで失敗箇所を把握できます。\n\n2. **レポート閲覧**  \n   Actions の該当ジョブ画面から **Artifacts** を開くと `playwright-report/index.html` をダウンロードし、ブラウザで開くだけで詳細レポートが確認できます。\n\n3. **CI 時のブランチ別実行**  \n   必要に応じて `on: pull_request` を除外・追加して、開発フローに合わせて調整してください。\n\n---\n\n### まとめ  \nPlaywright を GitHub Actions に組み込み、テスト結果をレポートとして生成・公開する設定を完了しました。これにより、コード変更時に自動で E2E テストが走り、失敗時の詳細情報をすぐに確認できるようになりました。何か追加の要望や不明点があれば遠慮なく教えてください！"
+  },
+  "c47c6f055de21f409f13f5ffe7eb23b06e25e477c72530c1df4d38ed5ce81048": {
+    "timestamp": 1769526659029,
+    "latencyMs": 146903,
+    "content": "{\"completed_ids\":[91]}"
   }
 }
