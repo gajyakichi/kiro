@@ -285,19 +285,19 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
           <div className="flex bg-(-sidebar-bg) p-1.5 rounded-xl border border-(-border-color) gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
              <button 
                 onClick={() => onUpdateIconSet('lucide')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'lucide' ? 'bg-(-theme-primary) text-white shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'lucide' ? 'bg-(-theme-primary) text-(-foreground) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
              >
                 LUCIDE
              </button>
              <button 
                 onClick={() => onUpdateIconSet('phosphor')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'phosphor' ? 'bg-(-theme-primary) text-white shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'phosphor' ? 'bg-(-theme-primary) text-(-foreground) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
              >
                 PHOSPHOR
              </button>
              <button 
                 onClick={() => onUpdateIconSet('original')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'original' ? 'bg-(-theme-primary) text-white shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'original' ? 'bg-(-theme-primary) text-(-foreground) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
              >
                 ORIGINAL
              </button>
@@ -318,13 +318,13 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
           <div className="flex bg-(-sidebar-bg) p-1.5 rounded-xl border border-(-border-color) gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
              <button 
                 onClick={() => onUpdateSkin('notion')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin !== 'vscode' ? 'bg-(-theme-primary) text-white shadow-lg' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin !== 'vscode' ? 'bg-(-theme-primary) text-(-foreground) shadow-lg' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
              >
                 ROUND (DEFAULT)
              </button>
              <button 
                 onClick={() => onUpdateSkin('vscode')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin === 'vscode' ? 'bg-(-theme-primary) text-white shadow-lg' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin === 'vscode' ? 'bg-(-theme-primary) text-(-foreground) shadow-lg' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
              >
                 COMPACT (DENSE)
              </button>
