@@ -749,10 +749,12 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style key={activeTheme?.id || 'default'} dangerouslySetInnerHTML={{ __html: `
         ${activeTheme?.css || ''}
-        .theme-active body { background-color: var(--background) !important; color: var(--foreground) !important; }
-        .theme-active .notion-card { border-color: var(--border-color); }
+        .theme-active { 
+          background-color: var(--background) !important; 
+          color: var(--foreground) !important; 
+        }
       `}} />
     </div>
   );
