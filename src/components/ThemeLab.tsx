@@ -115,7 +115,7 @@ h1, h2, h3 { color: #268bd2 !important; }
     {
       name: "Darcula",
       isPreset: true,
-      css: `html, body { background: #2b2b2b !important; color: #a9b7c6 !important; font-weight: 450; }
+      css: `html, body { background: #2b2b2b !important; color: #a9b7c6 !important; font-weight: 450; --background: #2b2b2b; --foreground: #a9b7c6; --card-bg: #313335; --sidebar-bg: #3c3f41; --hover-bg: rgba(255,255,255,0.1); --border-color: #4e5052; --theme-primary: #cc7832; --theme-primary-bg: rgba(204, 120, 50, 0.15); --theme-accent: #cc7832; }
 .notion-sidebar { background: #3c3f41 !important; border-right: 1px solid #2b2b2b !important; }
 .notion-card { background: #313335 !important; border: 1px solid #4e5052 !important; box-shadow: none !important; color: #cfd8dc !important; }
 .notion-item:hover, .notion-item.active { background: #4e5254 !important; color: #cc7832 !important; }
