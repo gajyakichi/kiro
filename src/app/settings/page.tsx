@@ -121,7 +121,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                 value={newVaultName}
                 onChange={(e) => setNewVaultName(e.target.value)}
                 placeholder={t.vault_name_placeholder}
-                className="w-full p-4 bg-white border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 transition-all font-medium"
+                className="w-full p-4 bg-(--card-bg) border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 transition-all font-medium"
               />
             </div>
             <div className="space-y-2">
@@ -132,7 +132,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                   value={newVaultPath}
                   onChange={(e) => setNewVaultPath(e.target.value)}
                   placeholder={t.dir_path_placeholder}
-                  className="w-full p-4 bg-white border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 pr-12 transition-all font-mono"
+                  className="w-full p-4 bg-(--card-bg) border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 pr-12 transition-all font-mono"
                 />
                 <button 
                   onClick={handleSelectDirectory}
@@ -165,8 +165,8 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
             key={vault.id} 
             className={`group flex items-center justify-between p-5 rounded-2xl border-2 transition-all ${
               vault.active 
-                ? 'border-(--theme-primary) bg-white shadow-md' 
-                : 'border-(--border-color) hover:border-neutral-300 bg-white/50'
+                ? 'border-(--theme-primary) bg-(--card-bg) shadow-md' 
+                : 'border-(--border-color) hover:border-neutral-300 bg-(--card-bg)/50'
             }`}
           >
             <div className="flex items-center gap-5">
@@ -392,7 +392,7 @@ export default function SettingsPage() {
       <div className="max-w-3xl mx-auto py-16 px-6">
         <header className="flex items-center justify-between mb-16">
           <div className="flex items-center gap-6">
-            <Link href="/" className="p-3 hover:bg-(--hover-bg) rounded-2xl transition-all shadow-sm bg-white border border-(--border-color)">
+            <Link href="/" className="p-3 hover:bg-(--hover-bg) rounded-2xl transition-all shadow-sm bg-(--card-bg) border border-(--border-color)">
               <ArrowLeft size={20} />
             </Link>
             <div>
@@ -428,7 +428,7 @@ export default function SettingsPage() {
 
         <div className="space-y-12 pb-32">
           {/* Section: Storage Mode */}
-          <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm">
+          <section className="bg-(--card-bg) p-8 rounded-3xl border border-(--border-color) shadow-sm">
             <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
               <Server size={22} className="text-(--theme-primary) opacity-40" />
               {t.storage_identity}
@@ -439,7 +439,7 @@ export default function SettingsPage() {
                 className={`flex flex-col p-6 rounded-2xl border-2 transition-all text-left group ${
                   config.STORAGE_MODE === 'local' 
                     ? 'border-(--theme-primary) bg-(--theme-primary-bg)' 
-                    : 'border-(--border-color) hover:border-neutral-300 bg-white'
+                    : 'border-(--border-color) hover:border-neutral-300 bg-(--card-bg)'
                 }`}
               >
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'local' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
@@ -453,7 +453,7 @@ export default function SettingsPage() {
                 className={`flex flex-col p-6 rounded-2xl border-2 transition-all text-left group ${
                   config.STORAGE_MODE === 'server' 
                     ? 'border-(--theme-primary) bg-(--theme-primary-bg)' 
-                    : 'border-(--border-color) hover:border-neutral-300 bg-white'
+                    : 'border-(--border-color) hover:border-neutral-300 bg-(--card-bg)'
                 }`}
               >
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'server' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
@@ -467,7 +467,7 @@ export default function SettingsPage() {
 
           {/* Section: Vault Manager */}
           {config.STORAGE_MODE === 'local' && (
-            <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm animate-fade-in relative overflow-hidden">
+            <section className="bg-(--card-bg) p-8 rounded-3xl border border-(--border-color) shadow-sm animate-fade-in relative overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-(--theme-primary)"></div>
               <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
                 <LayoutGrid size={22} className="text-(--theme-primary) opacity-40" />
@@ -478,7 +478,7 @@ export default function SettingsPage() {
           )}
 
           {config.STORAGE_MODE === 'server' && (
-            <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm animate-fade-in">
+            <section className="bg-(--card-bg) p-8 rounded-3xl border border-(--border-color) shadow-sm animate-fade-in">
               <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
                 <Database size={22} className="text-(--theme-primary) opacity-40" />
                 {t.sql_connection}
@@ -499,7 +499,7 @@ export default function SettingsPage() {
           )}
 
           {/* Section: Plugin Management */}
-          <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm">
+          <section className="bg-(--card-bg) p-8 rounded-3xl border border-(--border-color) shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold flex items-center gap-3">
                 <Package size={22} className="text-(--theme-primary) opacity-40" />
@@ -523,7 +523,7 @@ export default function SettingsPage() {
                 return (
                   <div key={plugin.id} className="group relative flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100 hover:border-neutral-200 transition-all">
                     <div className="flex items-start gap-4 flex-1">
-                      <div className={`p-3 rounded-xl transition-colors ${isEnabled ? 'bg-(--theme-primary) text-white shadow-md shadow-(--theme-primary)/20' : 'bg-white text-neutral-300'}`}>
+                      <div className={`p-3 rounded-xl transition-colors ${isEnabled ? 'bg-(--theme-primary) text-white shadow-md shadow-(--theme-primary)/20' : 'bg-(--card-bg) text-neutral-300'}`}>
                         <Blocks size={20} />
                       </div>
                       <div>
@@ -541,7 +541,7 @@ export default function SettingsPage() {
                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button 
                                 onClick={() => handleExportPlugin(plugin)}
-                                className="p-2 text-neutral-400 hover:text-(--theme-primary) hover:bg-white rounded-lg transition-all"
+                                className="p-2 text-neutral-400 hover:text-(--theme-primary) hover:bg-(--card-bg) rounded-lg transition-all"
                                 title="Export JSON to Clipboard"
                             >
                                 <Cloud size={16} />
@@ -549,7 +549,7 @@ export default function SettingsPage() {
                             {!isSystem && (
                                 <button 
                                     onClick={() => handleDeletePlugin(plugin.id, plugin.name)}
-                                    className="p-2 text-neutral-400 hover:text-red-500 hover:bg-white rounded-lg transition-all"
+                                    className="p-2 text-neutral-400 hover:text-red-500 hover:bg-(--card-bg) rounded-lg transition-all"
                                     title="Delete Plugin"
                                 >
                                     <X size={16} />
@@ -561,7 +561,7 @@ export default function SettingsPage() {
                           onClick={() => handlePluginToggle(plugin.id)}
                           className={`relative w-12 h-7 rounded-full transition-colors ${isEnabled ? 'bg-(--theme-primary)' : 'bg-neutral-200'}`}
                         >
-                          <div className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full shadow-sm transition-transform ${isEnabled ? 'translate-x-5' : ''}`}></div>
+                          <div className={`absolute top-1 left-1 bg-(--card-bg) w-5 h-5 rounded-full shadow-sm transition-transform ${isEnabled ? 'translate-x-5' : ''}`}></div>
                         </button>
                     </div>
                   </div>
@@ -574,7 +574,7 @@ export default function SettingsPage() {
           </section>
 
           {/* Section: AI Configuration */}
-          <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm">
+          <section className="bg-(--card-bg) p-8 rounded-3xl border border-(--border-color) shadow-sm">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-xl font-bold flex items-center gap-3">
                 <ShieldCheck size={22} className="text-(--theme-primary) opacity-40" />
@@ -589,7 +589,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setConfig({ ...config, AI_PROVIDER: 'openai' })}
                   className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-xs font-black transition-all ${
-                    config.AI_PROVIDER === 'openai' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                    config.AI_PROVIDER === 'openai' ? 'bg-(--card-bg) shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
                   }`}
                 >
                   <Cloud size={16} />
@@ -598,7 +598,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setConfig({ ...config, AI_PROVIDER: 'ollama' })}
                   className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-xs font-black transition-all ${
-                    config.AI_PROVIDER === 'ollama' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                    config.AI_PROVIDER === 'ollama' ? 'bg-(--card-bg) shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
                   }`}
                 >
                   <Server size={16} />
@@ -614,7 +614,7 @@ export default function SettingsPage() {
                     <button 
                       onClick={() => setConfig({ ...config, APP_LANG: 'en' })}
                       className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${
-                        config.APP_LANG === 'en' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                        config.APP_LANG === 'en' ? 'bg-(--card-bg) shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
                       }`}
                     >
                       <Languages size={16} />
@@ -624,7 +624,7 @@ export default function SettingsPage() {
                       <button 
                         onClick={() => setConfig({ ...config, APP_LANG: 'ja' })}
                         className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${
-                          config.APP_LANG === 'ja' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                          config.APP_LANG === 'ja' ? 'bg-(--card-bg) shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
                         }`}
                       >
                         <Languages size={16} />
