@@ -949,7 +949,7 @@ export default function Home() {
                         placeholder="Search timeline..." 
                         value={timelineSearch}
                         onChange={(e) => setTimelineSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 text-sm border border-(--border-color) rounded-lg focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 text-(--foreground) placeholder:text-(--foreground) placeholder:opacity-40"
+                        className="w-full pl-9 pr-4 py-2 text-sm border border-(--border-color) rounded-lg focus:outline-none focus:border-(--theme-primary) focus:ring-1 focus:ring-(--theme-primary) text-(--foreground) placeholder:text-(--foreground) placeholder:opacity-40 transition-all"
                         style={{ backgroundColor: 'var(--card-bg)' }}
                       />
                    </div>
@@ -966,7 +966,7 @@ export default function Home() {
                           onClick={() => setTimelineFilter(filter.id as TimelineFilter)}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                             timelineFilter === filter.id 
-                              ? 'bg-(--theme-primary) text-(--background) shadow-md' 
+                              ? 'bg-(--theme-primary) text-white shadow-md' 
                               : 'bg-(--card-bg) border border-(--border-color) text-(--foreground) opacity-60 hover:bg-(--hover-bg)'
                           }`}
                         >
