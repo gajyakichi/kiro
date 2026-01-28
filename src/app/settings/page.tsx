@@ -112,7 +112,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
       </div>
 
       {isAdding && (
-        <div className="bg-(--theme-primary-bg) p-3 rounded-lg border border-[var(--border-color)] animate-in slide-in-from-top-2 duration-300">
+        <div className="bg-(--theme-primary-bg) px-3 py-2 rounded-md border-[var(--border-color)] animate-in slide-in-from-top-2 duration-300">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-(--theme-primary) uppercase tracking-widest opacity-60">{t.vault_name_label}</label>
@@ -163,7 +163,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
         {vaults.map((vault) => (
           <div 
             key={vault.id} 
-            className={`group flex items-center justify-between p-3 rounded-lg border-2 transition-all ${
+            className={`group flex items-center justify-between px-3 py-2 rounded-md border transition-all ${
               vault.active 
                 ? 'border-(--theme-primary) bg-[var(--card-bg)] shadow-md' 
                 : 'border-[var(--border-color)] hover:border-[var(--border-color)] bg-[var(--card-bg)]/50'
@@ -388,7 +388,7 @@ export default function SettingsPage() {
   const t = getTranslation(config.APP_LANG);
 
   return (
-    <div className={`min-h-screen font-sans ${activeTheme ? 'theme-active' : ''}`} style={{ backgroundColor: '#2e3440', color: '#d8dee9' }}>
+    <div className={`min-h-screen font-sans bg-(--background) text-(--foreground) ${activeTheme ? 'theme-active' : ''}`} >
       <div className="max-w-4xl mx-auto py-6 px-4">
         <header className="flex items-center justify-between mb-4 pb-4 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-2">
@@ -414,7 +414,7 @@ export default function SettingsPage() {
         </header>
 
         {message && (
-          <div className={`mb-6 p-3 rounded-lg flex items-center gap-3 border text-xs animate-in slide-in-from-top-4 duration-500 ${
+          <div className={`mb-6 px-3 py-2 rounded-md flex items-center gap-3 border text-xs animate-in slide-in-from-top-4 duration-500 ${
             message.type === 'success' 
               ? 'bg-(--theme-success-bg) border-(--theme-success)/10 text-(--theme-success)' 
               : 'bg-(--theme-error-bg) border-(--theme-error)/10 text-(--theme-error)'
@@ -428,7 +428,7 @@ export default function SettingsPage() {
 
         <div className="space-y-4 pb-16">
           {/* Section: Storage Mode */}
-          <section className="bg-[var(--card-bg)] p-3 rounded-lg border border-[var(--border-color)] shadow-sm">
+          <section className="bg-[var(--card-bg)] px-3 py-2 rounded-md border-[var(--border-color)] shadow-sm">
             <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
               <Server size={12} className="text-(--theme-primary) opacity-40" />
               {t.storage_identity}
@@ -436,7 +436,7 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <button
                 onClick={() => setConfig({ ...config, STORAGE_MODE: 'local' })}
-                className={`flex flex-col p-3 rounded-lg border-2 transition-all text-left group ${
+                className={`flex flex-col px-3 py-2 rounded-md border transition-all text-left group ${
                   config.STORAGE_MODE === 'local' 
                     ? 'border-(--theme-primary) bg-(--theme-primary-bg)' 
                     : 'border-[var(--border-color)] hover:border-[var(--border-color)] bg-[var(--card-bg)]'
@@ -450,7 +450,7 @@ export default function SettingsPage() {
               </button>
               <button
                 onClick={() => setConfig({ ...config, STORAGE_MODE: 'server' })}
-                className={`flex flex-col p-3 rounded-lg border-2 transition-all text-left group ${
+                className={`flex flex-col px-3 py-2 rounded-md border transition-all text-left group ${
                   config.STORAGE_MODE === 'server' 
                     ? 'border-(--theme-primary) bg-(--theme-primary-bg)' 
                     : 'border-[var(--border-color)] hover:border-[var(--border-color)] bg-[var(--card-bg)]'
@@ -467,7 +467,7 @@ export default function SettingsPage() {
 
           {/* Section: Vault Manager */}
           {config.STORAGE_MODE === 'local' && (
-            <section className="bg-[var(--card-bg)] p-3 rounded-lg border border-[var(--border-color)] shadow-sm animate-fade-in relative overflow-hidden">
+            <section className="bg-[var(--card-bg)] px-3 py-2 rounded-md border-[var(--border-color)] shadow-sm animate-fade-in relative overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-[var(--theme-primary)]"></div>
               <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
                 <LayoutGrid size={12} className="text-(--theme-primary) opacity-40" />
@@ -478,7 +478,7 @@ export default function SettingsPage() {
           )}
 
           {config.STORAGE_MODE === 'server' && (
-            <section className="bg-[var(--card-bg)] p-3 rounded-lg border border-[var(--border-color)] shadow-sm animate-fade-in">
+            <section className="bg-[var(--card-bg)] px-3 py-2 rounded-md border-[var(--border-color)] shadow-sm animate-fade-in">
               <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
                 <Database size={12} className="text-(--theme-primary) opacity-40" />
                 {t.sql_connection}
@@ -499,7 +499,7 @@ export default function SettingsPage() {
           )}
 
           {/* Section: Plugin Management */}
-          <section className="bg-[var(--card-bg)] p-3 rounded-lg border border-[var(--border-color)] shadow-sm">
+          <section className="bg-[var(--card-bg)] px-3 py-2 rounded-md border-[var(--border-color)] shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-base font-semibold flex items-center gap-3">
                 <Package size={12} className="text-(--theme-primary) opacity-40" />
@@ -574,7 +574,7 @@ export default function SettingsPage() {
           </section>
 
           {/* Section: AI Configuration */}
-          <section className="bg-[var(--card-bg)] p-3 rounded-lg border border-[var(--border-color)] shadow-sm">
+          <section className="bg-[var(--card-bg)] px-3 py-2 rounded-md border-[var(--border-color)] shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-semibold flex items-center gap-3">
                 <ShieldCheck size={12} className="text-(--theme-primary) opacity-40" />
