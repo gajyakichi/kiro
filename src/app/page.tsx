@@ -949,8 +949,7 @@ export default function Home() {
                         placeholder="Search timeline..." 
                         value={timelineSearch}
                         onChange={(e) => setTimelineSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 text-sm border border-(--border-color) rounded-lg focus:outline-none focus:border-(--theme-primary) focus:ring-1 focus:ring-(--theme-primary) text-(--foreground) placeholder:text-(--foreground) placeholder:opacity-40 transition-all"
-                        style={{ backgroundColor: 'var(--card-bg)' }}
+                        className="w-full pl-9 pr-4 py-2 bg-(--card-bg) border border-(--border-color) rounded-lg text-sm text-(--foreground) focus:outline-none focus:border-(--theme-primary) focus:ring-1 focus:ring-(--theme-primary) placeholder:text-(--foreground) placeholder:opacity-40 transition-all"
                       />
                    </div>
                    <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto no-scrollbar pb-1">
