@@ -14,11 +14,11 @@ export function AnnotationMenu({ onSelectAI, onSelectMemo }: AnnotationMenuProps
         {/* AI Chat Button */}
         <button
           onClick={onSelectAI}
-          className="group relative w-12 h-12 rounded-full bg-linear-to-tr from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-110"
+          className="group relative w-12 h-12 rounded-full bg-[#88c0d0] hover:bg-[#81a1c1] flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-110"
           title="AI Chat"
         >
-          <Bot size={20} className="text-white" />
-          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          <Bot size={20} className="text-[#2e3440]" />
+          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-[#616e88] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
             AI Chat
           </div>
         </button>
@@ -26,11 +26,11 @@ export function AnnotationMenu({ onSelectAI, onSelectMemo }: AnnotationMenuProps
         {/* Memo Button */}
         <button
           onClick={onSelectMemo}
-          className="group relative w-12 h-12 rounded-full bg-linear-to-tr from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-110"
+          className="group relative w-12 h-12 rounded-full bg-[#a3be8c] hover:bg-[#8fbcbb] flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-110"
           title="Add Memo"
         >
-          <FileEdit size={20} className="text-white" />
-          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          <FileEdit size={20} className="text-[#2e3440]" />
+          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-[#616e88] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
             Add Memo
           </div>
         </button>
