@@ -265,24 +265,24 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
     <div className="space-y-10 animate-fade-in pb-20">
       {/* Theme Selector Section */}
       <section>
-        <div className="flex items-center gap-3 mb-6">
-          <Palette size={24} className="text-[#616e88]" weight="bold" />
-          <h2 className="text-xl font-bold tracking-tight text-gray-800 uppercase">Theme Selector</h2>
+        <div className="flex items-center gap-2 mb-4">
+          <Palette size={16} className="text-[#616e88]" weight="bold" />
+          <h2 className="text-sm font-bold tracking-tight text-[#d8dee9] uppercase">Theme Selector</h2>
         </div>
 
         {/* Global Icon Settings Row */}
         {/* Global Icon Settings Row */}
-        <div className="mb-8 p-6 bg-(--card-bg) rounded-2xl border border-(--border-color) flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm overflow-hidden">
-          <div className="flex items-center gap-5 w-full md:w-auto overflow-hidden">
-             <div className="w-12 h-12 shrink-0 rounded-xl bg-(--background) border border-(--border-color) flex items-center justify-center shadow-xs">
-                <IconRenderer icon="Settings" size={24} className="text-neutral-500" baseSet={appIconSet} />
+        <div className="mb-4 p-3 bg-[#434c5e] rounded-lg border border-[#4c566a] flex flex-col md:flex-row items-center justify-between gap-3 shadow-sm overflow-hidden">
+          <div className="flex items-center gap-3 w-full md:w-auto overflow-hidden">
+             <div className="w-8 h-8 shrink-0 rounded-lg bg-[#3b4252] border border-[#4c566a] flex items-center justify-center shadow-xs">
+                <IconRenderer icon="Settings" size={16} className="text-[#616e88]" baseSet={appIconSet} />
              </div>
              <div className="min-w-0">
-                <p className="text-[15px] font-black text-(--foreground) tracking-tight truncate">Global Icon Set</p>
-                <p className="text-[11px] text-neutral-400 font-bold uppercase tracking-widest whitespace-nowrap truncate">Selected style applies everywhere</p>
+                <p className="text-xs font-bold text-[#d8dee9] tracking-tight truncate">Global Icon Set</p>
+                <p className="text-[9px] text-[#616e88] font-semibold uppercase tracking-widest whitespace-nowrap truncate">Selected style applies everywhere</p>
              </div>
           </div>
-          <div className="flex bg-(--background) p-1.5 rounded-xl border border-(--border-color) gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
+          <div className="flex bg-[#3b4252] p-1.5 rounded-xl border border-[#4c566a] gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
              <button 
                 onClick={() => onUpdateIconSet('lucide')}
                 className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'lucide' ? 'bg-(--theme-primary) text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-(--foreground) opacity-60 hover:opacity-100 hover:bg-(--hover-bg)'}`}
@@ -305,17 +305,17 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
         </div>
 
         {/* Global Skin Settings Row */}
-        <div className="mb-8 p-6 bg-(--card-bg) rounded-2xl border border-(--border-color) flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm overflow-hidden">
-          <div className="flex items-center gap-5 w-full md:w-auto overflow-hidden">
-             <div className="w-12 h-12 shrink-0 rounded-xl bg-(--background) border border-(--border-color) flex items-center justify-center shadow-xs">
-                <Palette size={24} className="text-neutral-500" weight="fill" />
+        <div className="mb-4 p-3 bg-[#434c5e] rounded-lg border border-[#4c566a] flex flex-col md:flex-row items-center justify-between gap-3 shadow-sm overflow-hidden">
+          <div className="flex items-center gap-3 w-full md:w-auto overflow-hidden">
+             <div className="w-8 h-8 shrink-0 rounded-lg bg-[#3b4252] border border-[#4c566a] flex items-center justify-center shadow-xs">
+                <Palette size={16} className="text-[#616e88]" weight="fill" />
              </div>
              <div className="min-w-0">
-                <p className="text-[15px] font-black text-(--foreground) tracking-tight truncate">Display Skin</p>
-                <p className="text-[11px] text-neutral-400 font-bold uppercase tracking-widest whitespace-nowrap truncate">Layout Density & Spacing</p>
+                <p className="text-xs font-bold text-[#d8dee9] tracking-tight truncate">Display Skin</p>
+                <p className="text-[9px] text-[#616e88] font-semibold uppercase tracking-widest whitespace-nowrap truncate">Layout Density & Spacing</p>
              </div>
           </div>
-          <div className="flex bg-(--background) p-1.5 rounded-xl border border-(--border-color) gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
+          <div className="flex bg-[#3b4252] p-1.5 rounded-xl border border-[#4c566a] gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
              <button 
                 onClick={() => onUpdateSkin('notion')}
                 className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appSkin !== 'vscode' ? 'bg-(--theme-primary) text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-(--foreground) opacity-60 hover:opacity-100 hover:bg-(--hover-bg)'}`}
@@ -331,19 +331,19 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
           </div>
         </div>
         
-        <div className="flex flex-wrap gap-6 pt-4 pb-4">
+        <div className="flex flex-wrap gap-3 pt-2 pb-2">
           <button 
             onClick={() => onToggle(null)}
             onMouseEnter={() => onPreview("")}
             onMouseLeave={() => onPreview(newCss)}
-            className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 transition-all duration-500 ease-in-out bg-(--card-bg) hover:-translate-y-3 hover:translate-x-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 active:scale-[0.98] outline-none relative ${!activeTheme ? 'border-(--theme-primary) shadow-xl' : 'border-(--border-color) hover:border-(--theme-primary)/50 opacity-70 hover:opacity-100'}`}
+            className={`group flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all duration-500 ease-in-out bg-[#434c5e] hover:-translate-y-1 hover:shadow-lg hover:z-20 active:scale-[0.98] outline-none relative ${!activeTheme ? 'border-(--theme-primary) shadow-xl' : 'border-[#4c566a] hover:border-(--theme-primary)/50 opacity-70 hover:opacity-100'}`}
           >
-            <div className={`w-10 h-10 rounded-full bg-[#434c5e] border border-[#4c566a] flex items-center justify-center text-[#616e88] group-hover:scale-110 transition-transform duration-500 ${!activeTheme ? 'text-foreground border-foreground/10' : ''}`}>
-              {!activeTheme ? <CheckCircle size={22} weight="fill" className="text-foreground" /> : <Circle size={22} />}
+            <div className={`w-6 h-6 rounded-full bg-[#434c5e] border border-[#4c566a] flex items-center justify-center text-[#616e88] group-hover:scale-110 transition-transform duration-500 ${!activeTheme ? 'text-foreground border-foreground/10' : ''}`}>
+              {!activeTheme ? <CheckCircle size={14} weight="fill" className="text-foreground" /> : <Circle size={14} />}
             </div>
             <div className="text-left">
-              <div className="font-black text-sm tracking-tight">Original</div>
-              <div className="text-[10px] text-[#616e88] uppercase tracking-widest font-black opacity-60">Default System</div>
+              <div className="font-bold text-xs tracking-tight">Original</div>
+              <div className="text-[9px] text-[#616e88] uppercase tracking-widest font-semibold opacity-60">Default System</div>
             </div>
           </button>
 
@@ -354,9 +354,9 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               onClick={() => handleQuickAdd(preset)}
               onMouseEnter={() => onPreview(preset.css)}
               onMouseLeave={() => onPreview(newCss)}
-              className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 border-(--border-color) bg-(--card-bg) transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 opacity-70 hover:opacity-100 active:scale-[0.98] outline-none relative`}
+              className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 border-[#4c566a] bg-[#434c5e] transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 opacity-70 hover:opacity-100 active:scale-[0.98] outline-none relative`}
             >
-              <div className="w-10 h-10 rounded-full bg-(--hover-bg) border border-(--border-color) flex items-center justify-center text-gray-300 group-hover:scale-110 transition-transform">
+              <div className="w-10 h-10 rounded-full bg-(--hover-bg) border border-[#4c566a] flex items-center justify-center text-gray-300 group-hover:scale-110 transition-transform">
                 <Circle size={22} />
               </div>
               <div className="text-left">
@@ -374,9 +374,9 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               onClick={() => onToggle(theme)}
               onMouseEnter={() => onPreview(theme.css)}
               onMouseLeave={() => onPreview(newCss)}
-              className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 transition-all duration-500 ease-in-out bg-(--card-bg) hover:-translate-y-3 hover:translate-x-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 active:scale-[0.98] outline-none relative ${theme.active ? 'border-(--theme-primary) shadow-xl' : 'border-(--border-color) hover:border-(--theme-primary)/50 opacity-70 hover:opacity-100'}`}
+              className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 transition-all duration-500 ease-in-out bg-[#434c5e] hover:-translate-y-3 hover:translate-x-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 active:scale-[0.98] outline-none relative ${theme.active ? 'border-(--theme-primary) shadow-xl' : 'border-[#4c566a] hover:border-(--theme-primary)/50 opacity-70 hover:opacity-100'}`}
             >
-              <div className={`w-10 h-10 rounded-full bg-(--hover-bg) border border-(--border-color) flex items-center justify-center text-[#616e88] group-hover:scale-110 transition-transform duration-500 ${theme.active ? 'text-(--theme-primary) border-(--theme-primary)/20' : ''}`}>
+              <div className={`w-10 h-10 rounded-full bg-(--hover-bg) border border-[#4c566a] flex items-center justify-center text-[#616e88] group-hover:scale-110 transition-transform duration-500 ${theme.active ? 'text-(--theme-primary) border-(--theme-primary)/20' : ''}`}>
                 {theme.active ? <CheckCircle size={22} weight="fill" className="text-foreground" /> : <Circle size={22} />}
               </div>
               <div className="text-left relative">
@@ -557,11 +557,11 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                          <span className="opacity-50 line-through">Completed Task</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs">
-                         <div className="w-4 h-4 rounded border border-(--border-color)"></div>
+                         <div className="w-4 h-4 rounded border border-[#4c566a]"></div>
                          <span>Pending Task</span>
                       </div>
                    </div>
-                   <div className="flex items-center gap-2 pt-2 border-t border-(--border-color) opacity-50 uppercase text-[8px] font-black tracking-widest">
+                   <div className="flex items-center gap-2 pt-2 border-t border-[#4c566a] opacity-50 uppercase text-[8px] font-black tracking-widest">
                       <Clock size={10} /> 2 Minutes Ago
                    </div>
                 </div>
