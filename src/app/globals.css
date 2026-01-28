@@ -145,3 +145,109 @@ html, body {
 
 [data-skin="vscode"] h1 { font-size: 1.3em !important; }
 [data-skin="vscode"] h2 { font-size: 1.1em !important; }
+
+/* VS Code Skin - Git Badge Overrides */
+[data-skin="vscode"] .font-mono span.bg-\(--theme-primary-bg\) {
+  background-color: transparent !important;
+  color: #007acc !important; /* VS Code Blue for hash */
+  border: none !important;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace !important;
+  font-weight: normal !important;
+  text-decoration: underline; /* Clickable look */
+}
+
+[data-skin="vscode"] .text-\[10px\].bg-\(--theme-primary\),
+[data-skin="vscode"] .text-\[10px\].bg-\(--theme-accent\) {
+  border-radius: 2px !important;
+  font-weight: normal !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  padding: 1px 6px !important;
+}
+
+[data-skin="vscode"] .text-\[10px\].notion-text-subtle.bg-\(--theme-primary-bg\) {
+  background: transparent !important;
+  border: none !important;
+  color: #858585 !important;
+  padding: 0 !important;
+  font-weight: normal !important;
+  letter-spacing: 0 !important;
+}
+
+/* VS Code Skin - Timeline Density */
+[data-skin="vscode"] .timeline-row {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  border-left: 1px solid var(--border-color); /* Gutter line */
+  margin-left: -12px !important;
+  padding-left: 12px !important;
+}
+
+[data-skin="vscode"] .timeline-row:hover {
+  background: rgba(128, 128, 128, 0.05) !important;
+}
+
+[data-skin="vscode"] .timeline-icon {
+  width: 16px !important;
+  height: 16px !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  opacity: 0.7;
+  transform: none !important; /* Disable hover scale */
+  /* Make it look like a gutter icon */
+}
+
+[data-skin="vscode"] .timeline-icon svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+[data-skin="vscode"] summary {
+  margin-bottom: 0 !important;
+  min-height: 0 !important;
+}
+
+/* Hide noisy labels in VS Code mode */
+[data-skin="vscode"] span.bg-\(--theme-accent\),
+[data-skin="vscode"] span.bg-\(--theme-primary\) {
+  display: none !important; /* Hide "Daily Summary", "Task Added" badges */
+}
+
+/* Make content font dense */
+[data-skin="vscode"] p, 
+[data-skin="vscode"] .markdown-content {
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+}
+
+/* VS Code Skin - ThemeLab & Settings Density */
+[data-skin="vscode"] .bg-neutral-50, 
+[data-skin="vscode"] .bg-white,
+[data-skin="vscode"] .rounded-2xl,
+[data-skin="vscode"] .rounded-xl,
+[data-skin="vscode"] .rounded-lg,
+[data-skin="vscode"] .rounded-md {
+  border-radius: 0 !important;
+}
+
+[data-skin="vscode"] .p-6, [data-skin="vscode"] .p-8 {
+  padding: 12px !important;
+}
+
+[data-skin="vscode"] .gap-6, [data-skin="vscode"] .gap-8 {
+  gap: 12px !important;
+}
+
+[data-skin="vscode"] button {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-weight: normal !important;
+}
+
+[data-skin="vscode"] .shadow-sm, [data-skin="vscode"] .shadow-lg, [data-skin="vscode"] .shadow-xl, [data-skin="vscode"] .shadow-2xl {
+  box-shadow: none !important;
+  border: 1px solid var(--border-color) !important;
+}

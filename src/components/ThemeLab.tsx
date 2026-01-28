@@ -194,10 +194,21 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
   };
 
   const handleExport = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(themes.filter(t => !t.isPreset), null, 2));
+    // Export full configuration: skin, icon set, and custom themes
+    const exportData = {
+      type: 'kiro-config',
+      version: 1,
+      settings: {
+        appSkin,
+        appIconSet
+      },
+      themes: themes.filter(t => !t.isPreset)
+    };
+    
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
     const downloadAnchorNode = document.createElement('a');
     downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "kiro_themes.json");
+    downloadAnchorNode.setAttribute("download", "kiro_config.json");
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
@@ -210,20 +221,41 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
       fileReader.onload = async (e) => {
         try {
           if (e.target?.result) {
-            const importedThemes = JSON.parse(e.target.result as string) as Theme[];
-            if (Array.isArray(importedThemes)) {
-              for (const theme of importedThemes) {
+            const rawData = JSON.parse(e.target.result as string);
+            
+            // Check if it's the new config format
+            if (rawData.type === 'kiro-config' && rawData.settings) {
+                if (rawData.settings.appSkin) onUpdateSkin(rawData.settings.appSkin);
+                if (rawData.settings.appIconSet) onUpdateIconSet(rawData.settings.appIconSet);
+                
+                if (Array.isArray(rawData.themes)) {
+                    let importedCount = 0;
+                    for (const theme of rawData.themes) {
+                        if (!theme.name || !theme.css) continue;
+                        await onSave(theme.name, theme.css, false, false);
+                        importedCount++;
+                    }
+                    alert(`Configuration imported!\n- Updated Settings\n- Imported ${importedCount} themes`);
+                } else {
+                    alert('Configuration imported (Settings updated)');
+                }
+            } 
+            // Legacy support: Array of themes
+            else if (Array.isArray(rawData)) {
+              for (const theme of rawData) {
                 // Skip if not valid theme object
                 if (!theme.name || !theme.css) continue;
                 // Import as new custom theme
                 await onSave(theme.name, theme.css, false, false);
               }
-              alert(`Successfully imported ${importedThemes.length} themes!`);
+              alert(`Successfully imported ${rawData.length} themes!`);
+            } else {
+                 alert("Unknown file format.");
             }
           }
         } catch (error) {
           console.error("Error importing themes:", error);
-          alert("Failed to import themes. Invalid JSON file.");
+          alert("Failed to import. Invalid JSON file.");
         }
       };
     }
@@ -389,23 +421,22 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
           >
             {isAdding ? "Close Editor" : "Open CSS Editor"}
           </button>
-          
-          <div className="flex gap-2 ml-2">
-             <button
-               onClick={handleExport}
-               title="Export Custom Themes"
-               className="p-2 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-foreground transition-all"
-             >
-                <DownloadSimple size={18} weight="bold" />
-             </button>
-             <label
-               title="Import Themes JSON"
-               className="p-2 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-foreground transition-all cursor-pointer"
-             >
-                <UploadSimple size={18} weight="bold" />
-                <input type="file" accept=".json" onChange={handleImport} className="hidden" />
-             </label>
-          </div>
+                    <div className="flex gap-2 ml-2">
+              <button
+                onClick={handleExport}
+                title="Export Configuration (Themes, Skin, Icons)"
+                className="p-2 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-foreground transition-all"
+              >
+                 <DownloadSimple size={18} weight="bold" />
+              </button>
+              <label
+                title="Import Configuration"
+                className="p-2 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-foreground transition-all cursor-pointer"
+              >
+                 <UploadSimple size={18} weight="bold" />
+                 <input type="file" accept=".json" onChange={handleImport} className="hidden" />
+              </label>
+           </div>
         </div>
 
         {isAdding && (

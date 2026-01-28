@@ -228,5 +228,20 @@
     "timestamp": 1769557854205,
     "latencyMs": 150911,
     "content": "{\"tasks\":[\"AIレスポンスのオフラインキャッシュを実装し、ネットワーク障害時のフォールバックを提供する\",\"axe-coreを用いた自動アクセシビリティテストをCIに統合し、WCAG AA違反を検出する\",\"テーマラボ用の設定ページを作成し、テーマのカスタマイズや保存・共有を行えるようにする\",\"タイムラインデータの一括インポート/エクスポート機能を追加し、JSON形式でデータ移行を可能にする\",\"未使用コンポーネントの削除と動的インポートをさらに最適化し、バンドルサイズを最大15％削減する\"]}"
+  },
+  "b83dbb47c5fd1585522599392e3084f5d4a2bac092721b83e7d7f685b5821a3b": {
+    "timestamp": 1769558640985,
+    "latencyMs": 87729,
+    "content": "{ \"completed_ids\": [16] }"
+  },
+  "27b641bc6c1800c11cad4b9827fe446da1dea791bbec65aa717a979c80837d8b": {
+    "timestamp": 1769558648470,
+    "latencyMs": 95218,
+    "content": "{\"tasks\":[\"ユニットテストとE2Eテストのカバレッジを100％に近づけるための追加テストを書く\",\"Tailwind v4 で定義されているクラスを使い、レスポンシブデザイン（モバイル・タブレット）を実装する\",\"暗いテーマ（ダークモード）を追加し、ユーザーが切り替えられるようにする\",\"パフォーマンスを向上させるため、重いコンポーネントのプリフェッチとコードスプリッティングを検討する\",\"READMEとドキュメントを拡充し、API使用例・FAQを追加する\"]}"
+  },
+  "604a18c58010b118abc6566307a656f9413505c5eeaf541cddfe1ef8f29ba418": {
+    "timestamp": 1769558674270,
+    "latencyMs": 121016,
+    "content": "{\"en\":\"- Implemented Display Skin feature for Notion/VS Code.\\n- Removed Development Notes menu and hid completed tasks.\\n- Restored SuggestedTasks to Timeline view.\\n- Updated AI cache logic.\\n- Fixed Timeline icons and enhanced note deletion/editing.\\n- Bumped Tailwind to v4 and resolved lint issues.\\n- Added inline AI chat to Timeline items and Current Status.\\n- Consolidated Timeline view with search/filter, removed unused components.\\n- Added Import/Export theme support in ThemeLab.\\n- Corrected DATABASE_URL reference in README.\\n- Introduced Playwright E2E tests and CI integration for the Electron app.\\n- Split heatmap component and enabled dynamic imports for bundle optimization.\\n- Added MIT license, updated README with bilingual content, renamed app to Kiro, and updated icon.\\n- Finalized calendar UI, AI caching, and documentation.\\n- Improved WCAG AA compliance (semantics, aria‑labels).\\n- Fixed lint errors in page.tsx and updated system calendar to match timeline design.\\n\\n**Key technical shifts**: Tailwind v4 migration, dynamic imports, AI caching improvements, comprehensive E2E testing, WCAG AA upgrades, and significant UI/UX refinements.\",\"ja\":\"- Notion/VS Code用 Display Skin 機能実装。\\n- Development Notes メニューを削除し、完了タスクを非表示化。\\n- Timeline ビューへ SuggestedTasks を復帰。\\n- AI キャッシュの更新。\\n- Timeline アイコン修正とノート削除／編集機能の強化。\\n- Tailwind を v4 に更新し、Lint エラーを解消。\\n- Timeline 項目と Current Status にインライン AI チャットを追加。\\n- 検索／フィルタ付き統合 Timeline ビューへリファクタリングし、未使用コンポーネントを削除。\\n- ThemeLab にテーマのインポート／エクスポート機能を追加。\\n- README の DATABASE_URL を正しく修正。\\n- Playwright を用いた E2E テストを追加し、CI へ統合。\\n- Heatmap コンポーネントを分離し、バンドル最適化のため動的インポートを有効化。\\n- MIT ライセンス追加、README を二言語対応に更新、アプリ名を Kiro に変更、アイコンを更新。\\n- カレンダー UI、AI キャッシュ、ドキュメントを最終化。\\n- WCAG AA（意味合い、aria-label）への準拠を改善。\\n- page.tsx の lint エラーを修正し、システムカレンダーを Timeline デザインに合わせて更新。\\n\\n**主な技術変更点**: Tailwind v4 への移行、動的インポート、AI キャッシュの改善、包括的な E2E テスト、WCAG AA の向上、UI/UX の大幅なリファイン。」}\"}"
   }
 }

@@ -1022,7 +1022,7 @@ export default function Home() {
 
                       return (
                         <div key={`${entryType}-${entry.id}`} className="group relative">
-                          <div className="flex gap-4 items-start py-6 -mx-4 px-4 hover:bg-gray-50/50 rounded-2xl transition-all">
+                          <div className="timeline-row flex gap-4 items-start py-6 -mx-4 px-4 hover:bg-gray-50/50 rounded-2xl transition-all">
                             {/* Marker Icon (Clickable for AI Chat) */}
                             <button 
                                 onClick={(e) => {
@@ -1033,7 +1033,7 @@ export default function Home() {
                                         `Chat about ${typeLabel}`
                                     );
                                 }}
-                                className="shrink-0 w-6 h-6 rounded-full bg-white border-2 border-(--theme-primary-bg) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 group-hover:border-(--theme-primary) transition-all z-10 cursor-pointer hover:bg-blue-50"
+                                className="timeline-icon shrink-0 w-6 h-6 rounded-full bg-white border-2 border-(--theme-primary-bg) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 group-hover:border-(--theme-primary) transition-all z-10 cursor-pointer hover:bg-blue-50"
                                 title="Ask AI about this item"
                             >
                               {icon}
