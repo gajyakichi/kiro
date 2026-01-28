@@ -943,13 +943,13 @@ export default function Home() {
                   style={{ backgroundColor: 'var(--background)' }}
                 >
                    <div className="relative w-full md:w-auto md:min-w-[300px]">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-(--foreground) opacity-40" size={14} />
                       <input 
                         type="text" 
                         placeholder="Search timeline..." 
                         value={timelineSearch}
                         onChange={(e) => setTimelineSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 text-sm border border-(--border-color) rounded-lg focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 text-(--foreground)"
+                        className="w-full pl-9 pr-4 py-2 text-sm border border-(--border-color) rounded-lg focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 text-(--foreground) placeholder:text-(--foreground) placeholder:opacity-40"
                         style={{ backgroundColor: 'var(--card-bg)' }}
                       />
                    </div>
@@ -970,7 +970,7 @@ export default function Home() {
                               : 'bg-(--card-bg) border border-(--border-color) text-(--foreground) opacity-60 hover:bg-(--hover-bg)'
                           }`}
                         >
-                          {filter.icon && <IconRenderer icon={filter.icon} size={12} baseSet={appIconSet} className={timelineFilter === filter.id ? 'text-white' : 'text-gray-400'} />}
+                          {filter.icon && <IconRenderer icon={filter.icon} size={12} baseSet={appIconSet} className={timelineFilter === filter.id ? 'text-white' : 'text-(--foreground) opacity-60'} />}
                           {filter.label}
                         </button>
                       ))}
