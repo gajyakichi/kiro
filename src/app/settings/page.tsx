@@ -153,7 +153,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
           </div>
           <button 
             onClick={handleAdd}
-            className="w-full py-3 bg-(-theme-primary) text-white rounded-xl text-xs font-black shadow-lg shadow-(--theme-primary)/10 hover:opacity-90 transition-all"
+            className="w-full py-3 bg-(-theme-primary) text-white rounded-lg text-xs font-black shadow-lg shadow-(--theme-primary)/10 hover:opacity-90 transition-all"
           >
             {t.confirm_add_vault}
           </button>
@@ -590,8 +590,8 @@ export default function SettingsPage() {
               <div className="flex bg-(-card-bg) p-1.5 rounded-lg gap-1.5">
                 <button
                   onClick={() => setConfig({ ...config, AI_PROVIDER: 'openai' })}
-                  className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-xs font-black transition-all ${
-                    config.AI_PROVIDER === 'openai' ? 'bg-(-card-bg) shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
+                  className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-lg text-xs font-black transition-all ${
+                    config.AI_PROVIDER === 'openai' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
                   }`}
                 >
                   <Cloud size={12} />
@@ -599,8 +599,8 @@ export default function SettingsPage() {
                 </button>
                 <button
                   onClick={() => setConfig({ ...config, AI_PROVIDER: 'ollama' })}
-                  className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-xs font-black transition-all ${
-                    config.AI_PROVIDER === 'ollama' ? 'bg-(-card-bg) shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
+                  className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-lg text-xs font-black transition-all ${
+                    config.AI_PROVIDER === 'ollama' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
                   }`}
                 >
                   <Server size={12} />
@@ -615,8 +615,8 @@ export default function SettingsPage() {
                  <div className="flex bg-(-card-bg) p-1.5 rounded-lg gap-1.5">
                     <button 
                       onClick={() => setConfig({ ...config, APP_LANG: 'en' })}
-                      className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${
-                        config.APP_LANG === 'en' ? 'bg-(-card-bg) shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
+                      className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-black transition-all ${
+                        config.APP_LANG === 'en' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
                       }`}
                     >
                       <Languages size={12} />
@@ -625,8 +625,8 @@ export default function SettingsPage() {
                     {config.ENABLED_PLUGINS?.includes('plugin-jp') ? (
                       <button 
                         onClick={() => setConfig({ ...config, APP_LANG: 'ja' })}
-                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${
-                          config.APP_LANG === 'ja' ? 'bg-(-card-bg) shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
+                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-black transition-all ${
+                          config.APP_LANG === 'ja' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
                         }`}
                       >
                         <Languages size={12} />
