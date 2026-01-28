@@ -261,27 +261,27 @@ html, body {
 [data-skin="vscode"] .bg-neutral-50,
 [data-skin="vscode"] .bg-gray-50,
 [data-skin="vscode"] .bg-gray-100 {
-  background-color: var(--background) !important;
+  background-color: var(--background);
   color: var(--foreground) !important;
   border-color: var(--border-color) !important;
 }
 
 /* Ensure no white background leaks in inputs/groups */
 [data-skin="vscode"] .group input {
-  background-color: var(--background) !important;
+  background-color: var(--background);
 }
 
 /* Active states for timeline filters & buttons in VS Code skin */
 [data-skin="vscode"] .bg-\(--theme-primary\),
 [data-skin="vscode"] button.bg-\(--theme-primary\) {
-  background-color: var(--theme-primary) !important;
+  background-color: var(--theme-primary);
   color: var(--background) !important; /* Contrast text */
   border: 1px solid var(--theme-primary) !important;
 }
 
 /* Inactive filter buttons */
 [data-skin="vscode"] button.bg-white {
-    background-color: var(--background) !important;
+    background-color: var(--background);
     border: 1px solid var(--border-color) !important;
     color: var(--foreground) !important;
     opacity: 0.8;
@@ -304,12 +304,12 @@ html, body {
 /* Calendar & Navigation Specifics for VS Code Skin */
 [data-skin="vscode"] .mini-calendar-day {
   border: 1px solid var(--border-color) !important;
-  background: var(--background) !important;
+  background: var(--background);
   color: var(--foreground) !important;
 }
 
 [data-skin="vscode"] .mini-calendar-day:hover {
-  background: var(--theme-primary-bg) !important;
+  background: var(--theme-primary-bg);
   color: var(--theme-primary) !important;
 }
 
@@ -327,7 +327,7 @@ html, body {
 /* Force dark header/steady areas to match theme if needed, or keep transparent */
 [data-skin="vscode"] header, 
 [data-skin="vscode"] .sticky {
-  background-color: var(--background) !important; 
+  background-color: var(--background); 
   border-bottom: 1px solid var(--border-color) !important;
   z-index: 40; /* Ensure it stays on top */
 }
@@ -339,7 +339,7 @@ html, body {
 [data-skin="vscode"] .z-100, /* Icon Picker, etc */
 [data-skin="vscode"] .bg-white.shadow-xl, 
 [data-skin="vscode"] .bg-white.shadow-lg {
-  background-color: var(--card-bg) !important;
+  background-color: var(--card-bg);
   color: var(--foreground) !important;
   border: 1px solid var(--border-color) !important;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important; /* Deeper shadow for popping elements */
