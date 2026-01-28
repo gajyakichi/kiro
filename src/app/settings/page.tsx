@@ -224,6 +224,7 @@ export default function SettingsPage() {
     OLLAMA_BASE_URL: 'http://localhost:11434',
     VAULT_PATH: '',
     APP_LANG: 'en',
+    APP_SKIN: 'notion',
     ENABLED_PLUGINS: ''
   });
   const [themes, setThemes] = useState<Theme[]>([]);
@@ -389,7 +390,7 @@ export default function SettingsPage() {
   const t = getTranslation(config.APP_LANG);
 
   return (
-    <div className={`min-h-screen font-sans bg-(--background) text-(--foreground) ${activeTheme ? 'theme-active' : ''}`} >
+    <div className={`min-h-screen font-sans bg-(--background) text-(--foreground) ${activeTheme ? 'theme-active' : ''}`} data-skin={config.APP_SKIN}>
       <div className="max-w-4xl mx-auto py-6 px-4">
         <header className="flex items-center justify-between mb-4 pb-4 border-b border-(-border-color)">
           <div className="flex items-center gap-2">
@@ -429,7 +430,7 @@ export default function SettingsPage() {
 
         <div className="space-y-4 pb-16">
           {/* Section: Storage Mode */}
-          <section className="bg-(-card-bg) px-3 py-2 rounded-md border-(-border-color) shadow-sm">
+          <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm">
             <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
               <Server size={12} className="text-(--theme-primary) opacity-40" />
               {t.storage_identity}
@@ -468,7 +469,7 @@ export default function SettingsPage() {
 
           {/* Section: Vault Manager */}
           {config.STORAGE_MODE === 'local' && (
-            <section className="bg-(-card-bg) px-3 py-2 rounded-md border-(-border-color) shadow-sm animate-fade-in relative overflow-hidden">
+            <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm animate-fade-in relative overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-(-theme-primary)"></div>
               <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
                 <LayoutGrid size={12} className="text-(--theme-primary) opacity-40" />
@@ -479,7 +480,7 @@ export default function SettingsPage() {
           )}
 
           {config.STORAGE_MODE === 'server' && (
-            <section className="bg-(-card-bg) px-3 py-2 rounded-md border-(-border-color) shadow-sm animate-fade-in">
+            <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm animate-fade-in">
               <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
                 <Database size={12} className="text-(--theme-primary) opacity-40" />
                 {t.sql_connection}
@@ -500,7 +501,7 @@ export default function SettingsPage() {
           )}
 
           {/* Section: Plugin Management */}
-          <section className="bg-(-card-bg) px-3 py-2 rounded-md border-(-border-color) shadow-sm">
+          <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-base font-semibold flex items-center gap-3">
                 <Package size={12} className="text-(--theme-primary) opacity-40" />
@@ -575,7 +576,7 @@ export default function SettingsPage() {
           </section>
 
           {/* Section: AI Configuration */}
-          <section className="bg-(-card-bg) px-3 py-2 rounded-md border-(-border-color) shadow-sm">
+          <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-semibold flex items-center gap-3">
                 <ShieldCheck size={12} className="text-(--theme-primary) opacity-40" />
@@ -745,7 +746,7 @@ export default function SettingsPage() {
           </section>
 
           {/* AI Prompt Vault */}
-          <section className="space-y-4 pb-8 border-b border-(-border-color)/30">
+          <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm">
             <PromptVault language={config.APP_LANG || 'en'} />
           </section>
 
