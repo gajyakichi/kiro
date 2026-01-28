@@ -237,8 +237,8 @@ export const PromptVault: React.FC<PromptVaultProps> = ({ language }) => {
           </p>
           <p className="opacity-70">
             {language === 'ja' 
-              ? 'ボタンをクリックして使用するプロンプトを切り替えます。アクティブなプロンプトがAIチャットで使用されます。' 
-              : 'Click the button to switch the active prompt. Only the active prompt will be used in AI chats.'}
+              ? 'カードをクリックして使用するプロンプトを切り替えます。アクティブなプロンプトがAIチャットで使用されます。' 
+              : 'Click a card to switch the active prompt. Only the active prompt will be used in AI chats.'}
           </p>
         </div>
       </div>
@@ -292,16 +292,41 @@ export const PromptVault: React.FC<PromptVaultProps> = ({ language }) => {
 
       {/* Prompt List */}
       <div className="space-y-2">
-        {prompts.map((prompt) => (
+        {prompts
+          .sort((a, b) => {
+            // Active prompt first
+            if (a.is_active && !b.is_active) return -1;
+            if (!a.is_active && b.is_active) return 1;
+            // Then default prompts
+            if (a.is_default && !b.is_default) return -1;
+            if (!a.is_default && b.is_default) return 1;
+            // Then alphabetically
+            return a.name.localeCompare(b.name);
+          })
+          .map((prompt) => (
           <div
             key={prompt.id}
-            className={`p-4 rounded-xl border transition-all ${
+            className={`group relative p-4 rounded-xl border-2 transition-all cursor-pointer ${
               prompt.is_active
-                ? 'bg-(-theme-primary-bg) border-(-theme-primary)/30'
-                : 'bg-(-card-bg) border-(-border-color) hover:border-(-theme-primary)/20'
+                ? 'bg-(-theme-primary-bg) border-(-theme-primary) shadow-lg'
+                : 'bg-(-card-bg) border-(-border-color) hover:border-(-theme-primary)/30 hover:shadow-md'
             }`}
+            onClick={() => prompt.is_active === 0 && handleActivate(prompt.id)}
           >
-            <div className="flex items-start justify-between">
+            {/* Radio Button Indicator */}
+            <div className="absolute left-4 top-4">
+              <div className={`w-6 h-6 rounded-full border-[3px] flex items-center justify-center transition-all ${
+                prompt.is_active
+                  ? 'border-(-theme-primary) bg-(-theme-primary) shadow-md'
+                  : 'border-(-border-color)/40 bg-(-sidebar-bg) group-hover:border-(-theme-primary)/60 group-hover:bg-(-card-bg)'
+              }`}>
+                {prompt.is_active === 1 && (
+                  <div className="w-3 h-3 rounded-full bg-white shadow-sm"></div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-start justify-between pl-8">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-sm font-bold">{prompt.name}</h3>
@@ -325,27 +350,23 @@ export const PromptVault: React.FC<PromptVaultProps> = ({ language }) => {
                 </p>
               </div>
               <div className="flex gap-1 ml-4 shrink-0">
-                {prompt.is_active === 0 && (
-                  <button
-                    onClick={() => handleActivate(prompt.id)}
-                    className="px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider transition-all bg-(-theme-primary) text-white hover:opacity-90 flex items-center gap-1"
-                    title={t('activate')}
-                  >
-                    <Check size={12} />
-                    {language === 'ja' ? 'これを使用' : 'Use This'}
-                  </button>
-                )}
                 {prompt.is_default === 0 && (
                   <>
                     <button
-                      onClick={() => handleEdit(prompt)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEdit(prompt);
+                      }}
                       className="p-2 rounded-lg hover:bg-(-hover-bg) transition-all"
                       title={t('edit')}
                     >
                       <Edit2 size={14} className="text-(-foreground) opacity-60" />
                     </button>
                     <button
-                      onClick={() => handleDelete(prompt.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(prompt.id);
+                      }}
                       className="p-2 rounded-lg hover:bg-(-hover-bg) transition-all"
                       title={t('delete')}
                     >

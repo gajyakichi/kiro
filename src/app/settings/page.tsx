@@ -415,7 +415,7 @@ export default function SettingsPage() {
         </header>
 
         {message && (
-          <div className={`mb-6 px-3 py-2 rounded-md flex items-center gap-3 border text-xs animate-in slide-in-from-top-4 duration-500 ${
+          <div className={`mb-6 px-3 py-2 rounded-lg flex items-center gap-3 border text-xs animate-in slide-in-from-top-4 duration-500 ${
             message.type === 'success' 
               ? 'bg-(--theme-success-bg) border-(--theme-success)/10 text-(--theme-success)' 
               : 'bg-(--theme-error-bg) border-(--theme-error)/10 text-(--theme-error)'
@@ -484,7 +484,7 @@ export default function SettingsPage() {
                 <Database size={12} className="text-(--theme-primary) opacity-40" />
                 {t.sql_connection}
               </h2>
-              <div className="space-y-5">
+              <div className="space-y-4">
                 <p className="text-xs notion-text-subtle leading-relaxed">
                   {t.sql_connection}
                 </p>
@@ -492,7 +492,7 @@ export default function SettingsPage() {
                   type="text"
                   value={config.DATABASE_URL}
                   onChange={(e) => setConfig({ ...config, DATABASE_URL: e.target.value })}
-                  className="w-full p-5 bg-(-sidebar-bg) rounded-2xl border border-(-border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all"
+                  className="w-full p-3 bg-(-sidebar-bg) rounded-lg border border-(-border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all"
                   placeholder="postgresql://user:password@host:port/db"
                 />
               </div>
@@ -522,9 +522,9 @@ export default function SettingsPage() {
                 const isSystem = AVAILABLE_PLUGINS.some(p => p.id === plugin.id);
 
                 return (
-                  <div key={plugin.id} className="group relative flex items-center justify-between p-4 bg-(-sidebar-bg) rounded-2xl border border-(-border-color) hover:border-(-border-color) transition-all">
+                  <div key={plugin.id} className="group relative flex items-center justify-between p-3 bg-(-sidebar-bg) rounded-lg border border-(-border-color) hover:border-(-border-color) transition-all">
                     <div className="flex items-start gap-2 flex-1">
-                      <div className={`p-3 rounded-xl transition-colors ${isEnabled ? 'bg-(-theme-primary) text-white shadow-md shadow-(--theme-primary)/20' : 'bg-(-card-bg) text-(-foreground)'}`}>
+                      <div className={`p-2 rounded-lg transition-colors ${isEnabled ? 'bg-(-theme-primary) text-white shadow-md shadow-(--theme-primary)/20' : 'bg-(-card-bg) text-(-foreground)'}`}>
                         <Blocks size={12} />
                       </div>
                       <div>
@@ -585,8 +585,8 @@ export default function SettingsPage() {
                 {t.api_config}
               </div>
             </div>
-            <div className="space-y-10">
-              <div className="flex bg-(-card-bg) p-1.5 rounded-2xl gap-1.5">
+            <div className="space-y-4">
+              <div className="flex bg-(-card-bg) p-1.5 rounded-lg gap-1.5">
                 <button
                   onClick={() => setConfig({ ...config, AI_PROVIDER: 'openai' })}
                   className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-xs font-black transition-all ${
@@ -611,7 +611,7 @@ export default function SettingsPage() {
                  <div className="flex items-center gap-2 mb-2">
                     <label className="text-[10px] font-black text-(-foreground) uppercase tracking-widest px-1">{t.language}</label>
                  </div>
-                 <div className="flex bg-(-card-bg) p-1.5 rounded-2xl gap-1.5">
+                 <div className="flex bg-(-card-bg) p-1.5 rounded-lg gap-1.5">
                     <button 
                       onClick={() => setConfig({ ...config, APP_LANG: 'en' })}
                       className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${
@@ -651,7 +651,7 @@ export default function SettingsPage() {
                         value={config.OPENAI_API_KEY}
                         autoComplete="off"
                         onChange={(e) => setConfig({ ...config, OPENAI_API_KEY: e.target.value })}
-                        className="w-full p-5 bg-(-sidebar-bg) rounded-2xl border border-(-border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all pr-12"
+                        className="w-full p-3 bg-(-sidebar-bg) rounded-lg border border-(-border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all pr-12"
                         placeholder="sk-proj-..."
                       />
                       <div className="absolute right-5 top-1/2 -translate-y-1/2 text-(-foreground) group-focus-within:text-(--theme-primary) transition-colors">
@@ -665,7 +665,7 @@ export default function SettingsPage() {
                       <select
                         value={config.AI_MODEL}
                         onChange={(e) => setConfig({ ...config, AI_MODEL: e.target.value })}
-                        className="w-full p-5 bg-(-sidebar-bg) rounded-2xl border border-(-border-color) text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
+                        className="w-full p-3 bg-(-sidebar-bg) rounded-lg border border-(-border-color) text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
                       >
                         <option value="gpt-4o-mini">GPT-4o mini (Recommended)</option>
                         <option value="gpt-4o">GPT-4o (High Intelligence)</option>
@@ -685,7 +685,7 @@ export default function SettingsPage() {
                       type="text"
                       value={config.OLLAMA_BASE_URL}
                       onChange={(e) => setConfig({ ...config, OLLAMA_BASE_URL: e.target.value })}
-                      className="w-full p-5 bg-(-sidebar-bg) rounded-2xl border border-(-border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all"
+                      className="w-full p-3 bg-(-sidebar-bg) rounded-lg border border-(-border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all"
                       placeholder="http://localhost:11434"
                     />
                   </div>
@@ -706,7 +706,7 @@ export default function SettingsPage() {
                         <select
                           value={config.AI_MODEL}
                           onChange={(e) => setConfig({ ...config, AI_MODEL: e.target.value })}
-                          className="w-full p-5 bg-(-sidebar-bg) rounded-2xl border border-(-border-color) text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
+                          className="w-full p-3 bg-(-sidebar-bg) rounded-lg border border-(-border-color) text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
                         >
                           {!ollamaModels.includes(config.AI_MODEL) && (
                             <option value={config.AI_MODEL}>{config.AI_MODEL} (Custom)</option>
@@ -721,7 +721,7 @@ export default function SettingsPage() {
                             type="text"
                             value={config.AI_MODEL}
                             onChange={(e) => setConfig({ ...config, AI_MODEL: e.target.value })}
-                            className="w-full p-5 bg-red-50/30 rounded-2xl border border-red-100 text-(--theme-error) font-bold text-xs focus:outline-none"
+                            className="w-full p-3 bg-red-50/30 rounded-lg border border-red-100 text-(--theme-error) font-bold text-xs focus:outline-none"
                             placeholder="e.g. llama3"
                           />
                           <p className="text-[10px] text-(--theme-error) font-bold px-1">Could not detect any local Ollama models. Ensure Ollama is running.</p>
@@ -735,7 +735,7 @@ export default function SettingsPage() {
                 </div>
               )}
 
-              <div className="flex items-start gap-3 p-4 bg-(--theme-warning-bg) border border-(--theme-warning)/10 rounded-2xl text-(--theme-warning) text-xs">
+              <div className="flex items-start gap-3 p-3 bg-(--theme-warning-bg) border border-(--theme-warning)/10 rounded-lg text-(--theme-warning) text-xs">
                 <AlertTriangle size={14} className="shrink-0" />
                 <span className="font-bold leading-relaxed">
                    {t.restart_required}
