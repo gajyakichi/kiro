@@ -318,15 +318,15 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
           <div className="flex bg-[var(--sidebar-bg)] p-1.5 rounded-xl border border-[var(--border-color)] gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
              <button 
                 onClick={() => onUpdateSkin('notion')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin !== 'vscode' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin !== 'vscode' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
              >
-                NOTION (DEFAULT)
+                ROUND (DEFAULT)
              </button>
              <button 
                 onClick={() => onUpdateSkin('vscode')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin === 'vscode' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin === 'vscode' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
              >
-                VS CODE (DENSE)
+                COMPACT (DENSE)
              </button>
           </div>
         </div>
