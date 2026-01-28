@@ -644,10 +644,10 @@ export default function Home() {
                 }}
                 className={`mini-calendar-day py-1 rounded-sm transition-colors cursor-pointer ${
                   isSelected 
-                    ? 'bg-[var(--theme-primary)] text-[var(--background)] font-bold ring-2 ring-[var(--theme-primary)] ring-opacity-50' 
+                    ? 'bg-(--theme-primary) text-(--background) font-bold ring-2 ring-(--theme-primary) ring-opacity-50' 
                     : activityDays.has(day) 
-                      ? 'bg-[var(--theme-primary-bg)] text-[var(--theme-primary)] font-bold hover:bg-[var(--theme-primary)] hover:text-[var(--background)]' 
-                      : 'text-gray-500 hover:bg-[var(--hover-bg)]'
+                      ? 'bg-(--theme-primary-bg) text-(--theme-primary) font-bold hover:bg-(--theme-primary) hover:text-(--background)' 
+                      : 'text-gray-500 hover:bg-(--hover-bg)'
                 }`}
               >
                 {day}
@@ -999,7 +999,7 @@ export default function Home() {
                         </button>
                       ))}
                       {selectedDate && (
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--theme-accent)] text-[var(--background)] rounded-lg text-xs font-bold">
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-(--theme-accent) text-(--background) rounded-lg text-xs font-bold">
                           <span>{selectedDate.toLocaleDateString(appLang, { month: 'short', day: 'numeric' })}</span>
                           <button 
                             onClick={() => setSelectedDate(null)}
