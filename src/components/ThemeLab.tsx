@@ -1,3 +1,4 @@
+// Force recompile - 2026-01-28 20:20 - GitHub Dimmed removed
 import React, { useState } from 'react';
 import { Theme } from '@/lib/types';
 import { MagicWand, Trash, Palette, CheckCircle, Circle, Folder, Clock, DownloadSimple, UploadSimple } from '@phosphor-icons/react';
@@ -29,68 +30,6 @@ const PRESET_THEMES = [
       name: "Monokai",
       isPreset: true,
       css: `html, body { background: #272822 !important; color: #f8f8f2 !important; --background: #272822; --foreground: #f8f8f2; --card-bg: #23241f; --sidebar-bg: #1e1f1c; --hover-bg: rgba(255,255,255,0.1); --theme-primary: #ae81ff; --theme-primary-bg: rgba(174, 129, 255, 0.15); --border-color: rgba(255, 255, 255, 0.1); } .notion-sidebar { background: #1e1f1c !important; } .notion-card { background: #23241f !important; border: 1px solid #49483e !important; color: #f8f8f2 !important; } .notion-item:hover, .notion-item.active { background: #3e3d32 !important; color: #f92672 !important; } .notion-text-subtle { color: #88846f !important; } h1, h2, h3 { color: #ae81ff !important; } .accent-text { color: #a6e22e !important; } :root, .theme-active { --background: #272822; --foreground: #f8f8f2; --card-bg: #23241f; --sidebar-bg: #1e1f1c; --hover-bg: rgba(255,255,255,0.1); --border-color: rgba(255, 255, 255, 0.1); --theme-primary: #ae81ff; --theme-primary-bg: rgba(174, 129, 255, 0.15); --theme-accent: #f92672; }`
-    },
-    {
-      name: "OneMonokai",
-      isPreset: true,
-      css: `html, body { background: #272822 !important; color: #f8f8f2 !important; font-weight: 450; --background: #272822; --foreground: #f8f8f2; --card-bg: #272822; --sidebar-bg: #1e1f1c; --hover-bg: rgba(255,255,255,0.1); --theme-primary: #f92672; --theme-primary-bg: rgba(249, 38, 114, 0.15); --theme-accent: #a6e22e; --theme-accent-bg: rgba(166, 226, 46, 0.2); }
-.notion-sidebar { background: #1e1f1c !important; }
-.notion-card { background: #272822 !important; border: 1px solid #49483e !important; color: #f8f8f2 !important; }
-.notion-item:hover, .notion-item.active { background: #49483e !important; color: #f92672 !important; }
-h1, h2, h3 { color: #f92672 !important; }
-.accent-text { color: #ae81ff !important; }
-:root, .theme-active { --background: #272822; --foreground: #f8f8f2; --card-bg: #272822; --sidebar-bg: #1e1f1c; --hover-bg: rgba(255,255,255,0.1); --theme-primary: #f92672; --theme-primary-bg: rgba(249, 38, 114, 0.15); --theme-accent: #a6e22e; --theme-accent-bg: rgba(166, 226, 46, 0.2); }`
-    },
-    {
-      name: "Atom Material",
-      isPreset: true,
-      css: `html, body { background: #263238 !important; color: #eeffff !important; font-weight: 450; --background: #263238; --foreground: #eeffff; --card-bg: #263238; --sidebar-bg: #21282d; --hover-bg: rgba(255,255,255,0.1); --theme-primary: #82aaff; --theme-primary-bg: rgba(130, 170, 255, 0.15); --theme-accent: #c3e88d; --theme-accent-bg: rgba(195, 232, 141, 0.2); }
-.notion-sidebar { background: #21282d !important; }
-.notion-card { background: #263238 !important; border: 1px solid #37474f !important; color: #eeffff !important; }
-.notion-item:hover, .notion-item.active { background: #37474f !important; color: #82aaff !important; }
-h1, h2, h3 { color: #82aaff !important; }
-.accent-text { color: #c792ea !important; }
-:root, .theme-active { --background: #263238; --foreground: #eeffff; --card-bg: #263238; --sidebar-bg: #21282d; --hover-bg: rgba(255,255,255,0.1); --theme-primary: #82aaff; --theme-primary-bg: rgba(130, 170, 255, 0.15); --theme-accent: #c3e88d; --theme-accent-bg: rgba(195, 232, 141, 0.2); }`
-    },
-    {
-      name: "Rain Syntax",
-      isPreset: true,
-      css: `html, body { background: #1c1f2b !important; color: #efefef !important; font-weight: 450; --background: #1c1f2b; --foreground: #efefef; --card-bg: #232734; --sidebar-bg: #161922; --hover-bg: rgba(255,255,255,0.1); --theme-primary: #94bfff; --theme-primary-bg: rgba(148, 191, 255, 0.1); --theme-accent: #78e1c1; }
-.notion-sidebar { background: #161922 !important; }
-.notion-card { background: #232734 !important; border: 1px solid #2d3345 !important; }
-.notion-item:hover, .notion-item.active { background: #2d3345 !important; color: #94bfff !important; }
-h1, h2, h3 { color: #94bfff !important; }
-:root, .theme-active { --background: #1c1f2b; --foreground: #efefef; --card-bg: #232734; --sidebar-bg: #161922; --hover-bg: rgba(255,255,255,0.1); --theme-primary: #94bfff; --theme-primary-bg: rgba(148, 191, 255, 0.1); --theme-accent: #78e1c1; }`
-    },
-    {
-      name: "Futurism",
-      isPreset: true,
-      css: `html, body { background: #080b12 !important; color: #c9d1d9 !important; font-weight: 450; }
-.notion-sidebar { background: #010409 !important; border-right: 1px solid #30363d !important; }
-.notion-card { background: #0d1117 !important; border: 1px solid #30363d !important; }
-.notion-item:hover, .notion-item.active { background: #161b22 !important; color: #58a6ff !important; }
-h1, h2, h3 { color: #58a6ff !important; }
-:root, .theme-active { --background: #080b12; --foreground: #c9d1d9; --card-bg: #0d1117; --sidebar-bg: #010409; --hover-bg: rgba(255,255,255,0.1); --border-color: #30363d; --theme-primary: #58a6ff; --theme-primary-bg: rgba(88, 166, 255, 0.1); --theme-accent: #3fb950; }`
-    },
-    {
-      name: "Pumpkin",
-      isPreset: true,
-      css: `html, body { background: #1b1811 !important; color: #ffb088 !important; font-weight: 450; --background: #1b1811; --foreground: #ffb088; --card-bg: #241f16; --sidebar-bg: #14110b; --hover-bg: rgba(255,255,255,0.1); --border-color: #3d3425; --theme-primary: #d2691e; --theme-primary-bg: rgba(210, 105, 30, 0.1); --theme-accent: #ffb088; }
-.notion-sidebar { background: #14110b !important; }
-.notion-card { background: #241f16 !important; border: 1px solid #3d3425 !important; }
-.notion-item:hover, .notion-item.active { background: #3d3425 !important; color: #d2691e !important; }
-h1, h2, h3 { color: #d2691e !important; }
-:root, .theme-active { --background: #1b1811; --foreground: #ffb088; --card-bg: #241f16; --sidebar-bg: #14110b; --hover-bg: rgba(255,255,255,0.1); --border-color: #3d3425; --theme-primary: #d2691e; --theme-primary-bg: rgba(210, 105, 30, 0.1); --theme-accent: #ffb088; }`
-    },
-    {
-      name: "Princess",
-      isPreset: true,
-      css: `html, body { background: #fff5f8 !important; color: #634e56 !important; font-weight: 450; --background: #fff5f8; --foreground: #634e56; --card-bg: #ffffff; --sidebar-bg: #fde8ef; --hover-bg: rgba(0,0,0,0.05); --border-color: #f9dbe4; --theme-primary: #ff85a2; --theme-primary-bg: rgba(255, 133, 162, 0.1); --theme-accent: #f06292; }
-.notion-sidebar { background: #fde8ef !important; }
-.notion-card { background: #ffffff !important; border: 1px solid #f9dbe4 !important; }
-.notion-item:hover, .notion-item.active { background: #f9dbe4 !important; color: #ff85a2 !important; }
-h1, h2, h3 { color: #ff85a2 !important; }
-:root, .theme-active { --background: #fff5f8; --foreground: #634e56; --card-bg: #ffffff; --sidebar-bg: #fde8ef; --hover-bg: rgba(0,0,0,0.05); --border-color: #f9dbe4; --theme-primary: #ff85a2; --theme-primary-bg: rgba(255, 133, 162, 0.1); --theme-accent: #f06292; }`
     },
     {
       name: "Solarized Light",
@@ -132,16 +71,6 @@ h1, h2, h3 { color: #cc7832 !important; }
 h1, h2, h3 { color: #fe4450 !important; text-shadow: 0 0 10px rgba(254, 68, 80, 0.5); }
 :root, .theme-active { --background: #2b213a; --foreground: #fff; --card-bg: #2b213a; --sidebar-bg: #241b35; --hover-bg: rgba(255,255,255,0.1); --border-color: rgba(255,255,255,0.13); --theme-primary: #ff7edb; --theme-primary-bg: rgba(255, 126, 219, 0.2); --theme-accent: #36f9f6; --theme-accent-bg: rgba(54, 249, 246, 0.2); }
 .notion-text-subtle { color: #72f1b8 !important; }`
-    },
-    {
-      name: "Winter Blue",
-      isPreset: true,
-      css: `html, body { background: #f0f8ff !important; color: #2c3e50 !important; font-weight: 450; --background: #f0f8ff; --foreground: #2c3e50; --card-bg: #ffffff; --sidebar-bg: #e6f2ff; --hover-bg: rgba(0,0,0,0.05); --border-color: #d6eaff; --theme-primary: #007bff; --theme-primary-bg: rgba(0, 123, 255, 0.1); --theme-accent: #17a2b8; }
-.notion-sidebar { background: #e6f2ff !important; border-right: 1px solid #cce4ff !important; }
-.notion-card { background: #ffffff !important; border: 1px solid #d6eaff !important; color: #2c3e50 !important; }
-.notion-item:hover, .notion-item.active { background: #cce4ff !important; color: #007bff !important; }
-h1, h2, h3 { color: #0056b3 !important; }
-:root, .theme-active { --background: #f0f8ff; --foreground: #2c3e50; --card-bg: #ffffff; --sidebar-bg: #e6f2ff; --hover-bg: rgba(0,0,0,0.05); --border-color: #d6eaff; --theme-primary: #007bff; --theme-primary-bg: rgba(0, 123, 255, 0.1); --theme-accent: #17a2b8; }`
     }
   ];
 
