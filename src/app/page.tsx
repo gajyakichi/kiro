@@ -937,7 +937,7 @@ export default function Home() {
                 </div>
 
                 {/* 2. Search & Filter Bar */}
-                <div className="flex flex-col md:flex-row gap-4 items-center justify-between sticky top-0 bg-(--background) py-4 z-20 backdrop-blur-sm bg-opacity-90 border-b border-(--border-color)">
+                <div className="flex flex-col md:flex-row gap-4 items-center justify-between sticky top-0 bg-(--background)! py-4 z-20 border-b border-(--border-color)">
                    <div className="relative w-full md:w-auto md:min-w-[300px]">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
                       <input 
