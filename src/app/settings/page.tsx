@@ -88,9 +88,9 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
   if (loading) return <div className="text-xs text-neutral-400 animate-pulse">{t.loading_vault}</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm notion-text-subtle max-w-md leading-relaxed">
+        <p className="text-xs notion-text-subtle max-w-md leading-relaxed">
           {t.vault_manager_desc}
         </p>
         <div className="flex gap-2">
@@ -99,13 +99,13 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
               className="p-2 bg-neutral-100 text-neutral-500 rounded-xl hover:bg-neutral-200 transition-all shadow-sm"
               title="Refresh"
             >
-              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+              <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
             </button>
             <button 
               onClick={() => setIsAdding(!isAdding)}
               className="flex items-center gap-2 px-4 py-2 bg-(--theme-primary) text-white rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-sm whitespace-nowrap"
             >
-              {isAdding ? <X size={14} /> : <Plus size={14} />}
+              {isAdding ? <X size={12} /> : <Plus size={12} />}
               {isAdding ? t.cancel : t.add_new_vault}
             </button>
         </div>
@@ -113,7 +113,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
 
       {isAdding && (
         <div className="bg-(--theme-primary-bg) p-3 rounded-lg border border-(--border-color) animate-in slide-in-from-top-2 duration-300">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-(--theme-primary) uppercase tracking-widest opacity-60">{t.vault_name_label}</label>
               <input 
@@ -121,7 +121,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                 value={newVaultName}
                 onChange={(e) => setNewVaultName(e.target.value)}
                 placeholder={t.vault_name_placeholder}
-                className="w-full p-4 bg-(--card-bg) border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 transition-all font-medium"
+                className="w-full p-4 bg-(--card-bg) border border-(--border-color) rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 transition-all font-medium"
               />
             </div>
             <div className="space-y-2">
@@ -132,7 +132,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                   value={newVaultPath}
                   onChange={(e) => setNewVaultPath(e.target.value)}
                   placeholder={t.dir_path_placeholder}
-                  className="w-full p-4 bg-(--card-bg) border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 pr-12 transition-all font-mono"
+                  className="w-full p-4 bg-(--card-bg) border border-(--border-color) rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 pr-12 transition-all font-mono"
                 />
                 <button 
                   onClick={handleSelectDirectory}
@@ -144,7 +144,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                   disabled={!window.electron}
                   title={window.electron ? t.select_folder_title : t.native_dialog_not_available}
                 >
-                  <Folder size={18} />
+                  <Folder size={14} />
                 </button>
               </div>
               {!window.electron && <p className="text-[9px] text-orange-500 font-medium">{t.native_desc_only_desktop}</p>}
@@ -169,8 +169,8 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                 : 'border-(--border-color) hover:border-neutral-300 bg-(--card-bg)/50'
             }`}
           >
-            <div className="flex items-center gap-5">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${vault.active ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 group-hover:bg-neutral-200'}`}>
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${vault.active ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 group-hover:bg-neutral-200'}`}>
                 <ShieldCheck size={24} />
               </div>
               <div>
@@ -196,13 +196,13 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                       onClick={() => handleDelete(vault.id)}
                       className="p-2 text-neutral-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                     >
-                      <X size={18} />
+                      <X size={14} />
                     </button>
                   )}
                 </>
               ) : (
                 <div className="p-2 text-(--theme-success)">
-                   <ShieldCheck size={20} />
+                   <ShieldCheck size={12} />
                 </div>
               )}
             </div>
@@ -389,15 +389,15 @@ export default function SettingsPage() {
 
   return (
     <div className={`min-h-screen text-(--foreground) font-sans ${activeTheme ? 'theme-active' : ''}`} style={{ backgroundColor: 'var(--background)' }}>
-      <div className="max-w-4xl mx-auto py-8 px-4">
-        <header className="flex items-center justify-between mb-8 pb-4 border-b border-(--border-color)">
-          <div className="flex items-center gap-4">
+      <div className="max-w-4xl mx-auto py-6 px-4">
+        <header className="flex items-center justify-between mb-4 pb-4 border-b border-(--border-color)">
+          <div className="flex items-center gap-2">
             <Link href="/" className="p-2 hover:bg-(--hover-bg) rounded-lg transition-all bg-(--card-bg) border border-(--border-color)">
-              <ArrowLeft size={16} />
+              <ArrowLeft size={12} />
             </Link>
             <div>
-              <h1 className="text-xl font-bold tracking-tight flex items-center gap-2">
-                <Settings className="text-(--theme-primary) opacity-40" size={20} />
+              <h1 className="text-base font-semibold tracking-tight flex items-center gap-2">
+                <Settings className="text-(--theme-primary) opacity-40" size={12} />
                 {t.environment_settings}
               </h1>
               <p className="notion-text-subtle text-xs mt-0.5">{t.settings_desc}</p>
@@ -408,7 +408,7 @@ export default function SettingsPage() {
             disabled={saving}
             className="flex items-center gap-2 px-4 py-2 bg-(--theme-primary) text-white rounded-lg hover:opacity-90 disabled:opacity-50 transition-all text-xs font-bold"
           >
-            {saving ? <RotateCcw className="animate-spin" size={14} /> : <Save size={14} />}
+            {saving ? <RotateCcw className="animate-spin" size={12} /> : <Save size={12} />}
             {saving ? t.saving : t.save_config}
           </button>
         </header>
@@ -420,20 +420,20 @@ export default function SettingsPage() {
               : 'bg-(--theme-error-bg) border-(--theme-error)/10 text-(--theme-error)'
           }`}>
             <div className={`w-6 h-6 rounded-full flex items-center justify-center ${message.type === 'success' ? 'bg-(--theme-success) text-white' : 'bg-(--theme-error) text-white'}`}>
-               {message.type === 'success' ? <ShieldCheck size={14} /> : <AlertTriangle size={14} />}
+               {message.type === 'success' ? <ShieldCheck size={12} /> : <AlertTriangle size={12} />}
             </div>
             <span className="font-bold uppercase tracking-wider">{message.text}</span>
           </div>
         )}
 
-        <div className="space-y-6 pb-16">
+        <div className="space-y-4 pb-16">
           {/* Section: Storage Mode */}
-          <section className="bg-(--card-bg) p-4 rounded-lg border border-(--border-color) shadow-sm">
-            <h2 className="text-sm font-bold mb-3 flex items-center gap-3">
-              <Server size={16} className="text-(--theme-primary) opacity-40" />
+          <section className="bg-(--card-bg) p-3 rounded-lg border border-(--border-color) shadow-sm">
+            <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
+              <Server size={12} className="text-(--theme-primary) opacity-40" />
               {t.storage_identity}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <button
                 onClick={() => setConfig({ ...config, STORAGE_MODE: 'local' })}
                 className={`flex flex-col p-3 rounded-lg border-2 transition-all text-left group ${
@@ -442,10 +442,10 @@ export default function SettingsPage() {
                     : 'border-(--border-color) hover:border-neutral-300 bg-(--card-bg)'
                 }`}
               >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'local' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'local' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
                   <Database size={24} />
                 </div>
-                <span className="font-black text-sm uppercase tracking-widest">{t.local_vaults}</span>
+                <span className="font-black text-xs uppercase tracking-widest">{t.local_vaults}</span>
                 <span className="text-xs notion-text-subtle mt-2 leading-relaxed opacity-70">{t.local_vault_desc}</span>
               </button>
               <button
@@ -456,10 +456,10 @@ export default function SettingsPage() {
                     : 'border-(--border-color) hover:border-neutral-300 bg-(--card-bg)'
                 }`}
               >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'server' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'server' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
                   <Cloud size={24} />
                 </div>
-                <span className="font-black text-sm uppercase tracking-widest">{t.remote_sync}</span>
+                <span className="font-black text-xs uppercase tracking-widest">{t.remote_sync}</span>
                 <span className="text-xs notion-text-subtle mt-2 leading-relaxed opacity-70">{t.remote_sync_desc}</span>
               </button>
             </div>
@@ -467,10 +467,10 @@ export default function SettingsPage() {
 
           {/* Section: Vault Manager */}
           {config.STORAGE_MODE === 'local' && (
-            <section className="bg-(--card-bg) p-4 rounded-lg border border-(--border-color) shadow-sm animate-fade-in relative overflow-hidden">
+            <section className="bg-(--card-bg) p-3 rounded-lg border border-(--border-color) shadow-sm animate-fade-in relative overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-(--theme-primary)"></div>
-              <h2 className="text-sm font-bold mb-3 flex items-center gap-3">
-                <LayoutGrid size={16} className="text-(--theme-primary) opacity-40" />
+              <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
+                <LayoutGrid size={12} className="text-(--theme-primary) opacity-40" />
                 {t.vault_management}
               </h2>
               <VaultManager appLang={config.APP_LANG} onVaultSwitch={fetchSettings} />
@@ -478,13 +478,13 @@ export default function SettingsPage() {
           )}
 
           {config.STORAGE_MODE === 'server' && (
-            <section className="bg-(--card-bg) p-4 rounded-lg border border-(--border-color) shadow-sm animate-fade-in">
-              <h2 className="text-sm font-bold mb-3 flex items-center gap-3">
-                <Database size={16} className="text-(--theme-primary) opacity-40" />
+            <section className="bg-(--card-bg) p-3 rounded-lg border border-(--border-color) shadow-sm animate-fade-in">
+              <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
+                <Database size={12} className="text-(--theme-primary) opacity-40" />
                 {t.sql_connection}
               </h2>
               <div className="space-y-5">
-                <p className="text-sm notion-text-subtle leading-relaxed">
+                <p className="text-xs notion-text-subtle leading-relaxed">
                   {t.sql_connection}
                 </p>
                 <input
@@ -499,10 +499,10 @@ export default function SettingsPage() {
           )}
 
           {/* Section: Plugin Management */}
-          <section className="bg-(--card-bg) p-4 rounded-lg border border-(--border-color) shadow-sm">
+          <section className="bg-(--card-bg) p-3 rounded-lg border border-(--border-color) shadow-sm">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold flex items-center gap-3">
-                <Package size={16} className="text-(--theme-primary) opacity-40" />
+              <h2 className="text-base font-semibold flex items-center gap-3">
+                <Package size={12} className="text-(--theme-primary) opacity-40" />
                 Plugins & Extensions
               </h2>
               <button 
@@ -510,7 +510,7 @@ export default function SettingsPage() {
                 className="flex items-center gap-2 px-3 py-1.5 bg-neutral-100 text-neutral-600 rounded-lg text-xs font-bold hover:bg-neutral-200 transition-all"
                 title="Import JSON from Clipboard"
               >
-                <Plus size={14} />
+                <Plus size={12} />
                 Import
               </button>
             </div>
@@ -522,12 +522,12 @@ export default function SettingsPage() {
 
                 return (
                   <div key={plugin.id} className="group relative flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100 hover:border-neutral-200 transition-all">
-                    <div className="flex items-start gap-4 flex-1">
+                    <div className="flex items-start gap-2 flex-1">
                       <div className={`p-3 rounded-xl transition-colors ${isEnabled ? 'bg-(--theme-primary) text-white shadow-md shadow-(--theme-primary)/20' : 'bg-(--card-bg) text-neutral-300'}`}>
-                        <Blocks size={20} />
+                        <Blocks size={12} />
                       </div>
                       <div>
-                        <h3 className="font-bold text-sm flex items-center gap-2">
+                        <h3 className="font-bold text-xs flex items-center gap-2">
                           {plugin.name}
                           <span className="text-[9px] bg-neutral-200 text-neutral-500 px-1.5 py-0.5 rounded font-mono">{plugin.version}</span>
                           {!isSystem && <span className="text-[9px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded font-bold uppercase">Custom</span>}
@@ -544,7 +544,7 @@ export default function SettingsPage() {
                                 className="p-2 text-neutral-400 hover:text-(--theme-primary) hover:bg-(--card-bg) rounded-lg transition-all"
                                 title="Export JSON to Clipboard"
                             >
-                                <Cloud size={16} />
+                                <Cloud size={12} />
                             </button>
                             {!isSystem && (
                                 <button 
@@ -552,7 +552,7 @@ export default function SettingsPage() {
                                     className="p-2 text-neutral-400 hover:text-red-500 hover:bg-(--card-bg) rounded-lg transition-all"
                                     title="Delete Plugin"
                                 >
-                                    <X size={16} />
+                                    <X size={12} />
                                 </button>
                             )}
                          </div>
@@ -574,10 +574,10 @@ export default function SettingsPage() {
           </section>
 
           {/* Section: AI Configuration */}
-          <section className="bg-(--card-bg) p-4 rounded-lg border border-(--border-color) shadow-sm">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-xl font-bold flex items-center gap-3">
-                <ShieldCheck size={16} className="text-(--theme-primary) opacity-40" />
+          <section className="bg-(--card-bg) p-3 rounded-lg border border-(--border-color) shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-semibold flex items-center gap-3">
+                <ShieldCheck size={12} className="text-(--theme-primary) opacity-40" />
                 {t.intelligence_layer}
               </h2>
               <div className="text-[9px] bg-neutral-100 text-neutral-400 px-3 py-1 rounded-full font-black uppercase tracking-widest">
@@ -592,7 +592,7 @@ export default function SettingsPage() {
                     config.AI_PROVIDER === 'openai' ? 'bg-(--card-bg) shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
                   }`}
                 >
-                  <Cloud size={16} />
+                  <Cloud size={12} />
                   OPENAI (CLOUD)
                 </button>
                 <button
@@ -601,7 +601,7 @@ export default function SettingsPage() {
                     config.AI_PROVIDER === 'ollama' ? 'bg-(--card-bg) shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
                   }`}
                 >
-                  <Server size={16} />
+                  <Server size={12} />
                   {t.ollama_local}
                 </button>
               </div>
@@ -617,7 +617,7 @@ export default function SettingsPage() {
                         config.APP_LANG === 'en' ? 'bg-(--card-bg) shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
                       }`}
                     >
-                      <Languages size={16} />
+                      <Languages size={12} />
                       {t.english}
                     </button>
                     {config.ENABLED_PLUGINS?.includes('plugin-jp') ? (
@@ -627,12 +627,12 @@ export default function SettingsPage() {
                           config.APP_LANG === 'ja' ? 'bg-(--card-bg) shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
                         }`}
                       >
-                        <Languages size={16} />
+                        <Languages size={12} />
                         {t.japanese}
                       </button>
                     ) : (
                       <div className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold text-neutral-300 bg-neutral-50 border border-transparent cursor-not-allowed group relative" title="Enable 'Japanese Language Support' plugin to unlock">
-                         <Languages size={14} />
+                         <Languages size={12} />
                          {t.japanese}
                          <span className="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-white text-[9px] px-2 py-1 rounded shadow-lg whitespace-nowrap z-10">Plugin Required</span>
                       </div>
@@ -641,7 +641,7 @@ export default function SettingsPage() {
               </div>
 
               {config.AI_PROVIDER === 'openai' ? (
-                <div className="space-y-6 animate-fade-in">
+                <div className="space-y-4 animate-fade-in">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">OpenAI API Key</label>
                     <div className="relative group">
@@ -654,7 +654,7 @@ export default function SettingsPage() {
                         placeholder="sk-proj-..."
                       />
                       <div className="absolute right-5 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within:text-(--theme-primary) transition-colors">
-                        <ShieldCheck size={20} />
+                        <ShieldCheck size={12} />
                       </div>
                     </div>
                   </div>
@@ -664,20 +664,20 @@ export default function SettingsPage() {
                       <select
                         value={config.AI_MODEL}
                         onChange={(e) => setConfig({ ...config, AI_MODEL: e.target.value })}
-                        className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
+                        className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
                       >
                         <option value="gpt-4o-mini">GPT-4o mini (Recommended)</option>
                         <option value="gpt-4o">GPT-4o (High Intelligence)</option>
                         <option value="o1-mini">o1-mini (Reasoning)</option>
                       </select>
                       <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400">
-                        <Plus size={16} className="rotate-45" />
+                        <Plus size={12} className="rotate-45" />
                       </div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-6 animate-fade-in">
+                <div className="space-y-4 animate-fade-in">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Ollama Base URL</label>
                     <input
@@ -705,7 +705,7 @@ export default function SettingsPage() {
                         <select
                           value={config.AI_MODEL}
                           onChange={(e) => setConfig({ ...config, AI_MODEL: e.target.value })}
-                          className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
+                          className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
                         >
                           {!ollamaModels.includes(config.AI_MODEL) && (
                             <option value={config.AI_MODEL}>{config.AI_MODEL} (Custom)</option>
@@ -720,14 +720,14 @@ export default function SettingsPage() {
                             type="text"
                             value={config.AI_MODEL}
                             onChange={(e) => setConfig({ ...config, AI_MODEL: e.target.value })}
-                            className="w-full p-5 bg-red-50/30 rounded-2xl border border-red-100 text-(--theme-error) font-bold text-sm focus:outline-none"
+                            className="w-full p-5 bg-red-50/30 rounded-2xl border border-red-100 text-(--theme-error) font-bold text-xs focus:outline-none"
                             placeholder="e.g. llama3"
                           />
                           <p className="text-[10px] text-(--theme-error) font-bold px-1">Could not detect any local Ollama models. Ensure Ollama is running.</p>
                         </div>
                       )}
                       <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400">
-                        <Plus size={16} className="rotate-45" />
+                        <Plus size={12} className="rotate-45" />
                       </div>
                     </div>
                   </div>
@@ -735,7 +735,7 @@ export default function SettingsPage() {
               )}
 
               <div className="flex items-start gap-3 p-4 bg-(--theme-warning-bg) border border-(--theme-warning)/10 rounded-2xl text-(--theme-warning) text-xs">
-                <AlertTriangle size={18} className="shrink-0" />
+                <AlertTriangle size={14} className="shrink-0" />
                 <span className="font-bold leading-relaxed">
                    {t.restart_required}
                 </span>
