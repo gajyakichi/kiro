@@ -751,9 +751,13 @@ export default function SettingsPage() {
 
       <style key={activeTheme?.id || 'default'} dangerouslySetInnerHTML={{ __html: `
         ${activeTheme?.css || ''}
-        .theme-active { 
+        html, body { 
           background-color: var(--background) !important; 
           color: var(--foreground) !important; 
+        }
+        .theme-active, .theme-active > * { 
+          background-color: var(--background); 
+          color: var(--foreground); 
         }
       `}} />
     </div>
