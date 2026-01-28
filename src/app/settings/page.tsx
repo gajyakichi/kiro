@@ -390,28 +390,28 @@ export default function SettingsPage() {
   return (
     <div className={`min-h-screen text-(--foreground) font-sans ${activeTheme ? 'theme-active' : ''}`} style={{ backgroundColor: 'var(--background)' }}>
       <div className="max-w-3xl mx-auto py-16 px-6">
-        <header className="flex items-center justify-between mb-16">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="p-3 hover:bg-(--hover-bg) rounded-2xl transition-all shadow-sm bg-(--card-bg) border border-(--border-color)">
-              <ArrowLeft size={20} />
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-                <Settings className="text-(--theme-primary) opacity-40" size={28} />
-                {t.environment_settings}
-              </h1>
-              <p className="notion-text-subtle text-sm mt-1">{t.settings_desc}</p>
+          <header className="flex items-center justify-between mb-16">
+            <div className="flex items-center gap-6">
+              <Link href="/" className="p-3 hover:bg-(--hover-bg) rounded-2xl transition-all shadow-sm bg-(--card-bg) border border-(--border-color)">
+                <ArrowLeft size={20} />
+              </Link>
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+                  <Settings className="text-(--theme-primary) opacity-40" size={28} />
+                  {t.environment_settings}
+                </h1>
+                <p className="notion-text-subtle text-sm mt-1">{t.settings_desc}</p>
+              </div>
             </div>
-          </div>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex items-center gap-2 px-6 py-3 bg-(--theme-primary) text-white rounded-2xl hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-(--theme-primary)/10 text-sm font-bold"
-          >
-            {saving ? <RotateCcw className="animate-spin" size={18} /> : <Save size={18} />}
-            {saving ? t.saving : t.save_config}
-          </button>
-        </header>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-2 px-6 py-3 bg-(--theme-primary) text-white rounded-2xl hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-(--theme-primary)/10 text-sm font-bold"
+            >
+              {saving ? <RotateCcw className="animate-spin" size={18} /> : <Save size={18} />}
+              {saving ? t.saving : t.save_config}
+            </button>
+          </header>
 
         {message && (
           <div className={`mb-10 p-5 rounded-2xl flex items-center gap-4 border shadow-md animate-in slide-in-from-top-4 duration-500 ${
