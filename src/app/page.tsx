@@ -1185,7 +1185,7 @@ export default function Home() {
                                           <div>
                                           <p className="text-[15px] font-medium leading-relaxed">{content}</p>
                                           <div className="mt-2 flex items-center gap-2 text-[10px] notion-text-subtle font-mono">
-                                              <span className="bg-(--theme-primary-bg) px-1.5 py-0.5 rounded border border-(--border-color)">
+                                              <span className="bg-(--sidebar-bg) px-1.5 py-0.5 rounded border border-(--border-color)">
                                               {metadata.hash.substring(0, 7)}
                                               </span>
                                               <span>{metadata.author || 'Unknown'}</span>
