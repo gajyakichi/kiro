@@ -704,7 +704,7 @@ export default function Home() {
                                 type="text"
                                 value={newWPath}
                                 onChange={(e) => setNewWPath(e.target.value)}
-                                className="w-full text-[11px] p-3 pr-10 bg-(--card-bg) border border-(--border-color) rounded-xl focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 shadow-sm font-mono transition-all"
+                                className="w-full text-[11px] p-3 pr-10 bg-(--card-bg)! border border-(--border-color) rounded-xl focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 shadow-sm font-mono transition-all"
                                 placeholder="/Users/..."
                             />
                             <button 
@@ -945,7 +945,7 @@ export default function Home() {
                         placeholder="Search timeline..." 
                         value={timelineSearch}
                         onChange={(e) => setTimelineSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 text-sm border border-(--border-color) rounded-lg focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 bg-(--card-bg) text-(--foreground)"
+                        className="w-full pl-9 pr-4 py-2 text-sm border border-(--border-color) rounded-lg focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 bg-(--card-bg)! text-(--foreground)"
                       />
                    </div>
                    <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto no-scrollbar pb-1">
