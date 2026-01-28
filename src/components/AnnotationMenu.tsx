@@ -26,7 +26,7 @@ export function AnnotationMenu({ onSelectAI, onSelectMemo }: AnnotationMenuProps
         {/* Memo Button */}
         <button
           onClick={onSelectMemo}
-          className="group relative w-12 h-12 rounded-full bg-[var(--theme-accent)] hover:bg-[var(--theme-primary)] flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-110"
+          className="group relative w-12 h-12 rounded-full bg-[var(--theme-primary)] hover:bg-[var(--theme-accent)] flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-110"
           title="Add Memo"
         >
           <FileEdit size={20} className="text-[var(--background)]" />
