@@ -793,7 +793,7 @@ export default function Home() {
       </aside>
 
       <main className="flex-1 flex flex-col h-full overflow-hidden">
-        <div className="flex-1 overflow-y-auto p-12 lg:px-20 xl:px-40 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-12 lg:px-20 xl:px-40 custom-scrollbar" style={{ backgroundColor: 'var(--background)' }}>
         <header className="mb-12 animate-fade-in relative z-50 bg-transparent">
           <h1 className="group relative flex items-center text-4xl font-bold tracking-tight mb-2">
             <div className="relative mr-4">
@@ -852,7 +852,7 @@ export default function Home() {
 
         <section className="animate-fade-in">
           {activeTab === "timeline" && (
-             <div className="relative animate-fade-in space-y-8" style={{ backgroundColor: 'var(--background)' }}>
+             <div className="relative animate-fade-in space-y-8">
                 
                 {/* 1. Current Progress (Pinned) */}
                 <div className="group relative pl-6 border-l-2 border-(--theme-primary-bg) hover:border-(--theme-primary) transition-colors">
@@ -885,7 +885,7 @@ export default function Home() {
                     )}
                   </div>
                   
-                  <div className="bg-(--card-bg) notion-card p-6 rounded-xl border border-(--border-color) shadow-sm hover:shadow-md transition-shadow">
+                  <div className="notion-card p-6 rounded-xl border border-(--border-color) shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: 'var(--card-bg)' }}>
                     <article className="prose prose-slate max-w-none text-(--foreground) leading-relaxed text-sm">
                         <div className="markdown-content">
                           <ReactMarkdown>
@@ -923,7 +923,7 @@ export default function Home() {
                 </div>
 
                 {/* 1.5. Suggestions & Tasks */}
-                <div className="bg-(--card-bg) notion-card rounded-xl border border-(--border-color) shadow-sm p-6 relative group">
+                <div className="notion-card rounded-xl border border-(--border-color) shadow-sm p-6 relative group" style={{ backgroundColor: 'var(--card-bg)' }}>
                    <div className="absolute top-4 right-4 text-(--foreground) opacity-30 group-hover:text-(--foreground) group-hover:opacity-50 transition-colors">
                       <IconRenderer icon="Lightbulb" size={16} baseSet={appIconSet} />
                    </div>
