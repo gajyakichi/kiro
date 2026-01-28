@@ -85,7 +85,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
     }
   };
 
-  if (loading) return <div className="text-xs text-neutral-400 animate-pulse">{t.loading_vault}</div>;
+  if (loading) return <div className="text-xs text-[#616e88] animate-pulse">{t.loading_vault}</div>;
 
   return (
     <div className="space-y-4">
@@ -96,7 +96,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
         <div className="flex gap-2">
             <button 
               onClick={fetchVaults}
-              className="p-2 bg-neutral-100 text-neutral-500 rounded-xl hover:bg-neutral-200 transition-all shadow-sm"
+              className="p-2 bg-[#434c5e] text-[#616e88] rounded-xl hover:bg-[#4c566a] transition-all shadow-sm"
               title="Refresh"
             >
               <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
@@ -139,7 +139,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                   className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-all ${
                     window.electron 
                     ? 'text-(--theme-primary) hover:bg-(--theme-primary-bg)' 
-                    : 'text-neutral-300 opacity-20 cursor-not-allowed'
+                    : 'text-[#616e88] opacity-20 cursor-not-allowed'
                   }`}
                   disabled={!window.electron}
                   title={window.electron ? t.select_folder_title : t.native_dialog_not_available}
@@ -166,11 +166,11 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
             className={`group flex items-center justify-between p-3 rounded-lg border-2 transition-all ${
               vault.active 
                 ? 'border-(--theme-primary) bg-[#434c5e] shadow-md' 
-                : 'border-(--border-color) hover:border-neutral-300 bg-[#434c5e]/50'
+                : 'border-(--border-color) hover:border-[#4c566a] bg-[#434c5e]/50'
             }`}
           >
             <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${vault.active ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 group-hover:bg-neutral-200'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${vault.active ? 'bg-(--theme-primary) text-white' : 'bg-[#434c5e] text-[#616e88] group-hover:bg-[#4c566a]'}`}>
                 <ShieldCheck size={24} />
               </div>
               <div>
@@ -187,14 +187,14 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                 <>
                   <button 
                     onClick={() => handleSwitch(vault.id)}
-                    className="px-4 py-2 bg-neutral-100 text-(--theme-primary) hover:bg-(--theme-primary) hover:text-white rounded-xl text-[11px] font-black transition-all"
+                    className="px-4 py-2 bg-[#434c5e] text-(--theme-primary) hover:bg-(--theme-primary) hover:text-white rounded-xl text-[11px] font-black transition-all"
                   >
                     {t.select}
                   </button>
                   {vault.id !== 'default' && (
                     <button 
                       onClick={() => handleDelete(vault.id)}
-                      className="p-2 text-neutral-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                      className="p-2 text-[#616e88] hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                     >
                       <X size={14} />
                     </button>
@@ -439,10 +439,10 @@ export default function SettingsPage() {
                 className={`flex flex-col p-3 rounded-lg border-2 transition-all text-left group ${
                   config.STORAGE_MODE === 'local' 
                     ? 'border-(--theme-primary) bg-(--theme-primary-bg)' 
-                    : 'border-(--border-color) hover:border-neutral-300 bg-[#434c5e]'
+                    : 'border-(--border-color) hover:border-[#4c566a] bg-[#434c5e]'
                 }`}
               >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'local' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'local' ? 'bg-(--theme-primary) text-white' : 'bg-[#434c5e] text-[#616e88] opacity-40'}`}>
                   <Database size={24} />
                 </div>
                 <span className="font-black text-xs uppercase tracking-widest">{t.local_vaults}</span>
@@ -453,10 +453,10 @@ export default function SettingsPage() {
                 className={`flex flex-col p-3 rounded-lg border-2 transition-all text-left group ${
                   config.STORAGE_MODE === 'server' 
                     ? 'border-(--theme-primary) bg-(--theme-primary-bg)' 
-                    : 'border-(--border-color) hover:border-neutral-300 bg-[#434c5e]'
+                    : 'border-(--border-color) hover:border-[#4c566a] bg-[#434c5e]'
                 }`}
               >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'server' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'server' ? 'bg-(--theme-primary) text-white' : 'bg-[#434c5e] text-[#616e88] opacity-40'}`}>
                   <Cloud size={24} />
                 </div>
                 <span className="font-black text-xs uppercase tracking-widest">{t.remote_sync}</span>
@@ -491,7 +491,7 @@ export default function SettingsPage() {
                   type="text"
                   value={config.DATABASE_URL}
                   onChange={(e) => setConfig({ ...config, DATABASE_URL: e.target.value })}
-                  className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all"
+                  className="w-full p-5 bg-[#3b4252] rounded-2xl border border-(--border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all"
                   placeholder="postgresql://user:password@host:port/db"
                 />
               </div>
@@ -507,7 +507,7 @@ export default function SettingsPage() {
               </h2>
               <button 
                 onClick={handleImportPlugin}
-                className="flex items-center gap-2 px-3 py-1.5 bg-neutral-100 text-neutral-600 rounded-lg text-xs font-bold hover:bg-neutral-200 transition-all"
+                className="flex items-center gap-2 px-3 py-1.5 bg-[#434c5e] text-[#d8dee9] rounded-lg text-xs font-bold hover:bg-[#4c566a] transition-all"
                 title="Import JSON from Clipboard"
               >
                 <Plus size={12} />
@@ -521,19 +521,19 @@ export default function SettingsPage() {
                 const isSystem = AVAILABLE_PLUGINS.some(p => p.id === plugin.id);
 
                 return (
-                  <div key={plugin.id} className="group relative flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100 hover:border-neutral-200 transition-all">
+                  <div key={plugin.id} className="group relative flex items-center justify-between p-4 bg-[#3b4252] rounded-2xl border border-[#4c566a] hover:border-[#4c566a] transition-all">
                     <div className="flex items-start gap-2 flex-1">
-                      <div className={`p-3 rounded-xl transition-colors ${isEnabled ? 'bg-(--theme-primary) text-white shadow-md shadow-(--theme-primary)/20' : 'bg-[#434c5e] text-neutral-300'}`}>
+                      <div className={`p-3 rounded-xl transition-colors ${isEnabled ? 'bg-(--theme-primary) text-white shadow-md shadow-(--theme-primary)/20' : 'bg-[#434c5e] text-[#616e88]'}`}>
                         <Blocks size={12} />
                       </div>
                       <div>
                         <h3 className="font-bold text-xs flex items-center gap-2">
                           {plugin.name}
-                          <span className="text-[9px] bg-neutral-200 text-neutral-500 px-1.5 py-0.5 rounded font-mono">{plugin.version}</span>
+                          <span className="text-[9px] bg-[#4c566a] text-[#616e88] px-1.5 py-0.5 rounded font-mono">{plugin.version}</span>
                           {!isSystem && <span className="text-[9px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded font-bold uppercase">Custom</span>}
                         </h3>
-                        <p className="text-xs text-neutral-500 mt-1 max-w-sm leading-relaxed">{plugin.description}</p>
-                        <p className="text-[10px] text-neutral-400 mt-1 font-mono opacity-60">ID: {plugin.id} • by {plugin.author}</p>
+                        <p className="text-xs text-[#616e88] mt-1 max-w-sm leading-relaxed">{plugin.description}</p>
+                        <p className="text-[10px] text-[#616e88] mt-1 font-mono opacity-60">ID: {plugin.id} • by {plugin.author}</p>
                       </div>
                     </div>
                     
@@ -541,7 +541,7 @@ export default function SettingsPage() {
                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button 
                                 onClick={() => handleExportPlugin(plugin)}
-                                className="p-2 text-neutral-400 hover:text-(--theme-primary) hover:bg-[#434c5e] rounded-lg transition-all"
+                                className="p-2 text-[#616e88] hover:text-(--theme-primary) hover:bg-[#434c5e] rounded-lg transition-all"
                                 title="Export JSON to Clipboard"
                             >
                                 <Cloud size={12} />
@@ -549,7 +549,7 @@ export default function SettingsPage() {
                             {!isSystem && (
                                 <button 
                                     onClick={() => handleDeletePlugin(plugin.id, plugin.name)}
-                                    className="p-2 text-neutral-400 hover:text-red-500 hover:bg-[#434c5e] rounded-lg transition-all"
+                                    className="p-2 text-[#616e88] hover:text-red-500 hover:bg-[#434c5e] rounded-lg transition-all"
                                     title="Delete Plugin"
                                 >
                                     <X size={12} />
@@ -559,7 +559,7 @@ export default function SettingsPage() {
 
                         <button 
                           onClick={() => handlePluginToggle(plugin.id)}
-                          className={`relative w-12 h-7 rounded-full transition-colors ${isEnabled ? 'bg-(--theme-primary)' : 'bg-neutral-200'}`}
+                          className={`relative w-12 h-7 rounded-full transition-colors ${isEnabled ? 'bg-(--theme-primary)' : 'bg-[#4c566a]'}`}
                         >
                           <div className={`absolute top-1 left-1 bg-[#434c5e] w-5 h-5 rounded-full shadow-sm transition-transform ${isEnabled ? 'translate-x-5' : ''}`}></div>
                         </button>
@@ -569,7 +569,7 @@ export default function SettingsPage() {
               })}
             </div>
             {(AVAILABLE_PLUGINS.length + customPlugins.length) === 0 && (
-                <p className="text-center text-xs text-neutral-400 mt-6 italic">No plugins available.</p>
+                <p className="text-center text-xs text-[#616e88] mt-6 italic">No plugins available.</p>
             )}
           </section>
 
@@ -580,16 +580,16 @@ export default function SettingsPage() {
                 <ShieldCheck size={12} className="text-(--theme-primary) opacity-40" />
                 {t.intelligence_layer}
               </h2>
-              <div className="text-[9px] bg-neutral-100 text-neutral-400 px-3 py-1 rounded-full font-black uppercase tracking-widest">
+              <div className="text-[9px] bg-[#434c5e] text-[#616e88] px-3 py-1 rounded-full font-black uppercase tracking-widest">
                 {t.api_config}
               </div>
             </div>
             <div className="space-y-10">
-              <div className="flex bg-neutral-100 p-1.5 rounded-2xl gap-1.5">
+              <div className="flex bg-[#434c5e] p-1.5 rounded-2xl gap-1.5">
                 <button
                   onClick={() => setConfig({ ...config, AI_PROVIDER: 'openai' })}
                   className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-xs font-black transition-all ${
-                    config.AI_PROVIDER === 'openai' ? 'bg-[#434c5e] shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                    config.AI_PROVIDER === 'openai' ? 'bg-[#434c5e] shadow-md text-(--theme-primary)' : 'text-[#616e88] hover:text-[#616e88]'
                   }`}
                 >
                   <Cloud size={12} />
@@ -598,7 +598,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setConfig({ ...config, AI_PROVIDER: 'ollama' })}
                   className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-xs font-black transition-all ${
-                    config.AI_PROVIDER === 'ollama' ? 'bg-[#434c5e] shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                    config.AI_PROVIDER === 'ollama' ? 'bg-[#434c5e] shadow-md text-(--theme-primary)' : 'text-[#616e88] hover:text-[#616e88]'
                   }`}
                 >
                   <Server size={12} />
@@ -608,13 +608,13 @@ export default function SettingsPage() {
 
               <div className="space-y-4 animate-fade-in">
                  <div className="flex items-center gap-2 mb-2">
-                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">{t.language}</label>
+                    <label className="text-[10px] font-black text-[#616e88] uppercase tracking-widest px-1">{t.language}</label>
                  </div>
-                 <div className="flex bg-neutral-100 p-1.5 rounded-2xl gap-1.5">
+                 <div className="flex bg-[#434c5e] p-1.5 rounded-2xl gap-1.5">
                     <button 
                       onClick={() => setConfig({ ...config, APP_LANG: 'en' })}
                       className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${
-                        config.APP_LANG === 'en' ? 'bg-[#434c5e] shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                        config.APP_LANG === 'en' ? 'bg-[#434c5e] shadow-md text-(--theme-primary)' : 'text-[#616e88] hover:text-[#616e88]'
                       }`}
                     >
                       <Languages size={12} />
@@ -624,14 +624,14 @@ export default function SettingsPage() {
                       <button 
                         onClick={() => setConfig({ ...config, APP_LANG: 'ja' })}
                         className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${
-                          config.APP_LANG === 'ja' ? 'bg-[#434c5e] shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                          config.APP_LANG === 'ja' ? 'bg-[#434c5e] shadow-md text-(--theme-primary)' : 'text-[#616e88] hover:text-[#616e88]'
                         }`}
                       >
                         <Languages size={12} />
                         {t.japanese}
                       </button>
                     ) : (
-                      <div className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold text-neutral-300 bg-neutral-50 border border-transparent cursor-not-allowed group relative" title="Enable 'Japanese Language Support' plugin to unlock">
+                      <div className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold text-[#616e88] bg-[#3b4252] border border-transparent cursor-not-allowed group relative" title="Enable 'Japanese Language Support' plugin to unlock">
                          <Languages size={12} />
                          {t.japanese}
                          <span className="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-white text-[9px] px-2 py-1 rounded shadow-lg whitespace-nowrap z-10">Plugin Required</span>
@@ -643,34 +643,34 @@ export default function SettingsPage() {
               {config.AI_PROVIDER === 'openai' ? (
                 <div className="space-y-4 animate-fade-in">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">OpenAI API Key</label>
+                    <label className="text-[10px] font-black text-[#616e88] uppercase tracking-widest px-1">OpenAI API Key</label>
                     <div className="relative group">
                       <input
                         type="password"
                         value={config.OPENAI_API_KEY}
                         autoComplete="off"
                         onChange={(e) => setConfig({ ...config, OPENAI_API_KEY: e.target.value })}
-                        className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all pr-12"
+                        className="w-full p-5 bg-[#3b4252] rounded-2xl border border-(--border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all pr-12"
                         placeholder="sk-proj-..."
                       />
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within:text-(--theme-primary) transition-colors">
+                      <div className="absolute right-5 top-1/2 -translate-y-1/2 text-[#616e88] group-focus-within:text-(--theme-primary) transition-colors">
                         <ShieldCheck size={12} />
                       </div>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">{t.target_model}</label>
+                    <label className="text-[10px] font-black text-[#616e88] uppercase tracking-widest px-1">{t.target_model}</label>
                     <div className="relative">
                       <select
                         value={config.AI_MODEL}
                         onChange={(e) => setConfig({ ...config, AI_MODEL: e.target.value })}
-                        className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
+                        className="w-full p-5 bg-[#3b4252] rounded-2xl border border-(--border-color) text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
                       >
                         <option value="gpt-4o-mini">GPT-4o mini (Recommended)</option>
                         <option value="gpt-4o">GPT-4o (High Intelligence)</option>
                         <option value="o1-mini">o1-mini (Reasoning)</option>
                       </select>
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400">
+                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[#616e88]">
                         <Plus size={12} className="rotate-45" />
                       </div>
                     </div>
@@ -679,17 +679,17 @@ export default function SettingsPage() {
               ) : (
                 <div className="space-y-4 animate-fade-in">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Ollama Base URL</label>
+                    <label className="text-[10px] font-black text-[#616e88] uppercase tracking-widest px-1">Ollama Base URL</label>
                     <input
                       type="text"
                       value={config.OLLAMA_BASE_URL}
                       onChange={(e) => setConfig({ ...config, OLLAMA_BASE_URL: e.target.value })}
-                      className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all"
+                      className="w-full p-5 bg-[#3b4252] rounded-2xl border border-(--border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all"
                       placeholder="http://localhost:11434"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1 flex items-center justify-between">
+                    <label className="text-[10px] font-black text-[#616e88] uppercase tracking-widest px-1 flex items-center justify-between">
                       {t.active_model}
                       <button 
                         onClick={fetchOllamaModels}
@@ -705,7 +705,7 @@ export default function SettingsPage() {
                         <select
                           value={config.AI_MODEL}
                           onChange={(e) => setConfig({ ...config, AI_MODEL: e.target.value })}
-                          className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
+                          className="w-full p-5 bg-[#3b4252] rounded-2xl border border-(--border-color) text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
                         >
                           {!ollamaModels.includes(config.AI_MODEL) && (
                             <option value={config.AI_MODEL}>{config.AI_MODEL} (Custom)</option>
@@ -726,7 +726,7 @@ export default function SettingsPage() {
                           <p className="text-[10px] text-(--theme-error) font-bold px-1">Could not detect any local Ollama models. Ensure Ollama is running.</p>
                         </div>
                       )}
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400">
+                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[#616e88]">
                         <Plus size={12} className="rotate-45" />
                       </div>
                     </div>
