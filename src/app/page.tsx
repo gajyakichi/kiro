@@ -852,7 +852,7 @@ export default function Home() {
 
         <section className="animate-fade-in">
           {activeTab === "timeline" && (
-             <div className="relative animate-fade-in space-y-8">
+             <div className="relative animate-fade-in space-y-8" style={{ backgroundColor: 'var(--background)' }}>
                 
                 {/* 1. Current Progress (Pinned) */}
                 <div className="group relative pl-6 border-l-2 border-(--theme-primary-bg) hover:border-(--theme-primary) transition-colors">
