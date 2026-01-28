@@ -926,7 +926,11 @@ export default function Home() {
                       {chatState.mode === 'menu' && (
                         <AnnotationMenu 
                           onSelectAI={() => setChatState(prev => ({ ...prev, mode: 'ai' }))}
-                          onSelectMemo={() => setChatState(prev => ({ ...prev, mode: 'memo' }))}
+                          onSelectMemo={() => setChatState(prev => ({ 
+                            ...prev, 
+                            mode: 'memo',
+                            title: prev.title.replace('Chat about', 'Note about')
+                          }))}
                         />
                       )}
                       {chatState.mode === 'ai' && (
@@ -1246,7 +1250,11 @@ export default function Home() {
                                   {chatState.mode === 'menu' && (
                                     <AnnotationMenu 
                                       onSelectAI={() => setChatState(prev => ({ ...prev, mode: 'ai' }))}
-                                      onSelectMemo={() => setChatState(prev => ({ ...prev, mode: 'memo' }))}
+                                      onSelectMemo={() => setChatState(prev => ({ 
+                                        ...prev, 
+                                        mode: 'memo',
+                                        title: prev.title.replace('Chat about', 'Note about')
+                                      }))}
                                     />
                                   )}
                                   {chatState.mode === 'ai' && (
