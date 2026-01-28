@@ -517,12 +517,6 @@ export default function Home() {
       });
       if (res.ok) {
         await fetchAbsorbData(activeProject.id);
-        setDialogState({
-          open: true,
-          title: "完了",
-          message: "Absorbが完了しました",
-          type: 'success'
-        });
       } else {
         throw new Error("Absorbに失敗しました");
       }
