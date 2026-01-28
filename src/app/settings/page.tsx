@@ -388,7 +388,7 @@ export default function SettingsPage() {
   const t = getTranslation(config.APP_LANG);
 
   return (
-    <div className={`min-h-screen bg-(--background) text-(--foreground) font-sans ${activeTheme ? 'theme-active' : ''}`}>
+    <div className={`min-h-screen text-(--foreground) font-sans ${activeTheme ? 'theme-active' : ''}`} style={{ backgroundColor: 'var(--background)' }}>
       <div className="max-w-3xl mx-auto py-16 px-6">
         <header className="flex items-center justify-between mb-16">
           <div className="flex items-center gap-6">
