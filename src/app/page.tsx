@@ -937,7 +937,11 @@ export default function Home() {
                 </div>
 
                 {/* 2. Search & Filter Bar */}
-                <div className="flex flex-col md:flex-row gap-4 items-center justify-between sticky top-0 bg-(--background)! py-4 z-20 border-b border-(--border-color)">
+                {/* 2. Search & Filter Bar */}
+                <div 
+                  className="flex flex-col md:flex-row gap-4 items-center justify-between sticky top-0 py-4 z-20 border-b border-(--border-color)"
+                  style={{ backgroundColor: 'var(--background)' }}
+                >
                    <div className="relative w-full md:w-auto md:min-w-[300px]">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
                       <input 
@@ -945,7 +949,8 @@ export default function Home() {
                         placeholder="Search timeline..." 
                         value={timelineSearch}
                         onChange={(e) => setTimelineSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 text-sm border border-(--border-color) rounded-lg focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 bg-(--card-bg)! text-(--foreground)"
+                        className="w-full pl-9 pr-4 py-2 text-sm border border-(--border-color) rounded-lg focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 text-(--foreground)"
+                        style={{ backgroundColor: 'var(--card-bg)' }}
                       />
                    </div>
                    <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto no-scrollbar pb-1">
