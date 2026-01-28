@@ -794,13 +794,13 @@ export default function Home() {
 
       <main className="flex-1 flex flex-col h-full overflow-hidden">
         <div className="flex-1 overflow-y-auto p-12 lg:px-20 xl:px-40 custom-scrollbar">
-        <header className="mb-12 animate-fade-in relative z-50">
+        <header className="mb-12 animate-fade-in relative z-50 bg-transparent">
           <h1 className="group relative flex items-center text-4xl font-bold tracking-tight mb-2">
             <div className="relative mr-4">
               <button 
                 onClick={() => setIconPickerTarget('header')}
                 aria-label="Change project icon"
-                className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-gray-100 cursor-pointer transition-colors border border-transparent hover:border-gray-200"
+                className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-(--hover-bg) cursor-pointer transition-colors border border-transparent hover:border-(--border-color)"
               >
                 {activeProject?.icon ? (
                     <IconRenderer icon={activeProject.icon} size={32} baseSet={appIconSet} />
@@ -821,11 +821,11 @@ export default function Home() {
                 </div>
               )}
             </div>
-            <span>
+            <span className="text-(--foreground)">
               {activeTab === "timeline" && "Project Timeline"}
               {activeTab === "themes" && t.theme_lab}
             </span>
-            {activeProject && <span className="text-lg ml-4 opacity-30 font-normal">/ {activeProject.name}</span>}
+            {activeProject && <span className="text-lg ml-4 opacity-30 font-normal text-(--foreground)">/ {activeProject.name}</span>}
             
             {activeProject && (
               <button 
@@ -835,7 +835,7 @@ export default function Home() {
                 className={`ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   isAbsorbing 
                     ? 'bg-(--hover-bg) text-(--foreground) opacity-50 cursor-not-allowed border border-(--border-color)' 
-                    : 'bg-(--card-bg) text-(--foreground) border border-(--border-color) hover:bg-(--hover-bg) shadow-xs'
+                    : 'bg-(--background) text-(--foreground) border border-(--border-color) hover:bg-(--hover-bg) shadow-xs'
                 }`}
               >
                 <Sparkles size={14} className={isAbsorbing ? 'animate-spin' : 'text-(--theme-accent) transition-colors'} />
