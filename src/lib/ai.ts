@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import Database from 'better-sqlite3';
 
 // Remove top-level consts
 // const AI_PROVIDER = process.env.AI_PROVIDER || 'openai';
@@ -9,6 +10,25 @@ const getOpenAI = () => {
   return new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
+};
+
+// Get active system prompt from database
+const getActiveSystemPrompt = (): string => {
+  try {
+    const dbPath = process.cwd() + '/kaihatsunote.db';
+    const db = new Database(dbPath);
+    const result = db.prepare('SELECT system_prompt FROM prompts WHERE is_active = 1').get() as { system_prompt: string } | undefined;
+    db.close();
+    
+    if (result) {
+      return result.system_prompt;
+    }
+  } catch (e) {
+    console.error('Failed to get active prompt from database', e);
+  }
+  
+  // Fallback to default
+  return 'You are a helpful development assistant. Provide clear, concise, and accurate responses. Focus on practical solutions and best practices.';
 };
 
 type Message = {

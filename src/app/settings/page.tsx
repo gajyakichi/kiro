@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Vault, Theme } from '@/lib/types';
 import { getTranslation } from '@/lib/i18n';
 import { AVAILABLE_PLUGINS } from '@/lib/plugins';
+import { PromptVault } from '@/components/PromptVault';
 
 
 const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onVaultSwitch: () => void }) => {
@@ -741,6 +742,11 @@ export default function SettingsPage() {
                 </span>
               </div>
             </div>
+          </section>
+
+          {/* AI Prompt Vault */}
+          <section className="space-y-4 pb-8 border-b border-(-border-color)/30">
+            <PromptVault language={config.APP_LANG || 'en'} />
           </section>
 
           <footer className="text-center notion-text-subtle text-[10px] font-black uppercase tracking-widest pt-12 opacity-30">
