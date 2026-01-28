@@ -106,7 +106,7 @@ html, body {
 
 [data-skin="vscode"] .notion-sidebar {
   padding-top: 25px !important; /* Make space for traffic lights */
-  background-color: var(--sidebar-bg) !important;
+  background-color: var(--sidebar-bg);
   border-right-width: 1px !important;
 }
 

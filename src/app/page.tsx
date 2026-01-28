@@ -671,7 +671,7 @@ export default function Home() {
       )}
 
       {/* Notion Sidebar */}
-      <aside className="w-80 notion-sidebar flex flex-col pt-8 pb-4 px-3 sticky top-0 h-screen overflow-y-auto">
+      <aside className="w-80 notion-sidebar flex flex-col pt-8 pb-4 px-3 sticky top-0 h-screen overflow-y-auto bg-(--sidebar-bg) border-r border-(--border-color)">
         <div className="mb-6">
           <div className="px-2 mt-4">
             <div className="flex items-center justify-between mb-2">
