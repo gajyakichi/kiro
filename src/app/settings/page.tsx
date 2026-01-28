@@ -749,26 +749,9 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <style key={activeTheme?.id || 'default'} dangerouslySetInnerHTML={{ __html: `
-        ${activeTheme?.css || `:root, .theme-active { 
-          --background: #2e3440; 
-          --foreground: #d8dee9; 
-          --card-bg: #434c5e; 
-          --sidebar-bg: #3b4252; 
-          --hover-bg: rgba(255,255,255,0.1); 
-          --border-color: rgba(255, 255, 255, 0.1); 
-          --theme-primary: #88c0d0; 
-          --theme-primary-bg: rgba(136, 192, 208, 0.15); 
-        }`}
-        html, body { 
-          background-color: var(--background) !important; 
-          color: var(--foreground) !important; 
-        }
-        .theme-active, .theme-active > * { 
-          background-color: var(--background); 
-          color: var(--foreground); 
-        }
-      `}} />
+      {activeTheme && (
+        <style key={activeTheme.id} dangerouslySetInnerHTML={{ __html: activeTheme.css }} />
+      )}
     </div>
   );
 }
