@@ -266,7 +266,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
       {/* Theme Selector Section */}
       <section>
         <div className="flex items-center gap-3 mb-6">
-          <Palette size={24} className="text-gray-400" weight="bold" />
+          <Palette size={24} className="text-[#616e88]" weight="bold" />
           <h2 className="text-xl font-bold tracking-tight text-gray-800 uppercase">Theme Selector</h2>
         </div>
 
@@ -338,12 +338,12 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
             onMouseLeave={() => onPreview(newCss)}
             className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 transition-all duration-500 ease-in-out bg-(--card-bg) hover:-translate-y-3 hover:translate-x-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 active:scale-[0.98] outline-none relative ${!activeTheme ? 'border-(--theme-primary) shadow-xl' : 'border-(--border-color) hover:border-(--theme-primary)/50 opacity-70 hover:opacity-100'}`}
           >
-            <div className={`w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform duration-500 ${!activeTheme ? 'text-foreground border-foreground/10' : ''}`}>
+            <div className={`w-10 h-10 rounded-full bg-[#434c5e] border border-[#4c566a] flex items-center justify-center text-[#616e88] group-hover:scale-110 transition-transform duration-500 ${!activeTheme ? 'text-foreground border-foreground/10' : ''}`}>
               {!activeTheme ? <CheckCircle size={22} weight="fill" className="text-foreground" /> : <Circle size={22} />}
             </div>
             <div className="text-left">
               <div className="font-black text-sm tracking-tight">Original</div>
-              <div className="text-[10px] text-gray-400 uppercase tracking-widest font-black opacity-60">Default System</div>
+              <div className="text-[10px] text-[#616e88] uppercase tracking-widest font-black opacity-60">Default System</div>
             </div>
           </button>
 
@@ -363,7 +363,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                 <div className="font-black text-sm tracking-tight flex items-center gap-2">
                   {preset.name}
                 </div>
-                <div className="text-[10px] text-gray-400 uppercase tracking-widest font-black opacity-60">Built-in Preset</div>
+                <div className="text-[10px] text-[#616e88] uppercase tracking-widest font-black opacity-60">Built-in Preset</div>
               </div>
             </button>
           ))}
@@ -376,7 +376,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               onMouseLeave={() => onPreview(newCss)}
               className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 transition-all duration-500 ease-in-out bg-(--card-bg) hover:-translate-y-3 hover:translate-x-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 active:scale-[0.98] outline-none relative ${theme.active ? 'border-(--theme-primary) shadow-xl' : 'border-(--border-color) hover:border-(--theme-primary)/50 opacity-70 hover:opacity-100'}`}
             >
-              <div className={`w-10 h-10 rounded-full bg-(--hover-bg) border border-(--border-color) flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform duration-500 ${theme.active ? 'text-(--theme-primary) border-(--theme-primary)/20' : ''}`}>
+              <div className={`w-10 h-10 rounded-full bg-(--hover-bg) border border-(--border-color) flex items-center justify-center text-[#616e88] group-hover:scale-110 transition-transform duration-500 ${theme.active ? 'text-(--theme-primary) border-(--theme-primary)/20' : ''}`}>
                 {theme.active ? <CheckCircle size={22} weight="fill" className="text-foreground" /> : <Circle size={22} />}
               </div>
               <div className="text-left relative">
@@ -388,7 +388,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                      </span>
                    )}
                  </div>
-                 <div className="text-[10px] text-gray-400 uppercase tracking-widest font-black opacity-60">{theme.isPreset ? 'Built-in Preset' : 'Custom Style'}</div>
+                 <div className="text-[10px] text-[#616e88] uppercase tracking-widest font-black opacity-60">{theme.isPreset ? 'Built-in Preset' : 'Custom Style'}</div>
               </div>
             </button>
           ))}
@@ -417,7 +417,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               }
               setIsAdding(!isAdding);
             }}
-            className={`notion-item px-4 py-2 rounded-md font-medium text-sm transition-all ${isAdding ? 'bg-gray-100 text-gray-600' : 'bg-foreground text-background'}`}
+            className={`notion-item px-4 py-2 rounded-md font-medium text-sm transition-all ${isAdding ? 'bg-[#434c5e] text-[#d8dee9]' : 'bg-foreground text-background'}`}
           >
             {isAdding ? "Close Editor" : "Open CSS Editor"}
           </button>
@@ -425,13 +425,13 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               <button
                 onClick={handleExport}
                 title="Export Configuration (Themes, Skin, Icons)"
-                className="p-2 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-foreground transition-all"
+                className="p-2 rounded-md bg-[#434c5e] border border-[#4c566a] text-[#d8dee9] hover:bg-[#3b4252] hover:text-foreground transition-all"
               >
                  <DownloadSimple size={18} weight="bold" />
               </button>
               <label
                 title="Import Configuration"
-                className="p-2 rounded-md bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-foreground transition-all cursor-pointer"
+                className="p-2 rounded-md bg-[#434c5e] border border-[#4c566a] text-[#d8dee9] hover:bg-[#3b4252] hover:text-foreground transition-all cursor-pointer"
               >
                  <UploadSimple size={18} weight="bold" />
                  <input type="file" accept=".json" onChange={handleImport} className="hidden" />
@@ -441,7 +441,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
 
         {isAdding && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in slide-in-from-top-4 duration-500">
-            <div className="bg-white notion-card p-6 border-2 border-gray-100 space-y-6">
+            <div className="bg-[#434c5e] notion-card p-6 border-2 border-[#4c566a] space-y-6">
               <div className="flex items-center gap-3">
                  <Palette size={20} className="text-foreground" />
                  <span className="font-bold">Laboratory</span>
@@ -450,7 +450,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">Theme Name</label>
                 <input 
-                  className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 ring-gray-900 outline-none transition-all shadow-sm disabled:opacity-50"
+                  className="w-full border border-[#4c566a] rounded-xl p-3 text-sm focus:ring-2 ring-gray-900 outline-none transition-all shadow-sm disabled:opacity-50"
                   placeholder="e.g. Cyberpunk"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
@@ -461,7 +461,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               <div className="space-y-1.5">
                   <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">Custom CSS</label>
                   <textarea 
-                    className="w-full h-80 border border-gray-200 rounded-2xl p-4 text-xs font-mono bg-gray-50 focus:bg-white transition-all focus:ring-2 ring-gray-900 outline-none leading-relaxed shadow-xs disabled:opacity-50"
+                    className="w-full h-80 border border-[#4c566a] rounded-2xl p-4 text-xs font-mono bg-[#3b4252] focus:bg-[#434c5e] transition-all focus:ring-2 ring-gray-900 outline-none leading-relaxed shadow-xs disabled:opacity-50"
                     placeholder="/* Add your custom CSS here */"
                     value={newCss}
                     readOnly={editingTheme?.isPreset}
@@ -480,7 +480,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                   <button 
                     key={preset.name}
                     onClick={() => handleSelectForEdit(preset)}
-                    className={`text-[10px] px-3 py-1.5 rounded-full font-bold transition-all ${newName === preset.name ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-foreground hover:text-background'}`}
+                    className={`text-[10px] px-3 py-1.5 rounded-full font-bold transition-all ${newName === preset.name ? 'bg-purple-600 text-white' : 'bg-[#434c5e] text-[#d8dee9] hover:bg-foreground hover:text-background'}`}
                   >
                     {preset.name}
                   </button>
@@ -500,7 +500,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               {/* Overlay for "Original" mode or when no specific theme is active in preview but we want base dark bg */}
                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0,transparent_100%)] pointer-events-none mix-blend-overlay"></div>
               
-              <div className="z-10 w-full flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">
+              <div className="z-10 w-full flex justify-between items-center bg-[#434c5e]/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">
                 <div className="flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
                   <div className="w-8 h-8 rounded-full bg-(--theme-primary) flex items-center justify-center text-white shadow-lg">
                     <CheckCircle size={18} weight="fill" />
@@ -567,7 +567,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                 </div>
               </div>
 
-              <div className="z-10 bg-white/5 px-6 py-3 rounded-2xl backdrop-blur-md border border-white/5 text-[10px] text-neutral-400 font-bold uppercase tracking-[0.2em] shadow-xl">
+              <div className="z-10 bg-[#434c5e]/5 px-6 py-3 rounded-2xl backdrop-blur-md border border-white/5 text-[10px] text-neutral-400 font-bold uppercase tracking-[0.2em] shadow-xl">
                  Real-time Reflecting...
               </div>
             </div>
