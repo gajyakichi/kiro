@@ -25,7 +25,9 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
     },
     titleBarStyle: 'hiddenInset', // Modern macOS look
-    backgroundColor: '#ffffff',
+    // Transparent background allows CSS theme to be visible immediately and avoids "white flash"
+    backgroundColor: '#00000000',
+    trafficLightPosition: { x: 20, y: 18 }, /* Adjusted for dense layout */
     title: 'Kiro',
     icon: path.join(__dirname, '../public/icon.png'),
   });

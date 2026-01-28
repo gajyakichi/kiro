@@ -611,8 +611,8 @@ export default function Home() {
             {new Intl.DateTimeFormat(appLang, { month: 'short', year: 'numeric' }).format(currentDate)}
           </span>
           <div className="flex gap-1">
-            <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-0.5 hover:bg-gray-100 rounded text-gray-400" aria-label="Previous month">‹</button>
-            <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-0.5 hover:bg-gray-100 rounded text-gray-400" aria-label="Next month">›</button>
+            <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-0.5 hover:bg-(--hover-bg) rounded text-gray-400" aria-label="Previous month">‹</button>
+            <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-0.5 hover:bg-(--hover-bg) rounded text-gray-400" aria-label="Next month">›</button>
           </div>
         </div>
         <div className="grid grid-cols-7 gap-px text-[10px] text-center">
@@ -624,7 +624,7 @@ export default function Home() {
           {Array.from({ length: days }, (_, i) => i + 1).map(day => (
             <div 
               key={day} 
-              className={`py-1 rounded-sm transition-colors cursor-default ${activityDays.has(day) ? 'bg-blue-50 text-blue-600 font-bold' : 'text-gray-500 hover:bg-gray-50'}`}
+              className={`mini-calendar-day py-1 rounded-sm transition-colors cursor-default ${activityDays.has(day) ? 'bg-(--theme-primary-bg) text-(--theme-primary) font-bold' : 'text-gray-500 hover:bg-(--hover-bg)'}`}
             >
               {day}
             </div>
@@ -678,7 +678,7 @@ export default function Home() {
                 <div className="text-[11px] font-semibold notion-text-subtle uppercase">{t.workspace}</div>
                 <button 
                     onClick={() => setIsAddingWorkspace(!isAddingWorkspace)}
-                    className="p-1 hover:bg-neutral-100 rounded transition-colors text-neutral-400 hover:text-neutral-600"
+                    className="p-1 hover:bg-(--hover-bg) rounded transition-colors text-neutral-400 hover:text-neutral-600"
                     title={t.add_workspace}
                 >
                     <Plus size={14} />
@@ -686,14 +686,14 @@ export default function Home() {
             </div>
             
             {isAddingWorkspace && (
-                <div className="mb-4 p-4 bg-neutral-50/50 border border-(--border-color) rounded-2xl space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="mb-4 p-4 bg-(--card-bg) border border-(--border-color) rounded-2xl space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
                         <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">{t.workspace_name}</label>
                         <input 
                             type="text"
                             value={newWName}
                             onChange={(e) => setNewWName(e.target.value)}
-                            className="w-full text-xs p-3 bg-white border border-(--border-color) rounded-xl focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 shadow-sm font-medium transition-all"
+                            className="w-full text-xs p-3 bg-(--card-bg) border border-(--border-color) rounded-xl focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 shadow-sm font-medium transition-all"
                             placeholder="e.g. My Repo"
                         />
                     </div>
@@ -704,12 +704,12 @@ export default function Home() {
                                 type="text"
                                 value={newWPath}
                                 onChange={(e) => setNewWPath(e.target.value)}
-                                className="w-full text-[11px] p-3 pr-10 bg-white border border-(--border-color) rounded-xl focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 shadow-sm font-mono transition-all"
+                                className="w-full text-[11px] p-3 pr-10 bg-(--card-bg) border border-(--border-color) rounded-xl focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 shadow-sm font-mono transition-all"
                                 placeholder="/Users/..."
                             />
                             <button 
                                 onClick={handleSelectWDir}
-                                className="absolute right-1 top-1/2 -translate-y-1/2 p-2 hover:bg-neutral-100 rounded-lg text-neutral-400 hover:text-(--theme-primary) transition-all"
+                                className="absolute right-1 top-1/2 -translate-y-1/2 p-2 hover:bg-(--hover-bg) rounded-lg text-neutral-400 hover:text-(--theme-primary) transition-all"
                                 title={t.select_folder_title}
                             >
                                 <Folder size={14} />
@@ -733,7 +733,7 @@ export default function Home() {
                     const p = projects.find(proj => proj.id === parseInt(e.target.value));
                     if (p) setActiveProject(p);
                 }}
-                className="w-full bg-white border border-(--border-color) rounded px-2 py-1.5 pl-8 text-sm focus:outline-none appearance-none"
+                className="w-full bg-(--card-bg) border border-(--border-color) rounded px-2 py-1.5 pl-8 text-sm focus:outline-none appearance-none"
                 >
                 <option value="" disabled>{t.select_workspace}</option>
                 {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -834,8 +834,8 @@ export default function Home() {
                 aria-busy={isAbsorbing}
                 className={`ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   isAbsorbing 
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-100' 
-                    : 'bg-white text-foreground border border-gray-200 hover:bg-gray-100 shadow-xs'
+                    ? 'bg-(--hover-bg) text-(--foreground) opacity-50 cursor-not-allowed border border-(--border-color)' 
+                    : 'bg-(--card-bg) text-(--foreground) border border-(--border-color) hover:bg-(--hover-bg) shadow-xs'
                 }`}
               >
                 <Sparkles size={14} className={isAbsorbing ? 'animate-spin' : 'text-(--theme-accent) transition-colors'} />
@@ -856,13 +856,13 @@ export default function Home() {
                 
                 {/* 1. Current Progress (Pinned) */}
                 <div className="group relative pl-6 border-l-2 border-(--theme-primary-bg) hover:border-(--theme-primary) transition-colors">
-                  <button 
+                    <button 
                     onClick={() => handleOpenChat(
                         'current-status',
                         `Current Status Task:\n${progress?.task || 'No task set'}`,
                         "Current Status AI"
                     )}
-                    className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-(--theme-primary-bg) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center cursor-pointer hover:scale-110 z-10"
+                    className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-(--card-bg) border-2 border-(--theme-primary-bg) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center cursor-pointer hover:scale-110 z-10"
                     title="Ask AI about this status"
                   >
                     <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
@@ -870,13 +870,13 @@ export default function Home() {
                   
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-gray-500 uppercase tracking-widest">Current Status</span>
+                        <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">Current Status</span>
                     </div>
                     {settings?.ENABLED_PLUGINS?.includes('plugin-jp') && (
                         <button
                           onClick={handleToggleProgressLang}
                           disabled={isTranslatingProgress}
-                          className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium text-gray-400 hover:text-(--theme-primary) hover:bg-(--theme-primary-bg) rounded transition-colors"
+                          className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium text-(--foreground) opacity-40 hover:text-(--theme-primary) hover:bg-(--theme-primary-bg) rounded transition-colors"
                           title="Toggle Language"
                         >
                           {isTranslatingProgress ? <Loader2 size={12} className="animate-spin" /> : <Languages size={12} />}
@@ -885,8 +885,8 @@ export default function Home() {
                     )}
                   </div>
                   
-                  <div className="bg-white notion-card p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                    <article className="prose prose-slate max-w-none text-gray-700 leading-relaxed text-sm">
+                  <div className="bg-(--card-bg) notion-card p-6 rounded-xl border border-(--border-color) shadow-sm hover:shadow-md transition-shadow">
+                    <article className="prose prose-slate max-w-none text-(--foreground) leading-relaxed text-sm">
                         <div className="markdown-content">
                           <ReactMarkdown>
                             {progressLang === 'ja' ? (progressTranslated || "翻訳中...") : (progress?.task || t.loading_progress)}
@@ -923,8 +923,8 @@ export default function Home() {
                 </div>
 
                 {/* 1.5. Suggestions & Tasks */}
-                <div className="bg-white notion-card rounded-xl border border-gray-100 shadow-sm p-6 relative group">
-                   <div className="absolute top-4 right-4 text-gray-300 group-hover:text-gray-400 transition-colors">
+                <div className="bg-(--card-bg) notion-card rounded-xl border border-(--border-color) shadow-sm p-6 relative group">
+                   <div className="absolute top-4 right-4 text-(--foreground) opacity-30 group-hover:text-(--foreground) group-hover:opacity-50 transition-colors">
                       <IconRenderer icon="Lightbulb" size={16} baseSet={appIconSet} />
                    </div>
                    <SuggestedTasks 
@@ -945,7 +945,7 @@ export default function Home() {
                         placeholder="Search timeline..." 
                         value={timelineSearch}
                         onChange={(e) => setTimelineSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20"
+                        className="w-full pl-9 pr-4 py-2 text-sm border border-(--border-color) rounded-lg focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 bg-(--card-bg) text-(--foreground)"
                       />
                    </div>
                    <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto no-scrollbar pb-1">
@@ -961,8 +961,8 @@ export default function Home() {
                           onClick={() => setTimelineFilter(filter.id as TimelineFilter)}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                             timelineFilter === filter.id 
-                              ? 'bg-(--theme-primary) text-white shadow-md' 
-                              : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
+                              ? 'bg-(--theme-primary) text-(--background) shadow-md' 
+                              : 'bg-(--card-bg) border border-(--border-color) text-(--foreground) opacity-60 hover:bg-(--hover-bg)'
                           }`}
                         >
                           {filter.icon && <IconRenderer icon={filter.icon} size={12} baseSet={appIconSet} className={timelineFilter === filter.id ? 'text-white' : 'text-gray-400'} />}
@@ -1022,7 +1022,7 @@ export default function Home() {
 
                       return (
                         <div key={`${entryType}-${entry.id}`} className="group relative">
-                          <div className="timeline-row flex gap-4 items-start py-6 -mx-4 px-4 hover:bg-gray-50/50 rounded-2xl transition-all">
+                          <div className="timeline-row flex gap-4 items-start py-6 -mx-4 px-4 hover:bg-(--hover-bg)/50 rounded-2xl transition-all">
                             {/* Marker Icon (Clickable for AI Chat) */}
                             <button 
                                 onClick={(e) => {
@@ -1033,7 +1033,7 @@ export default function Home() {
                                         `Chat about ${typeLabel}`
                                     );
                                 }}
-                                className="timeline-icon shrink-0 w-6 h-6 rounded-full bg-white border-2 border-(--theme-primary-bg) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 group-hover:border-(--theme-primary) transition-all z-10 cursor-pointer hover:bg-blue-50"
+                                className="timeline-icon shrink-0 w-6 h-6 rounded-full bg-(--card-bg) border-2 border-(--theme-primary-bg) flex items-center justify-center text-(--theme-primary) shadow-sm group-hover:scale-110 group-hover:border-(--theme-primary) transition-all z-10 cursor-pointer hover:bg-(--theme-primary-bg)"
                                 title="Ask AI about this item"
                             >
                               {icon}
@@ -1070,8 +1070,8 @@ export default function Home() {
                                               setEditingContent("");
                                           }}
                                         />
-                                        <div className="bg-gray-50 border-t border-gray-100 p-2 flex justify-end">
-                                            <button 
+                                        <div className="bg-(--background) border-t border-(--border-color) p-2 flex justify-end">
+                                            <button  
                                                 onClick={() => setEditingType('markdown')}
                                                 className="text-[10px] text-gray-500 hover:text-gray-800 underline"
                                             >
@@ -1080,23 +1080,23 @@ export default function Home() {
                                         </div>
                                     </div>
                                   ) : entryType === 'comment' && editingCommentId === entry.id && editingType === 'markdown' ? (
-                                    <div className="mt-2 border border-(--theme-primary) rounded-xl overflow-hidden shadow-sm bg-white p-3">
+                                    <div className="mt-2 border border-(--theme-primary) rounded-xl overflow-hidden shadow-sm bg-(--card-bg) p-3">
                                         <textarea
                                             value={editingContent}
                                             onChange={(e) => setEditingContent(e.target.value)}
                                             className="w-full text-sm min-h-[100px] outline-none resize-y"
                                             placeholder="Edit note..."
                                         />
-                                        <div className="flex justify-between items-center mt-2 border-t pt-2 border-gray-100">
+                                        <div className="flex justify-between items-center mt-2 border-t pt-2 border-(--border-color)">
                                             <button 
                                                 onClick={() => setEditingType('block')}
-                                                className="text-[10px] text-gray-500 hover:text-gray-800 underline"
+                                                className="text-[10px] text-(--foreground) opacity-50 hover:text-(--foreground) underline"
                                             >
                                                 Switch to Block Editor
                                             </button>
                                             <div className="flex gap-2">
-                                                <button onClick={() => setEditingCommentId(null)} className="text-xs text-gray-500 hover:text-gray-700">Cancel</button>
-                                                <button onClick={handleUpdateComment} className="text-xs bg-black text-white px-3 py-1 rounded-md">Save</button>
+                                                <button onClick={() => setEditingCommentId(null)} className="text-xs text-(--foreground) opacity-50 hover:text-(--foreground)">Cancel</button>
+                                                <button onClick={handleUpdateComment} className="text-xs bg-(--foreground) text-(--background) px-3 py-1 rounded-md">Save</button>
                                             </div>
                                         </div>
                                     </div>
@@ -1118,14 +1118,14 @@ export default function Home() {
                                               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                   <button 
                                                       onClick={() => startEditingComment(entry.id, content, entry.type)}
-                                                      className="p-1.5 text-gray-400 hover:text-(--theme-primary) hover:bg-gray-100 rounded transition-colors"
+                                                      className="p-1.5 text-(--foreground) opacity-40 hover:text-(--theme-primary) hover:bg-(--hover-bg) rounded transition-colors"
                                                       title="Edit"
                                                   >
                                                       <Edit2 size={14} />
                                                   </button>
                                                   <button 
                                                       onClick={() => handleDeleteComment(entry.id)}
-                                                      className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                                                      className="p-1.5 text-(--foreground) opacity-40 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
                                                       title="Delete"
                                                   >
                                                       <Trash2 size={14} />
@@ -1231,7 +1231,7 @@ export default function Home() {
                      })}
                     
                     {filteredTimelineData.length === 0 && (
-                       <div className="py-20 text-center text-gray-400 italic">No activity matching your filters.</div>
+                       <div className="py-20 text-center text-(--foreground) opacity-40 italic">No activity matching your filters.</div>
                     )}
                   </div>
                 </div>
@@ -1264,14 +1264,14 @@ export default function Home() {
       {/* Custom Dialog */}
       {dialogState.open && (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in zoom-in-95 duration-200 border border-neutral-100">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${dialogState.type === 'success' ? 'bg-green-100 text-green-600' : dialogState.type === 'error' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}>
+          <div className="bg-(--card-bg) rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in zoom-in-95 duration-200 border border-(--border-color)">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${dialogState.type === 'success' ? 'bg-green-100 text-green-600' : dialogState.type === 'error' ? 'bg-red-100 text-red-600' : 'bg-(--hover-bg) text-(--foreground)'}`}>
               <Check size={24} className={dialogState.type === 'success' ? 'block' : 'hidden'} />
               <AlertTriangle size={24} className={dialogState.type === 'error' ? 'block' : 'hidden'} />
               <HelpCircle size={24} className={dialogState.type === 'confirm' ? 'block' : 'hidden'} />
             </div>
-            <h3 className="text-lg font-bold text-neutral-900 mb-2">{dialogState.title}</h3>
-            <p className="text-sm text-neutral-600 mb-6 leading-relaxed whitespace-pre-wrap">
+            <h3 className="text-lg font-bold text-(--foreground) mb-2">{dialogState.title}</h3>
+            <p className="text-sm text-(--foreground) opacity-80 mb-6 leading-relaxed whitespace-pre-wrap">
               {dialogState.message}
             </p>
             <div className="flex gap-3">
@@ -1288,7 +1288,7 @@ export default function Home() {
                         </button>
                         <button
                           onClick={() => setDialogState(prev => ({ ...prev, open: false }))}
-                          className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors"
+                          className="flex-1 py-2.5 bg-(--hover-bg) text-(--foreground) rounded-xl font-bold text-sm hover:opacity-80 transition-colors"
                         >
                           Cancel
                         </button>
@@ -1296,7 +1296,7 @@ export default function Home() {
                 ) : (
                     <button
                       onClick={() => setDialogState(prev => ({ ...prev, open: false }))}
-                      className="w-full py-2.5 bg-neutral-900 text-white rounded-xl font-bold text-sm hover:bg-neutral-800 transition-colors"
+                      className="w-full py-2.5 bg-(--foreground) text-(--background) rounded-xl font-bold text-sm hover:opacity-90 transition-colors"
                     >
                       OK
                     </button>

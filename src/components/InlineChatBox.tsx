@@ -66,29 +66,29 @@ export function InlineChatBox({ onClose, initialContext, title }: InlineChatBoxP
   return (
     <div className="mt-4 relative animate-in slide-in-from-top-2 duration-200">
       {/* Connection Line */}
-      <div className="absolute -left-[42px] top-6 w-10 h-[2px] bg-linear-to-r from-blue-500 to-blue-300 opacity-60"></div>
+      <div className="absolute -left-[42px] top-6 w-10 h-[2px] bg-(--border-color) opacity-60"></div>
       
-      <div className="ml-4 bg-white rounded-xl border-2 border-blue-200 shadow-lg overflow-hidden">
+      <div className="ml-4 bg-(--card-bg) rounded-xl border border-(--border-color) shadow-lg overflow-hidden">
         {/* Header */}
-        <div className="p-3 bg-linear-to-r from-blue-50 to-purple-50 border-b border-blue-100 flex items-center justify-between">
+        <div className="p-3 bg-(--theme-primary-bg) border-b border-(--border-color) flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-linear-to-tr from-blue-500 to-purple-500 flex items-center justify-center">
-              <Sparkles size={12} className="text-white" />
+            <div className="w-6 h-6 rounded-full bg-(--theme-primary) flex items-center justify-center">
+              <Sparkles size={12} className="text-(--background)" />
             </div>
-            <span className="text-xs font-bold text-gray-700">{title}</span>
+            <span className="text-xs font-bold text-(--foreground)">{title}</span>
           </div>
-          <button onClick={onClose} className="p-1 hover:bg-white/50 rounded transition-colors">
-            <X size={14} className="text-gray-500" />
+          <button onClick={onClose} className="p-1 hover:bg-(--hover-bg) rounded transition-colors">
+            <X size={14} className="text-(--foreground) opacity-50" />
           </button>
         </div>
 
         {/* Chat Messages */}
         <div 
           ref={scrollRef}
-          className="max-h-[300px] overflow-y-auto p-3 space-y-2 bg-gray-50/30"
+          className="max-h-[300px] overflow-y-auto p-3 space-y-2 bg-(--background)"
         >
           {messages.filter(m => m.role !== 'system').length === 0 && (
-            <div className="text-center py-8 text-gray-400 text-xs">
+            <div className="text-center py-8 text-(--foreground) opacity-40 text-xs">
               Ask me anything about this item.
             </div>
           )}
@@ -99,8 +99,8 @@ export function InlineChatBox({ onClose, initialContext, title }: InlineChatBoxP
             >
               <div className={`max-w-[85%] rounded-lg px-3 py-2 text-xs shadow-sm ${
                 m.role === 'user' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-white border border-gray-200 text-gray-800'
+                  ? 'bg-(--theme-primary) text-(--background)' 
+                  : 'bg-(--card-bg) border border-(--border-color) text-(--foreground)'
               }`}>
                 <div className="markdown-content">
                   <ReactMarkdown>{m.content}</ReactMarkdown>
@@ -110,17 +110,17 @@ export function InlineChatBox({ onClose, initialContext, title }: InlineChatBoxP
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 flex items-center gap-1">
-                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <div className="bg-(--card-bg) border border-(--border-color) rounded-lg px-3 py-2 flex items-center gap-1">
+                <div className="w-1 h-1 bg-(--foreground) opacity-50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-1 h-1 bg-(--foreground) opacity-50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-1 h-1 bg-(--foreground) opacity-50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           )}
         </div>
 
         {/* Input */}
-        <div className="p-2 bg-white border-t border-gray-100">
+        <div className="p-2 bg-(--card-bg) border-t border-(--border-color)">
           <div className="relative flex gap-2">
             <input
               type="text"
@@ -128,12 +128,12 @@ export function InlineChatBox({ onClose, initialContext, title }: InlineChatBoxP
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask a question..."
-              className="flex-1 px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              className="flex-1 px-3 py-2 text-xs bg-(--background) border border-(--border-color) rounded-lg focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 focus:border-(--theme-primary) text-(--foreground) transition-all"
             />
             <button
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
-              className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-30 transition-all"
+              className="p-2 bg-(--theme-primary) text-(--background) rounded-lg hover:opacity-90 disabled:opacity-30 transition-all cursor-pointer disabled:cursor-not-allowed"
             >
               <Send size={14} />
             </button>

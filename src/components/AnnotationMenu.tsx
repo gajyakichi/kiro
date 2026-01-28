@@ -1,5 +1,4 @@
 import { Bot, FileEdit } from 'lucide-react';
-
 interface AnnotationMenuProps {
   onSelectAI: () => void;
   onSelectMemo: () => void;
@@ -9,7 +8,7 @@ export function AnnotationMenu({ onSelectAI, onSelectMemo }: AnnotationMenuProps
   return (
     <div className="mt-4 relative animate-in slide-in-from-left-2 duration-200">
       {/* Connection Line */}
-      <div className="absolute -left-[42px] top-6 w-10 h-[2px] bg-linear-to-r from-gray-300 to-gray-200"></div>
+      <div className="absolute -left-[42px] top-6 w-10 h-[2px] bg-(--border-color) opacity-60"></div>
       
       <div className="ml-4 flex gap-3">
         {/* AI Chat Button */}
