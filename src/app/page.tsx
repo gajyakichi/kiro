@@ -156,6 +156,9 @@ export default function Home() {
     onConfirm?: () => void;
   }>({ open: false, type: 'success', title: '', message: '' });
 
+  // Selected Date for Timeline Filtering
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
   // AI Chat State
   const [chatState, setChatState] = useState<{ 
     open: boolean; 
@@ -371,6 +374,13 @@ export default function Home() {
     return raw
       .filter(item => {
         if (timelineFilter !== 'all' && item.entryType !== timelineFilter) return false;
+        if (selectedDate) {
+          const itemDate = new Date(item.timestamp);
+          const isSameDay = itemDate.getFullYear() === selectedDate.getFullYear() &&
+                           itemDate.getMonth() === selectedDate.getMonth() &&
+                           itemDate.getDate() === selectedDate.getDate();
+          if (!isSameDay) return false;
+        }
         if (timelineSearch) {
           const searchLower = timelineSearch.toLowerCase();
           const content = item.content || "";
@@ -380,7 +390,7 @@ export default function Home() {
         return true;
       })
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-  }, [dbLogs, comments, dailyNotes, suggestedTasks, timelineFilter, timelineSearch]);
+  }, [dbLogs, comments, dailyNotes, suggestedTasks, timelineFilter, timelineSearch, selectedDate]);
 
   useEffect(() => {
     setMounted(true);
@@ -615,14 +625,35 @@ export default function Home() {
             : t.days_short.map((d, i) => <div key={`${d}-${i}`} className="py-1 text-gray-400 font-medium">{d}</div>)
           }
           {Array(firstDay).fill(null).map((_, i) => <div key={`e-${i}`} />)}
-          {Array.from({ length: days }, (_, i) => i + 1).map(day => (
-            <div 
-              key={day} 
-              className={`mini-calendar-day py-1 rounded-sm transition-colors cursor-default ${activityDays.has(day) ? 'bg-(--theme-primary-bg) text-(--theme-primary) font-bold' : 'text-gray-500 hover:bg-(--hover-bg)'}`}
-            >
-              {day}
-            </div>
-          ))}
+          {Array.from({ length: days }, (_, i) => i + 1).map(day => {
+            const dayDate = new Date(year, month, day);
+            const isSelected = selectedDate && 
+              selectedDate.getFullYear() === year &&
+              selectedDate.getMonth() === month &&
+              selectedDate.getDate() === day;
+            
+            return (
+              <div 
+                key={day} 
+                onClick={() => {
+                  if (isSelected) {
+                    setSelectedDate(null); // Toggle off if already selected
+                  } else {
+                    setSelectedDate(dayDate);
+                  }
+                }}
+                className={`mini-calendar-day py-1 rounded-sm transition-colors cursor-pointer ${
+                  isSelected 
+                    ? 'bg-[var(--theme-primary)] text-[var(--background)] font-bold ring-2 ring-[var(--theme-primary)] ring-opacity-50' 
+                    : activityDays.has(day) 
+                      ? 'bg-[var(--theme-primary-bg)] text-[var(--theme-primary)] font-bold hover:bg-[var(--theme-primary)] hover:text-[var(--background)]' 
+                      : 'text-gray-500 hover:bg-[var(--hover-bg)]'
+                }`}
+              >
+                {day}
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -967,6 +998,18 @@ export default function Home() {
                           {filter.label}
                         </button>
                       ))}
+                      {selectedDate && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--theme-accent)] text-[var(--background)] rounded-lg text-xs font-bold">
+                          <span>{selectedDate.toLocaleDateString(appLang, { month: 'short', day: 'numeric' })}</span>
+                          <button 
+                            onClick={() => setSelectedDate(null)}
+                            className="hover:opacity-70 transition-opacity"
+                            aria-label="Clear date filter"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )}
                    </div>
                 </div>
 
