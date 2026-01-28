@@ -266,38 +266,38 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
       {/* Theme Selector Section */}
       <section>
         <div className="flex items-center gap-2 mb-4">
-          <Palette size={16} className="text-[var(--foreground)]" weight="bold" />
-          <h2 className="text-sm font-bold tracking-tight text-[var(--foreground)] uppercase">Theme Selector</h2>
+          <Palette size={16} className="text-(-foreground)" weight="bold" />
+          <h2 className="text-sm font-bold tracking-tight text-(-foreground) uppercase">Theme Selector</h2>
         </div>
 
         {/* Global Icon Settings Row */}
         {/* Global Icon Settings Row */}
-        <div className="mb-4 p-3 bg-[var(--card-bg)] rounded-lg border border-[var(--border-color)] flex flex-col md:flex-row items-center justify-between gap-3 shadow-sm overflow-hidden">
+        <div className="mb-4 p-3 bg-(-card-bg) rounded-lg border border-(-border-color) flex flex-col md:flex-row items-center justify-between gap-3 shadow-sm overflow-hidden">
           <div className="flex items-center gap-3 w-full md:w-auto overflow-hidden">
-             <div className="w-8 h-8 shrink-0 rounded-lg bg-[var(--sidebar-bg)] border border-[var(--border-color)] flex items-center justify-center shadow-xs">
-                <IconRenderer icon="Settings" size={16} className="text-[var(--foreground)]" baseSet={appIconSet} />
+             <div className="w-8 h-8 shrink-0 rounded-lg bg-(-sidebar-bg) border border-(-border-color) flex items-center justify-center shadow-xs">
+                <IconRenderer icon="Settings" size={16} className="text-(-foreground)" baseSet={appIconSet} />
              </div>
              <div className="min-w-0">
-                <p className="text-xs font-bold text-[var(--foreground)] tracking-tight truncate">Global Icon Set</p>
-                <p className="text-[9px] text-[var(--foreground)] font-semibold uppercase tracking-widest whitespace-nowrap truncate">Selected style applies everywhere</p>
+                <p className="text-xs font-bold text-(-foreground) tracking-tight truncate">Global Icon Set</p>
+                <p className="text-[9px] text-(-foreground) font-semibold uppercase tracking-widest whitespace-nowrap truncate">Selected style applies everywhere</p>
              </div>
           </div>
-          <div className="flex bg-[var(--sidebar-bg)] p-1.5 rounded-xl border border-[var(--border-color)] gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
+          <div className="flex bg-(-sidebar-bg) p-1.5 rounded-xl border border-(-border-color) gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
              <button 
                 onClick={() => onUpdateIconSet('lucide')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'lucide' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'lucide' ? 'bg-(-theme-primary) text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
              >
                 LUCIDE
              </button>
              <button 
                 onClick={() => onUpdateIconSet('phosphor')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'phosphor' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'phosphor' ? 'bg-(-theme-primary) text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
              >
                 PHOSPHOR
              </button>
              <button 
                 onClick={() => onUpdateIconSet('original')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'original' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'original' ? 'bg-(-theme-primary) text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
              >
                 ORIGINAL
              </button>
@@ -305,26 +305,26 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
         </div>
 
         {/* Global Skin Settings Row */}
-        <div className="mb-4 p-3 bg-[var(--card-bg)] rounded-lg border border-[var(--border-color)] flex flex-col md:flex-row items-center justify-between gap-3 shadow-sm overflow-hidden">
+        <div className="mb-4 p-3 bg-(-card-bg) rounded-lg border border-(-border-color) flex flex-col md:flex-row items-center justify-between gap-3 shadow-sm overflow-hidden">
           <div className="flex items-center gap-3 w-full md:w-auto overflow-hidden">
-             <div className="w-8 h-8 shrink-0 rounded-lg bg-[var(--sidebar-bg)] border border-[var(--border-color)] flex items-center justify-center shadow-xs">
-                <Palette size={16} className="text-[var(--foreground)]" weight="fill" />
+             <div className="w-8 h-8 shrink-0 rounded-lg bg-(-sidebar-bg) border border-(-border-color) flex items-center justify-center shadow-xs">
+                <Palette size={16} className="text-(-foreground)" weight="fill" />
              </div>
              <div className="min-w-0">
-                <p className="text-xs font-bold text-[var(--foreground)] tracking-tight truncate">Display Skin</p>
-                <p className="text-[9px] text-[var(--foreground)] font-semibold uppercase tracking-widest whitespace-nowrap truncate">Layout Density & Spacing</p>
+                <p className="text-xs font-bold text-(-foreground) tracking-tight truncate">Display Skin</p>
+                <p className="text-[9px] text-(-foreground) font-semibold uppercase tracking-widest whitespace-nowrap truncate">Layout Density & Spacing</p>
              </div>
           </div>
-          <div className="flex bg-[var(--sidebar-bg)] p-1.5 rounded-xl border border-[var(--border-color)] gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
+          <div className="flex bg-(-sidebar-bg) p-1.5 rounded-xl border border-(-border-color) gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
              <button 
                 onClick={() => onUpdateSkin('notion')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin !== 'vscode' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin !== 'vscode' ? 'bg-(-theme-primary) text-(--background) shadow-lg' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
              >
                 ROUND (DEFAULT)
              </button>
              <button 
                 onClick={() => onUpdateSkin('vscode')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin === 'vscode' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin === 'vscode' ? 'bg-(-theme-primary) text-(--background) shadow-lg' : 'text-(-foreground) opacity-60 hover:opacity-100 hover:bg-(-hover-bg)'}`}
              >
                 COMPACT (DENSE)
              </button>
@@ -336,14 +336,14 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
             onClick={() => onToggle(null)}
             onMouseEnter={() => onPreview("")}
             onMouseLeave={() => onPreview(newCss)}
-            className={`group flex items-center gap-2 px-3 py-2 rounded-md border transition-all duration-200 bg-[var(--card-bg)] hover:-translate-y-1 hover:shadow-lg hover:z-20 active:scale-[0.98] outline-none relative ${!activeTheme ? 'border-(--theme-primary) shadow-xl' : 'border-[var(--border-color)] hover:border-(--theme-primary)/50 '}`}
+            className={`group flex items-center gap-2 px-3 py-2 rounded-md border transition-all duration-200 bg-(-card-bg) hover:-translate-y-1 hover:shadow-lg hover:z-20 active:scale-[0.98] outline-none relative ${!activeTheme ? 'border-(--theme-primary) shadow-xl' : 'border-(-border-color) hover:border-(--theme-primary)/50 '}`}
           >
-            <div className={`w-5 h-5 rounded-full bg-[var(--card-bg)] border border-[var(--border-color)] flex items-center justify-center text-[var(--foreground)] group-hover:scale-110 transition-transform duration-200 ${!activeTheme ? 'text-foreground border-foreground/10' : ''}`}>
+            <div className={`w-5 h-5 rounded-full bg-(-card-bg) border border-(-border-color) flex items-center justify-center text-(-foreground) group-hover:scale-110 transition-transform duration-200 ${!activeTheme ? 'text-foreground border-foreground/10' : ''}`}>
               {!activeTheme ? <CheckCircle size={12} weight="fill" className="text-foreground" /> : <Circle size={12} />}
             </div>
             <div className="text-left flex-1">
               <div className="font-bold text-xs tracking-tight">Original</div>
-              <div className="text-[9px] text-[var(--foreground)] uppercase tracking-widest font-semibold opacity-60">Default System</div>
+              <div className="text-[9px] text-(-foreground) uppercase tracking-widest font-semibold opacity-60">Default System</div>
             </div>
           </button>
 
@@ -354,16 +354,16 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               onClick={() => handleQuickAdd(preset)}
               onMouseEnter={() => onPreview(preset.css)}
               onMouseLeave={() => onPreview(newCss)}
-              className={`group flex items-center gap-3 px-3 py-2 rounded-md border border-[var(--border-color)] bg-[var(--card-bg)] transition-all duration-200 hover:bg-[var(--hover-bg)] active:scale-[0.98] outline-none relative`}
+              className={`group flex items-center gap-3 px-3 py-2 rounded-md border border-(-border-color) bg-(-card-bg) transition-all duration-200 hover:bg-(-hover-bg) active:scale-[0.98] outline-none relative`}
             >
-              <div className="w-5 h-5 rounded-full bg-[var(--hover-bg)] border border-[var(--border-color)] flex items-center justify-center text-gray-300 group-hover:scale-110 transition-transform">
+              <div className="w-5 h-5 rounded-full bg-(-hover-bg) border border-(-border-color) flex items-center justify-center text-gray-300 group-hover:scale-110 transition-transform">
                 <Circle size={12} />
               </div>
               <div className="text-left flex-1">
                 <div className="font-semibold text-sm tracking-tight flex items-center gap-2">
                   {preset.name}
                 </div>
-                <div className="text-[10px] text-[var(--foreground)] uppercase tracking-widest font-semibold opacity-60">Built-in Preset</div>
+                <div className="text-[10px] text-(-foreground) uppercase tracking-widest font-semibold opacity-60">Built-in Preset</div>
               </div>
             </button>
           ))}
@@ -374,9 +374,9 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               onClick={() => onToggle(theme)}
               onMouseEnter={() => onPreview(theme.css)}
               onMouseLeave={() => onPreview(newCss)}
-              className={`group flex items-center gap-3 px-3 py-2 rounded-md border-2 transition-all duration-200 bg-[var(--card-bg)] hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 active:scale-[0.98] outline-none relative ${theme.active ? 'border-(--theme-primary) shadow-xl' : 'border-[var(--border-color)] hover:border-(--theme-primary)/50 '}`}
+              className={`group flex items-center gap-3 px-3 py-2 rounded-md border-2 transition-all duration-200 bg-(-card-bg) hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 active:scale-[0.98] outline-none relative ${theme.active ? 'border-(--theme-primary) shadow-xl' : 'border-(-border-color) hover:border-(--theme-primary)/50 '}`}
             >
-              <div className={`w-5 h-5 rounded-full bg-[var(--hover-bg)] border border-[var(--border-color)] flex items-center justify-center text-[var(--foreground)] group-hover:scale-110 transition-transform duration-200 ${theme.active ? 'text-(--theme-primary) border-(--theme-primary)/20' : ''}`}>
+              <div className={`w-5 h-5 rounded-full bg-(-hover-bg) border border-(-border-color) flex items-center justify-center text-(-foreground) group-hover:scale-110 transition-transform duration-200 ${theme.active ? 'text-(--theme-primary) border-(--theme-primary)/20' : ''}`}>
                 {theme.active ? <CheckCircle size={12} weight="fill" className="text-foreground" /> : <Circle size={12} />}
               </div>
               <div className="text-left relative">
@@ -388,7 +388,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                      </span>
                    )}
                  </div>
-                 <div className="text-[10px] text-[var(--foreground)] uppercase tracking-widest font-semibold opacity-60">{theme.isPreset ? 'Built-in Preset' : 'Custom Style'}</div>
+                 <div className="text-[10px] text-(-foreground) uppercase tracking-widest font-semibold opacity-60">{theme.isPreset ? 'Built-in Preset' : 'Custom Style'}</div>
               </div>
             </button>
           ))}
@@ -417,7 +417,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               }
               setIsAdding(!isAdding);
             }}
-            className={`notion-item px-4 py-2 rounded-md font-medium text-sm transition-all ${isAdding ? 'bg-[var(--card-bg)] text-[var(--foreground)]' : 'bg-foreground text-background'}`}
+            className={`notion-item px-4 py-2 rounded-md font-medium text-sm transition-all ${isAdding ? 'bg-(-card-bg) text-(-foreground)' : 'bg-foreground text-background'}`}
           >
             {isAdding ? "Close Editor" : "Open CSS Editor"}
           </button>
@@ -425,13 +425,13 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               <button
                 onClick={handleExport}
                 title="Export Configuration (Themes, Skin, Icons)"
-                className="p-2 rounded-md bg-[var(--card-bg)] border border-[var(--border-color)] text-[var(--foreground)] hover:bg-[var(--sidebar-bg)] hover:text-foreground transition-all"
+                className="p-2 rounded-md bg-(-card-bg) border border-(-border-color) text-(-foreground) hover:bg-(-sidebar-bg) hover:text-foreground transition-all"
               >
                  <DownloadSimple size={18} weight="bold" />
               </button>
               <label
                 title="Import Configuration"
-                className="p-2 rounded-md bg-[var(--card-bg)] border border-[var(--border-color)] text-[var(--foreground)] hover:bg-[var(--sidebar-bg)] hover:text-foreground transition-all cursor-pointer"
+                className="p-2 rounded-md bg-(-card-bg) border border-(-border-color) text-(-foreground) hover:bg-(-sidebar-bg) hover:text-foreground transition-all cursor-pointer"
               >
                  <UploadSimple size={18} weight="bold" />
                  <input type="file" accept=".json" onChange={handleImport} className="hidden" />
@@ -441,7 +441,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
 
         {isAdding && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in slide-in-from-top-4 duration-200">
-            <div className="bg-[var(--card-bg)] notion-card p-6 border border-[var(--border-color)] space-y-6">
+            <div className="bg-(-card-bg) notion-card p-6 border border-(-border-color) space-y-6">
               <div className="flex items-center gap-3">
                  <Palette size={20} className="text-foreground" />
                  <span className="font-bold">Laboratory</span>
@@ -450,7 +450,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               <div className="space-y-1.5">
                 <label className="text-[10px] font-semibold text-neutral-400 uppercase tracking-widest pl-1">Theme Name</label>
                 <input 
-                  className="w-full border border-[var(--border-color)] rounded-xl p-3 text-sm focus:ring-2 ring-gray-900 outline-none transition-all shadow-sm disabled:opacity-50"
+                  className="w-full border border-(-border-color) rounded-xl p-3 text-sm focus:ring-2 ring-gray-900 outline-none transition-all shadow-sm disabled:opacity-50"
                   placeholder="e.g. Cyberpunk"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
@@ -461,7 +461,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               <div className="space-y-1.5">
                   <label className="text-[10px] font-semibold text-neutral-400 uppercase tracking-widest pl-1">Custom CSS</label>
                   <textarea 
-                    className="w-full h-80 border border-[var(--border-color)] rounded-2xl p-4 text-xs font-mono bg-[var(--sidebar-bg)] focus:bg-[var(--card-bg)] transition-all focus:ring-2 ring-gray-900 outline-none leading-relaxed shadow-xs disabled:opacity-50"
+                    className="w-full h-80 border border-(-border-color) rounded-2xl p-4 text-xs font-mono bg-(-sidebar-bg) focus:bg-(-card-bg) transition-all focus:ring-2 ring-gray-900 outline-none leading-relaxed shadow-xs disabled:opacity-50"
                     placeholder="/* Add your custom CSS here */"
                     value={newCss}
                     readOnly={editingTheme?.isPreset}
@@ -480,7 +480,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                   <button 
                     key={preset.name}
                     onClick={() => handleSelectForEdit(preset)}
-                    className={`text-[10px] px-3 py-1.5 rounded-full font-bold transition-all ${newName === preset.name ? 'bg-purple-600 text-white' : 'bg-[var(--card-bg)] text-[var(--foreground)] hover:bg-foreground hover:text-background'}`}
+                    className={`text-[10px] px-3 py-1.5 rounded-full font-bold transition-all ${newName === preset.name ? 'bg-purple-600 text-white' : 'bg-(-card-bg) text-(-foreground) hover:bg-foreground hover:text-background'}`}
                   >
                     {preset.name}
                   </button>
@@ -500,9 +500,9 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               {/* Overlay for "Original" mode or when no specific theme is active in preview but we want base dark bg */}
                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0,transparent_100%)] pointer-events-none mix-blend-overlay"></div>
               
-              <div className="z-10 w-full flex justify-between items-center bg-[var(--card-bg)]/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">
+              <div className="z-10 w-full flex justify-between items-center bg-(-card-bg)/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">
                 <div className="flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-                  <div className="w-8 h-8 rounded-full bg-[var(--theme-primary)] flex items-center justify-center text-white shadow-lg">
+                  <div className="w-8 h-8 rounded-full bg-(-theme-primary) flex items-center justify-center text-white shadow-lg">
                     <CheckCircle size={18} weight="fill" />
                   </div>
                   <div>
@@ -510,7 +510,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                     <p className="text-sm font-bold">Theme Preview</p>
                   </div>
                 </div>
-                <div className="px-3 py-1 bg-[var(--theme-primary)] text-white rounded-full text-[9px] font-semibold uppercase tracking-tighter shadow-sm animate-pulse">LIVE</div>
+                <div className="px-3 py-1 bg-(-theme-primary) text-white rounded-full text-[9px] font-semibold uppercase tracking-tighter shadow-sm animate-pulse">LIVE</div>
               </div>
 
               <div className="z-10 w-full space-y-4">
@@ -536,7 +536,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                         <span>75%</span>
                      </div>
                      <div className="h-1.5 w-full bg-black/5 rounded-full overflow-hidden">
-                       <div className="h-full bg-[var(--theme-primary)] w-[75%] rounded-full shadow-[0_0_10px_var(--theme-primary)]"></div>
+                       <div className="h-full bg-(-theme-primary) w-[75%] rounded-full shadow-[0_0_10px_var(--theme-primary)]"></div>
                      </div>
                   </div>
                   <div className="flex gap-2">
@@ -553,21 +553,21 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                    {/* Dummy Checklist */}
                    <div className="space-y-2 mb-4">
                       <div className="flex items-center gap-2 text-xs">
-                         <div className="w-4 h-4 rounded bg-[var(--theme-primary)] flex items-center justify-center text-white"><CheckCircle size={10} weight="fill" /></div>
+                         <div className="w-4 h-4 rounded bg-(-theme-primary) flex items-center justify-center text-white"><CheckCircle size={10} weight="fill" /></div>
                          <span className="opacity-50 line-through">Completed Task</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs">
-                         <div className="w-4 h-4 rounded border border-[var(--border-color)]"></div>
+                         <div className="w-4 h-4 rounded border border-(-border-color)"></div>
                          <span>Pending Task</span>
                       </div>
                    </div>
-                   <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-color)] opacity-50 uppercase text-[8px] font-semibold tracking-widest">
+                   <div className="flex items-center gap-2 pt-2 border-t border-(-border-color) opacity-50 uppercase text-[8px] font-semibold tracking-widest">
                       <Clock size={10} /> 2 Minutes Ago
                    </div>
                 </div>
               </div>
 
-              <div className="z-10 bg-[var(--card-bg)]/5 px-6 py-3 rounded-2xl backdrop-blur-md border border-white/5 text-[10px] text-neutral-400 font-bold uppercase tracking-[0.2em] shadow-xl">
+              <div className="z-10 bg-(-card-bg)/5 px-6 py-3 rounded-2xl backdrop-blur-md border border-white/5 text-[10px] text-neutral-400 font-bold uppercase tracking-[0.2em] shadow-xl">
                  Real-time Reflecting...
               </div>
             </div>
