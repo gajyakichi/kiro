@@ -285,19 +285,19 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
           <div className="flex bg-[var(--sidebar-bg)] p-1.5 rounded-xl border border-[var(--border-color)] gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
              <button 
                 onClick={() => onUpdateIconSet('lucide')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'lucide' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'lucide' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
              >
                 LUCIDE
              </button>
              <button 
                 onClick={() => onUpdateIconSet('phosphor')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'phosphor' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'phosphor' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
              >
                 PHOSPHOR
              </button>
              <button 
                 onClick={() => onUpdateIconSet('original')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'original' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appIconSet === 'original' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
              >
                 ORIGINAL
              </button>
@@ -318,30 +318,30 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
           <div className="flex bg-[var(--sidebar-bg)] p-1.5 rounded-xl border border-[var(--border-color)] gap-1 shrink-0 shadow-sm whitespace-nowrap overflow-x-auto max-w-full no-scrollbar">
              <button 
                 onClick={() => onUpdateSkin('notion')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appSkin !== 'vscode' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin !== 'vscode' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
              >
                 NOTION (DEFAULT)
              </button>
              <button 
                 onClick={() => onUpdateSkin('vscode')}
-                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-black tracking-widest transition-all duration-300 active:scale-95 ${appSkin === 'vscode' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
+                className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-[10px] font-semibold tracking-widest transition-all duration-300 active:scale-95 ${appSkin === 'vscode' ? 'bg-[var(--theme-primary)] text-(--background) shadow-lg ring-2 ring-(--theme-primary)/20' : 'text-[var(--foreground)] opacity-60 hover:opacity-100 hover:bg-[var(--hover-bg)]'}`}
              >
                 VS CODE (DENSE)
              </button>
           </div>
         </div>
         
-        <div className="flex flex-wrap gap-3 pt-2 pb-2">
+        <div className="flex flex-col gap-2 pt-2 pb-2">
           <button 
             onClick={() => onToggle(null)}
             onMouseEnter={() => onPreview("")}
             onMouseLeave={() => onPreview(newCss)}
-            className={`group flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all duration-500 ease-in-out bg-[var(--card-bg)] hover:-translate-y-1 hover:shadow-lg hover:z-20 active:scale-[0.98] outline-none relative ${!activeTheme ? 'border-(--theme-primary) shadow-xl' : 'border-[var(--border-color)] hover:border-(--theme-primary)/50 opacity-70 hover:opacity-100'}`}
+            className={`group flex items-center gap-2 px-3 py-2 rounded-md border transition-all duration-200 bg-[var(--card-bg)] hover:-translate-y-1 hover:shadow-lg hover:z-20 active:scale-[0.98] outline-none relative ${!activeTheme ? 'border-(--theme-primary) shadow-xl' : 'border-[var(--border-color)] hover:border-(--theme-primary)/50 '}`}
           >
-            <div className={`w-6 h-6 rounded-full bg-[var(--card-bg)] border border-[var(--border-color)] flex items-center justify-center text-[var(--foreground)] group-hover:scale-110 transition-transform duration-500 ${!activeTheme ? 'text-foreground border-foreground/10' : ''}`}>
-              {!activeTheme ? <CheckCircle size={14} weight="fill" className="text-foreground" /> : <Circle size={14} />}
+            <div className={`w-5 h-5 rounded-full bg-[var(--card-bg)] border border-[var(--border-color)] flex items-center justify-center text-[var(--foreground)] group-hover:scale-110 transition-transform duration-200 ${!activeTheme ? 'text-foreground border-foreground/10' : ''}`}>
+              {!activeTheme ? <CheckCircle size={12} weight="fill" className="text-foreground" /> : <Circle size={12} />}
             </div>
-            <div className="text-left">
+            <div className="text-left flex-1">
               <div className="font-bold text-xs tracking-tight">Original</div>
               <div className="text-[9px] text-[var(--foreground)] uppercase tracking-widest font-semibold opacity-60">Default System</div>
             </div>
@@ -354,16 +354,16 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               onClick={() => handleQuickAdd(preset)}
               onMouseEnter={() => onPreview(preset.css)}
               onMouseLeave={() => onPreview(newCss)}
-              className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 border-[var(--border-color)] bg-[var(--card-bg)] transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 opacity-70 hover:opacity-100 active:scale-[0.98] outline-none relative`}
+              className={`group flex items-center gap-3 px-3 py-2 rounded-md border border-[var(--border-color)] bg-[var(--card-bg)] transition-all duration-200 hover:bg-[var(--hover-bg)] active:scale-[0.98] outline-none relative`}
             >
-              <div className="w-10 h-10 rounded-full bg-[var(--hover-bg)] border border-[var(--border-color)] flex items-center justify-center text-gray-300 group-hover:scale-110 transition-transform">
-                <Circle size={22} />
+              <div className="w-5 h-5 rounded-full bg-[var(--hover-bg)] border border-[var(--border-color)] flex items-center justify-center text-gray-300 group-hover:scale-110 transition-transform">
+                <Circle size={12} />
               </div>
-              <div className="text-left">
-                <div className="font-black text-sm tracking-tight flex items-center gap-2">
+              <div className="text-left flex-1">
+                <div className="font-semibold text-sm tracking-tight flex items-center gap-2">
                   {preset.name}
                 </div>
-                <div className="text-[10px] text-[var(--foreground)] uppercase tracking-widest font-black opacity-60">Built-in Preset</div>
+                <div className="text-[10px] text-[var(--foreground)] uppercase tracking-widest font-semibold opacity-60">Built-in Preset</div>
               </div>
             </button>
           ))}
@@ -374,13 +374,13 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               onClick={() => onToggle(theme)}
               onMouseEnter={() => onPreview(theme.css)}
               onMouseLeave={() => onPreview(newCss)}
-              className={`group flex items-center gap-4 px-6 py-5 rounded-xl border-2 transition-all duration-500 ease-in-out bg-[var(--card-bg)] hover:-translate-y-3 hover:translate-x-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 active:scale-[0.98] outline-none relative ${theme.active ? 'border-(--theme-primary) shadow-xl' : 'border-[var(--border-color)] hover:border-(--theme-primary)/50 opacity-70 hover:opacity-100'}`}
+              className={`group flex items-center gap-3 px-3 py-2 rounded-md border-2 transition-all duration-200 bg-[var(--card-bg)] hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:z-20 active:scale-[0.98] outline-none relative ${theme.active ? 'border-(--theme-primary) shadow-xl' : 'border-[var(--border-color)] hover:border-(--theme-primary)/50 '}`}
             >
-              <div className={`w-10 h-10 rounded-full bg-[var(--hover-bg)] border border-[var(--border-color)] flex items-center justify-center text-[var(--foreground)] group-hover:scale-110 transition-transform duration-500 ${theme.active ? 'text-(--theme-primary) border-(--theme-primary)/20' : ''}`}>
-                {theme.active ? <CheckCircle size={22} weight="fill" className="text-foreground" /> : <Circle size={22} />}
+              <div className={`w-5 h-5 rounded-full bg-[var(--hover-bg)] border border-[var(--border-color)] flex items-center justify-center text-[var(--foreground)] group-hover:scale-110 transition-transform duration-200 ${theme.active ? 'text-(--theme-primary) border-(--theme-primary)/20' : ''}`}>
+                {theme.active ? <CheckCircle size={12} weight="fill" className="text-foreground" /> : <Circle size={12} />}
               </div>
               <div className="text-left relative">
-                 <div className="font-black text-sm flex items-center gap-2 tracking-tight">
+                 <div className="font-semibold text-sm flex items-center gap-2 tracking-tight">
                    {theme.name}
                    {!theme.isPreset && (
                      <span onClick={(e) => { e.stopPropagation(); onDelete(theme.id); }} className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-125">
@@ -388,7 +388,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                      </span>
                    )}
                  </div>
-                 <div className="text-[10px] text-[var(--foreground)] uppercase tracking-widest font-black opacity-60">{theme.isPreset ? 'Built-in Preset' : 'Custom Style'}</div>
+                 <div className="text-[10px] text-[var(--foreground)] uppercase tracking-widest font-semibold opacity-60">{theme.isPreset ? 'Built-in Preset' : 'Custom Style'}</div>
               </div>
             </button>
           ))}
@@ -440,15 +440,15 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
         </div>
 
         {isAdding && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in slide-in-from-top-4 duration-500">
-            <div className="bg-[var(--card-bg)] notion-card p-6 border-2 border-[var(--border-color)] space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in slide-in-from-top-4 duration-200">
+            <div className="bg-[var(--card-bg)] notion-card p-6 border border-[var(--border-color)] space-y-6">
               <div className="flex items-center gap-3">
                  <Palette size={20} className="text-foreground" />
                  <span className="font-bold">Laboratory</span>
               </div>
               
               <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">Theme Name</label>
+                <label className="text-[10px] font-semibold text-neutral-400 uppercase tracking-widest pl-1">Theme Name</label>
                 <input 
                   className="w-full border border-[var(--border-color)] rounded-xl p-3 text-sm focus:ring-2 ring-gray-900 outline-none transition-all shadow-sm disabled:opacity-50"
                   placeholder="e.g. Cyberpunk"
@@ -459,7 +459,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               </div>
 
               <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">Custom CSS</label>
+                  <label className="text-[10px] font-semibold text-neutral-400 uppercase tracking-widest pl-1">Custom CSS</label>
                   <textarea 
                     className="w-full h-80 border border-[var(--border-color)] rounded-2xl p-4 text-xs font-mono bg-[var(--sidebar-bg)] focus:bg-[var(--card-bg)] transition-all focus:ring-2 ring-gray-900 outline-none leading-relaxed shadow-xs disabled:opacity-50"
                     placeholder="/* Add your custom CSS here */"
@@ -490,7 +490,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
               <button 
                 onClick={handleSave}
                 disabled={editingTheme?.isPreset}
-                className="w-full bg-foreground text-background font-black py-4 rounded-xl hover:opacity-90 transition-all shadow-lg shadow-gray-200 active:scale-[0.98] disabled:opacity-50"
+                className="w-full bg-foreground text-background font-semibold py-4 rounded-xl hover:opacity-90 transition-all shadow-lg shadow-gray-200 active:scale-[0.98] disabled:opacity-50"
               >
                 {editingTheme?.isPreset ? 'PRESET MODE ACTIVE (READ-ONLY)' : 'SAVE & ADD TO SELECTOR'}
               </button>
@@ -506,23 +506,23 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                     <CheckCircle size={18} weight="fill" />
                   </div>
                   <div>
-                    <p className="text-[10px] opacity-60 font-black uppercase tracking-widest">Live System</p>
+                    <p className="text-[10px] opacity-60 font-semibold uppercase tracking-widest">Live System</p>
                     <p className="text-sm font-bold">Theme Preview</p>
                   </div>
                 </div>
-                <div className="px-3 py-1 bg-[var(--theme-primary)] text-white rounded-full text-[9px] font-black uppercase tracking-tighter shadow-sm animate-pulse">LIVE</div>
+                <div className="px-3 py-1 bg-[var(--theme-primary)] text-white rounded-full text-[9px] font-semibold uppercase tracking-tighter shadow-sm animate-pulse">LIVE</div>
               </div>
 
               <div className="z-10 w-full space-y-4">
                 {/* Sample UI 1: Project Card */}
-                <div className="notion-card p-5 border shadow-2xl scale-100 transition-all duration-500 rounded-3xl w-full text-left" style={{ background: 'var(--background)', color: 'var(--foreground)', borderColor: 'var(--border-color)' }}>
+                <div className="notion-card p-5 border shadow-2xl scale-100 transition-all duration-200 rounded-3xl w-full text-left" style={{ background: 'var(--background)', color: 'var(--foreground)', borderColor: 'var(--border-color)' }}>
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-(--theme-primary-bg) text-(--theme-primary) flex items-center justify-center shadow-inner">
+                      <div className="w-5 h-5 rounded-2xl bg-(--theme-primary-bg) text-(--theme-primary) flex items-center justify-center shadow-inner">
                         <Folder size={20} weight="fill" />
                       </div>
                       <div>
-                        <h4 className="font-black text-sm tracking-tight leading-none mb-1">Preview Project</h4>
+                        <h4 className="font-semibold text-sm tracking-tight leading-none mb-1">Preview Project</h4>
                         <div className="flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
                           <span className="text-[9px] uppercase tracking-widest font-bold opacity-50">Active Now</span>
@@ -540,15 +540,15 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                      </div>
                   </div>
                   <div className="flex gap-2">
-                    <div className="px-2 py-1 rounded bg-(--theme-primary-bg) text-(--theme-primary) text-[8px] font-black uppercase tracking-wider border border-transparent hover:border-(--theme-primary) transition-colors cursor-default">Refactor</div>
-                    <div className="px-2 py-1 rounded bg-(--theme-accent-bg) text-(--theme-accent) text-[8px] font-black uppercase tracking-wider border border-transparent hover:border-(--theme-accent) transition-colors cursor-default">UI/UX</div>
+                    <div className="px-2 py-1 rounded bg-(--theme-primary-bg) text-(--theme-primary) text-[8px] font-semibold uppercase tracking-wider border border-transparent hover:border-(--theme-primary) transition-colors cursor-default">Refactor</div>
+                    <div className="px-2 py-1 rounded bg-(--theme-accent-bg) text-(--theme-accent) text-[8px] font-semibold uppercase tracking-wider border border-transparent hover:border-(--theme-accent) transition-colors cursor-default">UI/UX</div>
                   </div>
                 </div>
 
                 {/* Sample UI 2: Small Note */}
-                <div className="notion-card p-5 border opacity-90 scale-95 origin-top transition-all duration-500 rounded-3xl w-full text-left" style={{ background: 'var(--background)', color: 'var(--foreground)', borderColor: 'var(--border-color)' }}>
+                <div className="notion-card p-5 border opacity-90 scale-95 origin-top transition-all duration-200 rounded-3xl w-full text-left" style={{ background: 'var(--background)', color: 'var(--foreground)', borderColor: 'var(--border-color)' }}>
                    <p className="text-[11px] font-medium leading-relaxed mb-4">
-                     This is how your <span className="text-(--theme-primary) font-black">Colors</span> and <span className="opacity-60 italic">Typography</span> will feel in the actual editor.
+                     This is how your <span className="text-(--theme-primary) font-semibold">Colors</span> and <span className="opacity-60 italic">Typography</span> will feel in the actual editor.
                    </p>
                    {/* Dummy Checklist */}
                    <div className="space-y-2 mb-4">
@@ -561,7 +561,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
                          <span>Pending Task</span>
                       </div>
                    </div>
-                   <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-color)] opacity-50 uppercase text-[8px] font-black tracking-widest">
+                   <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-color)] opacity-50 uppercase text-[8px] font-semibold tracking-widest">
                       <Clock size={10} /> 2 Minutes Ago
                    </div>
                 </div>
