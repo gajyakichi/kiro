@@ -388,7 +388,7 @@ export default function SettingsPage() {
   const t = getTranslation(config.APP_LANG);
 
   return (
-    <div className={`min-h-screen text-(--foreground) font-sans ${activeTheme ? 'theme-active' : ''}`} style={{ backgroundColor: 'var(--background)' }}>
+    <div className={`min-h-screen text-(--foreground) font-sans ${activeTheme ? 'theme-active' : ''}`} style={{ backgroundColor: activeTheme ? 'var(--background)' : '#2e3440' }}>
       <div className="max-w-4xl mx-auto py-6 px-4">
         <header className="flex items-center justify-between mb-4 pb-4 border-b border-(--border-color)">
           <div className="flex items-center gap-2">
@@ -750,7 +750,16 @@ export default function SettingsPage() {
       </div>
 
       <style key={activeTheme?.id || 'default'} dangerouslySetInnerHTML={{ __html: `
-        ${activeTheme?.css || ''}
+        ${activeTheme?.css || `:root, .theme-active { 
+          --background: #2e3440; 
+          --foreground: #d8dee9; 
+          --card-bg: #434c5e; 
+          --sidebar-bg: #3b4252; 
+          --hover-bg: rgba(255,255,255,0.1); 
+          --border-color: rgba(255, 255, 255, 0.1); 
+          --theme-primary: #88c0d0; 
+          --theme-primary-bg: rgba(136, 192, 208, 0.15); 
+        }`}
         html, body { 
           background-color: var(--background) !important; 
           color: var(--foreground) !important; 
