@@ -121,7 +121,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                 value={newVaultName}
                 onChange={(e) => setNewVaultName(e.target.value)}
                 placeholder={t.vault_name_placeholder}
-                className="w-full p-4 bg-(--card-bg) border border-(--border-color) rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 transition-all font-medium"
+                className="w-full p-4 bg-[#434c5e] border border-(--border-color) rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 transition-all font-medium"
               />
             </div>
             <div className="space-y-2">
@@ -132,7 +132,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                   value={newVaultPath}
                   onChange={(e) => setNewVaultPath(e.target.value)}
                   placeholder={t.dir_path_placeholder}
-                  className="w-full p-4 bg-(--card-bg) border border-(--border-color) rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 pr-12 transition-all font-mono"
+                  className="w-full p-4 bg-[#434c5e] border border-(--border-color) rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 pr-12 transition-all font-mono"
                 />
                 <button 
                   onClick={handleSelectDirectory}
@@ -165,8 +165,8 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
             key={vault.id} 
             className={`group flex items-center justify-between p-3 rounded-lg border-2 transition-all ${
               vault.active 
-                ? 'border-(--theme-primary) bg-(--card-bg) shadow-md' 
-                : 'border-(--border-color) hover:border-neutral-300 bg-(--card-bg)/50'
+                ? 'border-(--theme-primary) bg-[#434c5e] shadow-md' 
+                : 'border-(--border-color) hover:border-neutral-300 bg-[#434c5e]/50'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -388,11 +388,11 @@ export default function SettingsPage() {
   const t = getTranslation(config.APP_LANG);
 
   return (
-    <div className={`min-h-screen text-(--foreground) font-sans ${activeTheme ? 'theme-active' : ''}`} style={{ backgroundColor: activeTheme ? 'var(--background)' : '#2e3440' }}>
+    <div className={`min-h-screen font-sans ${activeTheme ? 'theme-active' : ''}`} style={{ backgroundColor: '#2e3440', color: '#d8dee9' }}>
       <div className="max-w-4xl mx-auto py-6 px-4">
         <header className="flex items-center justify-between mb-4 pb-4 border-b border-(--border-color)">
           <div className="flex items-center gap-2">
-            <Link href="/" className="p-2 hover:bg-(--hover-bg) rounded-lg transition-all bg-(--card-bg) border border-(--border-color)">
+            <Link href="/" className="p-2 hover:bg-(--hover-bg) rounded-lg transition-all bg-[#434c5e] border border-(--border-color)">
               <ArrowLeft size={12} />
             </Link>
             <div>
@@ -428,7 +428,7 @@ export default function SettingsPage() {
 
         <div className="space-y-4 pb-16">
           {/* Section: Storage Mode */}
-          <section className="bg-(--card-bg) p-3 rounded-lg border border-(--border-color) shadow-sm">
+          <section className="bg-[#434c5e] p-3 rounded-lg border border-(--border-color) shadow-sm">
             <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
               <Server size={12} className="text-(--theme-primary) opacity-40" />
               {t.storage_identity}
@@ -439,7 +439,7 @@ export default function SettingsPage() {
                 className={`flex flex-col p-3 rounded-lg border-2 transition-all text-left group ${
                   config.STORAGE_MODE === 'local' 
                     ? 'border-(--theme-primary) bg-(--theme-primary-bg)' 
-                    : 'border-(--border-color) hover:border-neutral-300 bg-(--card-bg)'
+                    : 'border-(--border-color) hover:border-neutral-300 bg-[#434c5e]'
                 }`}
               >
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'local' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
@@ -453,7 +453,7 @@ export default function SettingsPage() {
                 className={`flex flex-col p-3 rounded-lg border-2 transition-all text-left group ${
                   config.STORAGE_MODE === 'server' 
                     ? 'border-(--theme-primary) bg-(--theme-primary-bg)' 
-                    : 'border-(--border-color) hover:border-neutral-300 bg-(--card-bg)'
+                    : 'border-(--border-color) hover:border-neutral-300 bg-[#434c5e]'
                 }`}
               >
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'server' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
@@ -467,7 +467,7 @@ export default function SettingsPage() {
 
           {/* Section: Vault Manager */}
           {config.STORAGE_MODE === 'local' && (
-            <section className="bg-(--card-bg) p-3 rounded-lg border border-(--border-color) shadow-sm animate-fade-in relative overflow-hidden">
+            <section className="bg-[#434c5e] p-3 rounded-lg border border-(--border-color) shadow-sm animate-fade-in relative overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-(--theme-primary)"></div>
               <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
                 <LayoutGrid size={12} className="text-(--theme-primary) opacity-40" />
@@ -478,7 +478,7 @@ export default function SettingsPage() {
           )}
 
           {config.STORAGE_MODE === 'server' && (
-            <section className="bg-(--card-bg) p-3 rounded-lg border border-(--border-color) shadow-sm animate-fade-in">
+            <section className="bg-[#434c5e] p-3 rounded-lg border border-(--border-color) shadow-sm animate-fade-in">
               <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
                 <Database size={12} className="text-(--theme-primary) opacity-40" />
                 {t.sql_connection}
@@ -499,7 +499,7 @@ export default function SettingsPage() {
           )}
 
           {/* Section: Plugin Management */}
-          <section className="bg-(--card-bg) p-3 rounded-lg border border-(--border-color) shadow-sm">
+          <section className="bg-[#434c5e] p-3 rounded-lg border border-(--border-color) shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-base font-semibold flex items-center gap-3">
                 <Package size={12} className="text-(--theme-primary) opacity-40" />
@@ -523,7 +523,7 @@ export default function SettingsPage() {
                 return (
                   <div key={plugin.id} className="group relative flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100 hover:border-neutral-200 transition-all">
                     <div className="flex items-start gap-2 flex-1">
-                      <div className={`p-3 rounded-xl transition-colors ${isEnabled ? 'bg-(--theme-primary) text-white shadow-md shadow-(--theme-primary)/20' : 'bg-(--card-bg) text-neutral-300'}`}>
+                      <div className={`p-3 rounded-xl transition-colors ${isEnabled ? 'bg-(--theme-primary) text-white shadow-md shadow-(--theme-primary)/20' : 'bg-[#434c5e] text-neutral-300'}`}>
                         <Blocks size={12} />
                       </div>
                       <div>
@@ -541,7 +541,7 @@ export default function SettingsPage() {
                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button 
                                 onClick={() => handleExportPlugin(plugin)}
-                                className="p-2 text-neutral-400 hover:text-(--theme-primary) hover:bg-(--card-bg) rounded-lg transition-all"
+                                className="p-2 text-neutral-400 hover:text-(--theme-primary) hover:bg-[#434c5e] rounded-lg transition-all"
                                 title="Export JSON to Clipboard"
                             >
                                 <Cloud size={12} />
@@ -549,7 +549,7 @@ export default function SettingsPage() {
                             {!isSystem && (
                                 <button 
                                     onClick={() => handleDeletePlugin(plugin.id, plugin.name)}
-                                    className="p-2 text-neutral-400 hover:text-red-500 hover:bg-(--card-bg) rounded-lg transition-all"
+                                    className="p-2 text-neutral-400 hover:text-red-500 hover:bg-[#434c5e] rounded-lg transition-all"
                                     title="Delete Plugin"
                                 >
                                     <X size={12} />
@@ -561,7 +561,7 @@ export default function SettingsPage() {
                           onClick={() => handlePluginToggle(plugin.id)}
                           className={`relative w-12 h-7 rounded-full transition-colors ${isEnabled ? 'bg-(--theme-primary)' : 'bg-neutral-200'}`}
                         >
-                          <div className={`absolute top-1 left-1 bg-(--card-bg) w-5 h-5 rounded-full shadow-sm transition-transform ${isEnabled ? 'translate-x-5' : ''}`}></div>
+                          <div className={`absolute top-1 left-1 bg-[#434c5e] w-5 h-5 rounded-full shadow-sm transition-transform ${isEnabled ? 'translate-x-5' : ''}`}></div>
                         </button>
                     </div>
                   </div>
@@ -574,7 +574,7 @@ export default function SettingsPage() {
           </section>
 
           {/* Section: AI Configuration */}
-          <section className="bg-(--card-bg) p-3 rounded-lg border border-(--border-color) shadow-sm">
+          <section className="bg-[#434c5e] p-3 rounded-lg border border-(--border-color) shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-semibold flex items-center gap-3">
                 <ShieldCheck size={12} className="text-(--theme-primary) opacity-40" />
@@ -589,7 +589,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setConfig({ ...config, AI_PROVIDER: 'openai' })}
                   className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-xs font-black transition-all ${
-                    config.AI_PROVIDER === 'openai' ? 'bg-(--card-bg) shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                    config.AI_PROVIDER === 'openai' ? 'bg-[#434c5e] shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
                   }`}
                 >
                   <Cloud size={12} />
@@ -598,7 +598,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setConfig({ ...config, AI_PROVIDER: 'ollama' })}
                   className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-xs font-black transition-all ${
-                    config.AI_PROVIDER === 'ollama' ? 'bg-(--card-bg) shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                    config.AI_PROVIDER === 'ollama' ? 'bg-[#434c5e] shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
                   }`}
                 >
                   <Server size={12} />
@@ -614,7 +614,7 @@ export default function SettingsPage() {
                     <button 
                       onClick={() => setConfig({ ...config, APP_LANG: 'en' })}
                       className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${
-                        config.APP_LANG === 'en' ? 'bg-(--card-bg) shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                        config.APP_LANG === 'en' ? 'bg-[#434c5e] shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
                       }`}
                     >
                       <Languages size={12} />
@@ -624,7 +624,7 @@ export default function SettingsPage() {
                       <button 
                         onClick={() => setConfig({ ...config, APP_LANG: 'ja' })}
                         className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${
-                          config.APP_LANG === 'ja' ? 'bg-(--card-bg) shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                          config.APP_LANG === 'ja' ? 'bg-[#434c5e] shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
                         }`}
                       >
                         <Languages size={12} />
