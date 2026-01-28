@@ -228,6 +228,21 @@ export const PromptVault: React.FC<PromptVaultProps> = ({ language }) => {
         </div>
       </div>
 
+      {/* Instruction */}
+      <div className="flex items-start gap-2 p-3 bg-(-theme-primary-bg) border border-(-theme-primary)/20 rounded-lg">
+        <Sparkles size={14} className="text-(-theme-primary) shrink-0 mt-0.5" />
+        <div className="text-[11px] text-(-foreground) leading-relaxed">
+          <p className="font-bold mb-1">
+            {language === 'ja' ? '✓ 1つだけ選択できます' : '✓ Select one prompt at a time'}
+          </p>
+          <p className="opacity-70">
+            {language === 'ja' 
+              ? 'ボタンをクリックして使用するプロンプトを切り替えます。アクティブなプロンプトがAIチャットで使用されます。' 
+              : 'Click the button to switch the active prompt. Only the active prompt will be used in AI chats.'}
+          </p>
+        </div>
+      </div>
+
       {/* Add/Edit Form */}
       {(isAdding || editingId !== null) && (
         <div className="p-4 bg-(-card-bg) rounded-xl border border-(-border-color) space-y-3">
@@ -309,14 +324,15 @@ export const PromptVault: React.FC<PromptVaultProps> = ({ language }) => {
                   {prompt.system_prompt}
                 </p>
               </div>
-              <div className="flex gap-1 ml-4">
+              <div className="flex gap-1 ml-4 shrink-0">
                 {prompt.is_active === 0 && (
                   <button
                     onClick={() => handleActivate(prompt.id)}
-                    className="p-2 rounded-lg hover:bg-(-hover-bg) transition-all"
+                    className="px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-wider transition-all bg-(-theme-primary) text-white hover:opacity-90 flex items-center gap-1"
                     title={t('activate')}
                   >
-                    <Check size={14} className="text-(-theme-primary)" />
+                    <Check size={12} />
+                    {language === 'ja' ? 'これを使用' : 'Use This'}
                   </button>
                 )}
                 {prompt.is_default === 0 && (
