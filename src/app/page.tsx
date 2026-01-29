@@ -1012,7 +1012,7 @@ export default function Home() {
                   
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">Current Status</span>
+                        <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">{t.current_status}</span>
                     </div>
                     {settings?.ENABLED_PLUGINS?.includes('plugin-jp') && (
                         <button
@@ -1086,7 +1086,7 @@ export default function Home() {
                     
                     <div className="mb-2 flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">Daily Report</span>
+                        <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">{t.daily_report}</span>
                         <span className="text-xs text-(--foreground) opacity-40">
                           {new Date(dailyNotes[0]?.timestamp || new Date()).toLocaleDateString(appLang, { month: 'short', day: 'numeric' })}
                         </span>
