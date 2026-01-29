@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SuggestedTask } from '@/lib/types';
-import { Lightbulb, Plus, X, Copy, CheckCircle } from 'lucide-react';
+import { Lightbulb, Plus, X, Copy, CheckCircle, Sparkles } from 'lucide-react';
 
 interface SuggestedTasksProps {
   tasks: SuggestedTask[];
@@ -8,9 +8,10 @@ interface SuggestedTasksProps {
   onDismiss: (task: SuggestedTask) => void;
   onUpdateStatus?: (task: SuggestedTask, status: string) => void;
   onManualAdd?: (task: string) => void;
+  onOpenChat?: (id: string, context: string, title: string) => void;
 }
 
-const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss, onUpdateStatus, onManualAdd }) => {
+const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss, onUpdateStatus, onManualAdd, onOpenChat }) => {
   const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
   const [activeTab, setActiveTab] = useState<'todo' | 'suggestions'>('todo');
   const [newTaskInput, setNewTaskInput] = useState('');
@@ -45,9 +46,12 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
     }
   }
 
-  /* Redesigned Task Row (Simple & Theme Aware) */
+  /* Redesigned Task Row (Simple & Theme Aware) with Connection Line */
   const renderTaskRow = (task: SuggestedTask, isTodo: boolean = false, isCompleted: boolean = false) => (
-    <div key={task.id} className="group flex items-start gap-3 py-3 border-b border-(--border-color) hover:bg-(--hover-bg) transition-colors px-2 -mx-2 rounded-lg">
+    <div key={task.id} className="group flex items-start gap-3 py-3 border-b border-(--border-color) hover:bg-(--hover-bg) transition-colors px-2 -mx-2 rounded-lg relative">
+        {/* Connection Line (like Current Status AI) */}
+        <div className="absolute -left-[42px] top-0 bottom-0 w-[2px] bg-(--border-color) opacity-60"></div>
+        
         {/* Checkbox / Icon Area */}
         <div 
             className={`mt-0.5 shrink-0 cursor-pointer text-(--foreground) hover:text-opacity-80 transition-colors opacity-40 ${(isTodo || isCompleted) ? '' : 'cursor-default'}`} 
@@ -80,6 +84,17 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
                     title="Add to Todo"
                 >
                     <Plus size={18} />
+                </button>
+            )}
+            
+            {/* AI Chat Button - for generating tasks via conversation */}
+            {onOpenChat && (
+                <button 
+                    onClick={() => onOpenChat(`task-${task.id}`, `Task: ${task.task}`, isTodo ? 'Todo AI Assistant' : 'Task AI Assistant')}
+                    className="p-1.5 text-(--foreground) opacity-40 hover:opacity-100 hover:text-(--theme-primary) hover:bg-(--hover-bg) rounded text-xs transition-colors"
+                    title="Chat with AI about this task"
+                >
+                    <Sparkles size={16} className="text-(--theme-primary)" />
                 </button>
             )}
             

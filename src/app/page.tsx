@@ -1070,6 +1070,7 @@ export default function Home() {
                       onDismiss={(t) => handleTaskStatusUpdate(t, 'dismissed')}
                       onUpdateStatus={(t, s) => handleTaskStatusUpdate(t, s)}
                       onManualAdd={handleManualTaskAdd}
+                      onOpenChat={handleOpenChat}
                    />
                 </div>
 
