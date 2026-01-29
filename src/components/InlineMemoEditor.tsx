@@ -67,7 +67,7 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
         </div>
 
         {/* Editor Area */}
-        <div className="p-3">
+        <div className="p-3 bg-(--card-bg)">
           {editorType === 'markdown' ? (
             <div className="space-y-2">
               {/* Markdown Toolbar */}
