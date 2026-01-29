@@ -612,6 +612,23 @@ export default function Home() {
     }
   };
 
+  const handleGenerateWalkthrough = async () => {
+    if (!activeProject) return;
+    setDialogState({ open: true, title: "生成中...", message: "Walkthroughドキュメントを生成しています...", type: 'loading' });
+    try {
+      const res = await fetch('/api/generate-walkthrough', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projectId: activeProject.id }) });
+      const data = await res.json();
+      if (res.ok) {
+        setDialogState({ open: true, title: t.success || "成功", message: `Walkthroughを生成しました: ${data.path}`, type: 'success' });
+      } else {
+        throw new Error(data.error || "Walkthrough生成に失敗しました");
+      }
+    } catch (e) {
+      console.error("Generate Walkthrough Error:", e);
+      setDialogState({ open: true, title: "エラー", message: `エラー: ${(e as Error).message}`, type: 'error' });
+    }
+  };
+
 
   const handleUpdateSettings = async (newSettings: Partial<Record<string, string>>) => {
     // Optimistic state updates
@@ -944,6 +961,13 @@ export default function Home() {
                 >
                   <MessageSquare size={14} className="text-(--theme-primary)" />
                   会話を記録
+                </button>
+                <button 
+                  onClick={handleGenerateWalkthrough}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-(--background) text-(--foreground) border border-(--border-color) hover:bg-(--hover-bg) shadow-xs"
+                >
+                  <BookOpen size={14} className="text-(--theme-accent)" />
+                  Walkthrough生成
                 </button>
               </>
             )}
