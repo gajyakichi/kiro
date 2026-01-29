@@ -1060,18 +1060,20 @@ export default function Home() {
                 </div>
 
                 {/* 1.5. Suggestions & Tasks */}
-                <div className="notion-card rounded-xl border border-(--border-color) shadow-sm p-6 relative group" style={{ backgroundColor: 'var(--card-bg)' }}>
-                   <div className="absolute top-4 right-4 text-(--foreground) opacity-30 group-hover:text-(--foreground) group-hover:opacity-50 transition-colors">
-                      <IconRenderer icon="Lightbulb" size={16} baseSet={appIconSet} />
+                <div className="relative">
+                   <div className="notion-card rounded-xl border border-(--border-color) shadow-sm p-6 relative group" style={{ backgroundColor: 'var(--card-bg)' }}>
+                      <div className="absolute top-4 right-4 text-(--foreground) opacity-30 group-hover:text-(--foreground) group-hover:opacity-50 transition-colors">
+                         <IconRenderer icon="Lightbulb" size={16} baseSet={appIconSet} />
+                      </div>
+                      <SuggestedTasks 
+                         tasks={suggestedTasks}
+                         onAdd={(t) => handleTaskStatusUpdate(t, 'added')}
+                         onDismiss={(t) => handleTaskStatusUpdate(t, 'dismissed')}
+                         onUpdateStatus={(t, s) => handleTaskStatusUpdate(t, s)}
+                         onManualAdd={handleManualTaskAdd}
+                         onOpenChat={handleOpenChat}
+                      />
                    </div>
-                   <SuggestedTasks 
-                      tasks={suggestedTasks}
-                      onAdd={(t) => handleTaskStatusUpdate(t, 'added')}
-                      onDismiss={(t) => handleTaskStatusUpdate(t, 'dismissed')}
-                      onUpdateStatus={(t, s) => handleTaskStatusUpdate(t, s)}
-                      onManualAdd={handleManualTaskAdd}
-                      onOpenChat={handleOpenChat}
-                   />
                 </div>
 
                 {/* 2. Search & Filter Bar */}
