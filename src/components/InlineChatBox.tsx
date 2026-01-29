@@ -70,7 +70,7 @@ export function InlineChatBox({ onClose, initialContext, title }: InlineChatBoxP
       
       <div className="ml-4 bg-(--card-bg) rounded-xl border border-(--border-color) shadow-lg overflow-hidden">
         {/* Header */}
-        <div className="p-3 bg-(--theme-primary-bg) border-b border-(--border-color) flex items-center justify-between">
+        <div className="p-3 bg-(--card-bg) border-b border-(--border-color) flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-(--theme-primary) flex items-center justify-center">
               <Sparkles size={12} className="text-white" />
