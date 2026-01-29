@@ -182,7 +182,7 @@ export async function generateDailySummary(context: string): Promise<{ en: strin
     const content = await getChatCompletion([
       {
         role: "system",
-        content: "You are a helpful development assistant. Summarize the provided Git logs and project walkthrough into a concise daily report. Focus on what was accomplished and any significant technical changes. Use a professional, minimalist tone similar to Notion notes. \n\nYou must return the result as a JSON object with two keys:\n- 'en': The summary in English\n- 'ja': The summary in Japanese\n\nEnsure strict JSON format."
+        content: "You are a helpful development assistant. Summarize the provided information into a concise daily report.\n\nThe context includes:\n1. Git logs: What code changes were made\n2. Conversation logs: Discussions with AI agents (Antigravity, Cursor, etc.) about the project\n3. Project walkthrough: General project context\n\nFocus on:\n- What was accomplished\n- Significant technical changes\n- Key discussions and decisions from AI agent conversations\n- Next steps or open questions\n\nUse a professional, minimalist tone similar to Notion notes.\n\nYou must return the result as a JSON object with two keys:\n- 'en': The summary in English\n- 'ja': The summary in Japanese\n\nEnsure strict JSON format."
       },
       {
         role: "user",
@@ -234,7 +234,7 @@ export async function suggestTasks(context: string, language: string = 'en'): Pr
     const content = await getChatCompletion([
       {
         role: "system",
-        content: `Analyze the project context (Git logs and walkthrough) and suggest 3-5 actionable next steps (TODOs). Each task should be descriptive but concise. Return the tasks as a JSON array of strings. Example: ["Task 1", "Task 2"]. ${langInstruction}`
+        content: `Analyze the project context (Git logs, conversation logs with AI agents, and project walkthrough) and suggest 3-5 actionable next steps (TODOs). Each task should be descriptive but concise. Return the tasks as a JSON array of strings. Example: ["Task 1", "Task 2"]. ${langInstruction}`
       },
       {
         role: "user",
