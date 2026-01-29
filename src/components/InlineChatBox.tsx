@@ -73,12 +73,12 @@ export function InlineChatBox({ onClose, initialContext, title }: InlineChatBoxP
         <div className="p-3 bg-(--theme-primary-bg) border-b border-(--border-color) flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-(--theme-primary) flex items-center justify-center">
-              <Sparkles size={12} className="text-(--background)" />
+              <Sparkles size={12} className="text-white" />
             </div>
-            <span className="text-xs font-bold text-(--foreground)">{title}</span>
+            <span className="text-xs font-bold text-(--theme-primary)">{title}</span>
           </div>
           <button onClick={onClose} className="p-1 hover:bg-(--hover-bg) rounded transition-colors">
-            <X size={14} className="text-(--foreground) opacity-50" />
+            <X size={14} className="text-(--theme-primary) opacity-70 hover:opacity-100" />
           </button>
         </div>
 
