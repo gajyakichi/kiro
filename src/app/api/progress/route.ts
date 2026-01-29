@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import fs from "fs/promises";
+import path from "path";
 
 export async function GET(request: Request) {
   try {
@@ -10,30 +12,29 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "projectId is required" }, { status: 400 });
     }
     
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Fetch today's daily note for the specific project
-    const todayNote = await db.dailyNote.findFirst({
-      where: {
-        project_id: parseInt(projectId),
-        date: today
-      },
-      orderBy: {
-        timestamp: 'desc'
-      }
+    // Get project path from database
+    const project = await db.project.findUnique({
+      where: { id: parseInt(projectId) }
     });
 
-    if (todayNote) {
-      return NextResponse.json({
-        task: todayNote.content,
-        walkthrough: "" // TODO: Restore walkthrough functionality
-      });
+    if (!project) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    // Fallback: if no daily note exists for today, return a default message
+    // Read walkthrough.md for overall project status
+    const walkthroughPath = path.join(project.git_path || '', 'docs', 'walkthrough.md');
+    let walkthroughContent = "";
+    
+    try {
+      walkthroughContent = await fs.readFile(walkthroughPath, 'utf-8');
+    } catch {
+      console.log('No walkthrough.md found, using default message');
+      walkthroughContent = "プロジェクトの概要はまだありません。「文脈を解析」ボタンをクリックして生成してください。";
+    }
+
     return NextResponse.json({
-      task: "本日の要約はまだありません。「文脈を解析」ボタンをクリックして生成してください。",
-      walkthrough: ""
+      task: walkthroughContent,
+      walkthrough: walkthroughContent
     });
   } catch (error) {
     console.error("Progress API Error:", error);
