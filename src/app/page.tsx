@@ -1120,6 +1120,12 @@ export default function Home() {
                       <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
                    </button>
                    
+                   <div className="mb-2 flex items-center justify-between">
+                     <div className="flex items-center gap-2">
+                       <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">Suggestions & Tasks</span>
+                     </div>
+                   </div>
+                   
                    <div className="notion-card rounded-xl border border-(--border-color) shadow-sm p-6 relative group" style={{ backgroundColor: 'var(--card-bg)' }}>
                       <div className="absolute top-4 right-4 text-(--foreground) opacity-30 group-hover:text-(--foreground) group-hover:opacity-50 transition-colors">
                          <IconRenderer icon="Lightbulb" size={16} baseSet={appIconSet} />
