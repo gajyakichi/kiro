@@ -65,45 +65,41 @@ export default function Home() {
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>('all');
   const [timelineSearch, setTimelineSearch] = useState("");
   
+  // Delete Confirmation State (inline, not full-screen)
+  const [deletingCommentId, setDeletingCommentId] = useState<number | null>(null);
+  
   const handleDeleteComment = async (id: number) => {
-    setDialogState({
-        open: true,
-        type: 'confirm',
-        title: 'Delete Note',
-        message: 'Are you sure you want to delete this note? This action cannot be undone.',
-        onConfirm: async () => {
-            try {
-              // Optimistic update
-              setComments(prev => prev.filter(c => c.id !== id));
-              
-              const res = await fetch(`/api/comments?id=${id}`, { method: 'DELETE' });
-              if (!res.ok) {
-                throw new Error("Failed to delete");
-              }
-              
-              if (activeProject) {
-                 const commentRes = await fetch(`/api/comments?projectId=${activeProject.id}`);
-                 const commentData = await commentRes.json();
-                 setComments(commentData);
-                 fetchAbsorbData(activeProject.id);
-              }
-            } catch (e) {
-              console.error(e);
-              setDialogState({
-                  open: true,
-                  type: 'error',
-                  title: 'Error',
-                  message: 'Failed to delete note.'
-              });
-              // Rollback
-              if (activeProject) {
-                   fetch(`/api/comments?projectId=${activeProject.id}`)
-                    .then(res => res.json())
-                    .then(data => setComments(data));
-              }
-            }
+    if (deletingCommentId === id) {
+      // User confirmed deletion
+      try {
+        // Optimistic update
+        setComments(prev => prev.filter(c => c.id !== id));
+        setDeletingCommentId(null);
+        
+        const res = await fetch(`/api/comments?id=${id}`, { method: 'DELETE' });
+        if (!res.ok) {
+          throw new Error("Failed to delete");
         }
-    });
+        
+        if (activeProject) {
+           const commentRes = await fetch(`/api/comments?projectId=${activeProject.id}`);
+           const commentData = await commentRes.json();
+           setComments(commentData);
+           fetchAbsorbData(activeProject.id);
+        }
+      } catch (e) {
+        console.error(e);
+        // Revert on error - would need to re-fetch to restore
+        if (activeProject) {
+          const commentRes = await fetch(`/api/comments?projectId=${activeProject.id}`);
+          const commentData = await commentRes.json();
+          setComments(commentData);
+        }
+      }
+    } else {
+      // First click - show confirmation
+      setDeletingCommentId(id);
+    }
   };
 
   const handleUpdateComment = async () => {
@@ -1324,13 +1320,31 @@ export default function Home() {
                                                   >
                                                       <Edit2 size={14} />
                                                   </button>
-                                                  <button 
-                                                      onClick={() => handleDeleteComment(entry.id)}
-                                                      className="p-1.5 text-(--foreground) opacity-40 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
-                                                      title="Delete"
-                                                  >
-                                                      <Trash2 size={14} />
-                                                  </button>
+                                                  {deletingCommentId === entry.id ? (
+                                                    <div className="flex gap-1 items-center animate-in slide-in-from-right-2">
+                                                      <span className="text-[10px] text-red-600 font-semibold px-2">削除?</span>
+                                                      <button 
+                                                          onClick={() => handleDeleteComment(entry.id)}
+                                                          className="px-2 py-1 text-[10px] bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-semibold"
+                                                      >
+                                                          確認
+                                                      </button>
+                                                      <button 
+                                                          onClick={() => setDeletingCommentId(null)}
+                                                          className="px-2 py-1 text-[10px] bg-(--sidebar-bg) text-(--foreground) rounded hover:bg-(--hover-bg) transition-colors"
+                                                      >
+                                                          ✕
+                                                      </button>
+                                                    </div>
+                                                  ) : (
+                                                    <button 
+                                                        onClick={() => setDeletingCommentId(entry.id)}
+                                                        className="p-1.5 text-(--foreground) opacity-40 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                  )}
                                               </div>
                                           )}
                                       </div>
