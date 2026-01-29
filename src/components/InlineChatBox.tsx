@@ -39,8 +39,12 @@ export function InlineChatBox({ onClose, initialContext, title, onSaveMemo }: In
         .filter(m => m.role !== 'system')
         .map(m => {
           const role = m.role === 'user' ? '**You**' : '**AI**';
+          // Clean up HTML tags: convert <br> to newlines and remove other HTML tags
+          const cleanContent = m.content
+            .replace(/<br\s*\/?>/gi, '\n')  // Convert <br> tags to newlines
+            .replace(/<[^>]+>/g, '');        // Remove all other HTML tags
           // Add double line breaks for better readability
-          return `${role}:\n\n${m.content}`;
+          return `${role}:\n\n${cleanContent}`;
         })
         .join('\n\n---\n\n');
       
