@@ -46,80 +46,68 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
     }
   }
 
-  /* Task Row - Exact Current Status Style */
+  /* Task Row - Simple Style (Timeline is on parent container) */
   const renderTaskRow = (task: SuggestedTask, isTodo: boolean = false, isCompleted: boolean = false) => (
-    <div key={task.id} className="group relative pl-6 border-l-2 border-(--border-color) hover:border-(--theme-primary) transition-colors mb-4">
-        {/* Circular Node */}
-        <button 
-            onClick={() => onOpenChat && onOpenChat(`task-${task.id}`, `Task: ${task.task}`, isTodo ? 'Todo AI Assistant' : 'Task AI Assistant')}
-            className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-(--card-bg) border-2 border-(--border-color) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center cursor-pointer hover:scale-110 z-10"
-            title="Ask AI about this task"
-        >
-            <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
-        </button>
+    <div key={task.id} className="group flex items-start justify-between gap-3 py-3 border-b border-(--border-color) last:border-b-0 hover:bg-(--hover-bg) transition-colors px-2 -mx-2 rounded-lg">
+        {/* Checkbox for Todo items */}
+        {(isTodo || isCompleted) && (
+            <div 
+                className="mt-0.5 shrink-0 cursor-pointer"
+                onClick={() => handleToggleComplete(task)}
+            >
+                {isCompleted ? (
+                    <CheckCircle size={20} className="text-(--theme-primary) fill-(--card-bg)" />
+                ) : (
+                    <div className="w-5 h-5 rounded-full border-2 border-(--border-color) hover:border-(--theme-primary) transition-colors" />
+                )}
+            </div>
+        )}
         
-        {/* Task Content */}
-        <div className="flex items-start justify-between gap-3 pb-3">
-            {/* Checkbox for Todo items */}
-            {(isTodo || isCompleted) && (
-                <div 
-                    className="mt-0.5 shrink-0 cursor-pointer"
-                    onClick={() => handleToggleComplete(task)}
+        {/* Task Text */}
+        <div className="flex-1 min-w-0">
+            <p className={`text-sm text-(--foreground) leading-snug ${isCompleted ? 'line-through opacity-50' : ''}`}>
+                {task.task}
+            </p>
+        </div>
+
+        {/* Actions - Visible on Hover */}
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {!isTodo && !isCompleted && (
+                <button 
+                    onClick={() => onAdd(task)}
+                    className="p-1.5 text-(--foreground) opacity-40 hover:opacity-100 hover:text-(--theme-primary) hover:bg-(--hover-bg) rounded text-xs transition-colors"
+                    title="Add to Todo"
                 >
-                    {isCompleted ? (
-                        <CheckCircle size={20} className="text-(--theme-primary) fill-(--card-bg)" />
-                    ) : (
-                        <div className="w-5 h-5 rounded-full border-2 border-(--border-color) hover:border-(--theme-primary) transition-colors" />
-                    )}
-                </div>
+                    <Plus size={18} />
+                </button>
             )}
             
-            {/* Task Text */}
-            <div className="flex-1 min-w-0">
-                <p className={`text-sm text-(--foreground) leading-snug ${isCompleted ? 'line-through opacity-50' : ''}`}>
-                    {task.task}
-                </p>
-            </div>
-
-            {/* Actions - Visible on Hover */}
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                {!isTodo && !isCompleted && (
-                    <button 
-                        onClick={() => onAdd(task)}
-                        className="p-1.5 text-(--foreground) opacity-40 hover:opacity-100 hover:text-(--theme-primary) hover:bg-(--hover-bg) rounded text-xs transition-colors"
-                        title="Add to Todo"
-                    >
-                        <Plus size={18} />
-                    </button>
-                )}
-                
-                {/* AI Chat Button */}
-                {onOpenChat && (
-                    <button 
-                        onClick={() => onOpenChat(`task-${task.id}`, `Task: ${task.task}`, isTodo ? 'Todo AI Assistant' : 'Task AI Assistant')}
-                        className="p-1.5 text-(--foreground) opacity-40 hover:opacity-100 hover:text-(--theme-primary) hover:bg-(--hover-bg) rounded text-xs transition-colors"
-                        title="Chat with AI about this task"
-                    >
-                        <Sparkles size={16} className="text-(--theme-primary)" />
-                    </button>
-                )}
-                
+            {/* AI Chat Button */}
+            {onOpenChat && (
                 <button 
-                    onClick={() => handleCopyPrompt(task.task)}
-                    className="p-1.5 text-(--foreground) opacity-40 hover:opacity-100 hover:bg-(--hover-bg) rounded text-xs transition-colors"
-                    title="Copy Prompt"
+                    onClick={() => onOpenChat(`task-${task.id}`, `Task: ${task.task}`, isTodo ? 'Todo AI Assistant' : 'Task AI Assistant')}
+                    className="p-1.5 text-(--foreground) opacity-40 hover:opacity-100 hover:text-(--theme-primary) hover:bg-(--hover-bg) rounded text-xs transition-colors"
+                    title="Chat with AI about this task"
                 >
-                   <Copy size={16} />
+                    <Sparkles size={16} className="text-(--theme-primary)" />
                 </button>
-                
-                <button 
-                    onClick={() => onDismiss(task)}
-                    className="p-1.5 text-(--foreground) opacity-40 hover:opacity-100 hover:text-red-500 hover:bg-red-50 rounded text-xs transition-colors"
-                    title="Dismiss"
-                >
-                   <X size={16} />
-                </button>
-            </div>
+            )}
+            
+            <button 
+                onClick={() => handleCopyPrompt(task.task)}
+                className="p-1.5 text-(--foreground) opacity-40 hover:opacity-100 hover:bg-(--hover-bg) rounded text-xs transition-colors"
+                title="Copy Prompt"
+            >
+               <Copy size={16} />
+            </button>
+            
+            <button 
+                onClick={() => onDismiss(task)}
+                className="p-1.5 text-(--foreground) opacity-40 hover:opacity-100 hover:text-red-500 hover:bg-red-50 rounded text-xs transition-colors"
+                title="Dismiss"
+            >
+               <X size={16} />
+            </button>
         </div>
     </div>
   );

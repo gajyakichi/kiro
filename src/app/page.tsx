@@ -1059,8 +1059,17 @@ export default function Home() {
                   )}
                 </div>
 
-                {/* 1.5. Suggestions & Tasks */}
-                <div className="relative">
+                {/* 1.5. Suggestions & Tasks - Timeline Style */}
+                <div className="group relative pl-6 border-l-2 border-(--border-color) hover:border-(--theme-primary) transition-colors">
+                   {/* Timeline Node */}
+                   <button 
+                      onClick={() => handleOpenChat('tasks', 'Task Management', 'Todo AI Assistant')}
+                      className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-(--card-bg) border-2 border-(--border-color) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center cursor-pointer hover:scale-110 z-10"
+                      title="Ask AI about tasks"
+                   >
+                      <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
+                   </button>
+                   
                    <div className="notion-card rounded-xl border border-(--border-color) shadow-sm p-6 relative group" style={{ backgroundColor: 'var(--card-bg)' }}>
                       <div className="absolute top-4 right-4 text-(--foreground) opacity-30 group-hover:text-(--foreground) group-hover:opacity-50 transition-colors">
                          <IconRenderer icon="Lightbulb" size={16} baseSet={appIconSet} />
