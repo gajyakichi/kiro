@@ -23,7 +23,7 @@ const InlineMemoEditor = dynamic(() => import('@/components/InlineMemoEditor').t
 const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'), { ssr: false });
 
 
-import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search, BookOpen, Download } from 'lucide-react';
+import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search, Download } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
 
 type TimelineEntry = {
@@ -558,6 +558,21 @@ export default function Home() {
         const progRes = await fetch(`/api/progress?projectId=${activeProject.id}`); 
         const progData = await progRes.json();
         setProgress(progData);
+        
+        // Automatically generate/update walkthrough after successful Absorb
+        try {
+          const walkthroughRes = await fetch('/api/generate-walkthrough', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ projectId: activeProject.id })
+          });
+          if (walkthroughRes.ok) {
+            console.log('Walkthrough automatically updated');
+          }
+        } catch (walkthroughError) {
+          // Don't fail Absorb if walkthrough generation fails
+          console.warn('Walkthrough generation failed:', walkthroughError);
+        }
       } else {
         const errorData = await res.json();
         throw new Error(errorData.error || "Absorbに失敗しました");
@@ -575,22 +590,6 @@ export default function Home() {
   };
 
 
-  const handleGenerateWalkthrough = async () => {
-    if (!activeProject) return;
-    setDialogState({ open: true, title: "生成中...", message: "Walkthroughドキュメントを生成しています...", type: 'loading' });
-    try {
-      const res = await fetch('/api/generate-walkthrough', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projectId: activeProject.id }) });
-      const data = await res.json();
-      if (res.ok) {
-        setDialogState({ open: true, title: t.success || "成功", message: `Walkthroughを生成しました: ${data.path}`, type: 'success' });
-      } else {
-        throw new Error(data.error || "Walkthrough生成に失敗しました");
-      }
-    } catch (e) {
-      console.error("Generate Walkthrough Error:", e);
-      setDialogState({ open: true, title: "エラー", message: `エラー: ${(e as Error).message}`, type: 'error' });
-    }
-  };
 
   const handleImportAntigravityConversations = async () => {
     if (!activeProject) return;
@@ -963,13 +962,7 @@ export default function Home() {
                   <Sparkles size={14} className={isAbsorbing ? 'animate-spin' : 'text-(--theme-accent) transition-colors'} />
                   {isAbsorbing ? t.absorbing : t.absorb_context}
                 </button>
-                <button 
-                  onClick={handleGenerateWalkthrough}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-(--background) text-(--foreground) border border-(--border-color) hover:bg-(--hover-bg) shadow-xs"
-                >
-                  <BookOpen size={14} className="text-(--theme-accent)" />
-                  Walkthrough生成
-                </button>
+
               </>
             )}
           </h1>
