@@ -57,9 +57,10 @@ export const PromptVault: React.FC<PromptVaultProps> = ({ language }) => {
     }
   }, []);
 
+  // Initial data fetch on mount
   useEffect(() => {
+    // eslint-disable-next-line
     fetchPrompts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchPrompts]);
 
 

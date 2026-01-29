@@ -8,7 +8,7 @@ test.describe('Electron E2E', () => {
     const electronApp = await electron.launch({
       args: [path.join(__dirname, '../../electron/main.js')],
       env: { 
-        ...process.env,
+        ...(process.env as Record<string, string>),
         // Ensure we don't start a concurrent next dev server if logic exists in main.js
         // But main.js likely relies on a running server in dev.
         // For CI/Test, usually we want to point to the built artifacts or handle the dev server.
