@@ -2,6 +2,11 @@
 
 **Track your development trajectory effortlessly.** / **開発の「軌跡」を、もっと「気楽」に。**
 
+![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
+📝 [Release Notes](RELEASE_NOTES.md) | 🤝 [Contributing](CONTRIBUTING.md)
+
 [English](#english) | [日本語](#japanese)
 
 ---
@@ -30,9 +35,17 @@ We removed the "ku" from "Kiroku" to symbolize our mission: **to remove the pain
   - Auto-generate daily reports from Git logs.
   - Explain or translate code snippets.
   - Performance optimization with query caching.
+  - **AI Prompt Management**: Create, edit, and switch between custom system prompts.
+- **Enhanced Note-Taking**
+  - Notion-like block editor with rich formatting.
+  - GitHub Flavored Markdown (GFM) support: tables, task lists, strikethrough.
+  - Inline memo editor for quick notes.
+  - Conversation history and export.
 - **Modern & Intuitive UI**
   - Smooth animations and refined design.
   - **Theme Lab**: Fully customizable themes via CSS.
+  - **VS Code Skin**: Compact developer-focused layout option.
+  - Complete theme consistency across all editors.
 - **Accessibility (A11y)**
   - WCAG AA compliant semantic markup and keyboard navigation.
 
@@ -108,9 +121,17 @@ Kiroは、開発者の日々の活動（Gitコミット、コーディング、�
   - Gitログから「今日やったこと」を要約する日報生成。
   - コードスニペットの解説や翻訳。
   - 応答速度のキャッシュシステムによる高速化。
+  - **AIプロンプト管理**: カスタムシステムプロンプトの作成・編集・切り替えが可能。
+- **強化されたノート機能**
+  - Notion風のブロックエディタでリッチフォーマッティング。
+  - GitHub Flavored Markdown (GFM) 対応：テーブル、タスクリスト、打ち消し線など。
+  - クイックメモ用のインラインエディタ。
+  - 会話履歴の保存とエクスポート。
 - **直感的なモダンUI**
   - スムーズなアニメーションと洗練されたデザイン。
   - **Theme Lab**: CSSによるフルカスタマイズ可能なテーマ機能。
+  - **VS Code Skin**: 開発者向けのコンパクトなレイアウトオプション。
+  - 全エディタで一貫したテーマカラー適用。
 - **アクセシビリティ (A11y)**
   - WCAG AA基準に準拠したセマンティックなマークアップとキーボード操作対応。スリーンリーダーへの配慮。
 

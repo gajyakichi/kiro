@@ -1,6 +1,6 @@
 {
   "name": "kiro",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Track your development trajectory effortlessly - An all-in-one dashboard for Git commits, notes, and AI-powered task management",
   "keywords": ["developer-tools", "git", "dashboard", "productivity", "ai", "notion-like", "electron"],
   "author": "Kiro Development Team",
