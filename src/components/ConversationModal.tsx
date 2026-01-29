@@ -47,7 +47,7 @@ export default function ConversationModal({ isOpen, onClose, onSave }: Conversat
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-(--card-bg) border border-(--border-color) rounded-lg shadow-xl w-full max-w-2xl mx-4">
+      <div className="bg-(--background) border border-(--border-color) rounded-lg shadow-xl w-full max-w-2xl mx-4">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-(--border-color)">
           <h2 className="text-lg font-semibold text-(--foreground)">会話を記録</h2>
