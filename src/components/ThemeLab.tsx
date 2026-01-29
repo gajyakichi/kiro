@@ -255,7 +255,7 @@ export const ThemeLab: React.FC<ThemeLabProps> = React.memo(({ themes, onSave, o
             onClick={() => onToggle(null)}
             onMouseEnter={() => onPreview("")}
             onMouseLeave={() => onPreview(newCss)}
-            className={`group flex items-center gap-2 px-3 py-2 rounded-md border transition-all duration-200 bg-(-card-bg) hover:-translate-y-1 hover:shadow-lg hover:z-20 active:scale-[0.98] outline-none relative ${!activeTheme ? 'border-(--theme-primary) shadow-xl' : 'border-(-border-color) hover:border-(--theme-primary)/50 '}`}
+            className={`group flex items-center gap-2 px-3 py-2 rounded-md border-2 transition-all duration-200 bg-(-card-bg) hover:-translate-y-1 hover:shadow-lg hover:z-20 active:scale-[0.98] outline-none relative ${!activeTheme ? 'border-(--theme-primary) shadow-xl' : 'border-(-border-color) hover:border-(--theme-primary)/50 '}`}
           >
             <div className={`w-5 h-5 rounded-full bg-(-card-bg) border border-(-border-color) flex items-center justify-center text-(-foreground) group-hover:scale-110 transition-transform duration-200 ${!activeTheme ? 'text-foreground border-foreground/10' : ''}`}>
               {!activeTheme ? <CheckCircle size={12} weight="fill" className="text-foreground" /> : <Circle size={12} />}
