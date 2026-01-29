@@ -71,6 +71,7 @@ export interface ConversationLog {
   agent: string;
   summary: string;
   full_text?: string | null;
+  metadata?: string | null;
   timestamp: string;
 }
 
