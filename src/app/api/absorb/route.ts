@@ -20,8 +20,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    // 2. Extract context
-    const contextData = getProjectContext(project.git_path || '', project.artifact_path || '');
+    // 2. Extract context (includes Antigravity KI and Kiro-generated walkthroughs)
+    const contextData = getProjectContext(
+      project.git_path || '', 
+      project.artifact_path || '',
+      project.git_path || '' // Pass project root for Kiro-generated walkthrough
+    );
 
     // Persist Git Logs to DB for Timeline/Calendar
     if (contextData.recentLogs.length > 0) {
@@ -54,11 +58,28 @@ export async function POST(req: NextRequest) {
                }))
            });
       }
-    }
+     }
+
+    // 2.25 Fetch today's conversation logs
+    const today = new Date().toISOString().split('T')[0];
+    const conversationLogs = await db.conversationLog.findMany({
+      where: {
+        project_id: Number(projectId),
+        date: today
+      },
+      orderBy: {
+        timestamp: 'asc'
+      }
+    });
 
     const contextString = `
 GIT LOGS:
-${contextData.recentLogs.map(l => `${l.date} [${l.hash}] ${l.message} (${l.author})`).join('\n')}
+${contextData.recentLogs.map((l: { date: string; hash: string; message: string; author: string }) => `${l.date} [${l.hash}] ${l.message} (${l.author})`).join('\n')}
+
+CONVERSATION LOGS (AI Agent Discussions):
+${conversationLogs.length > 0 
+  ? conversationLogs.map((c: { agent: string; summary: string; full_text: string | null }) => `[${c.agent}] ${c.summary}${c.full_text ? '\nDetails: ' + c.full_text : ''}`).join('\n\n')
+  : 'No conversations recorded today.'}
 
 WALKTHROUGH:
 ${contextData.walkthrough || 'No walkthrough available.'}

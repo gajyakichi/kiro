@@ -63,6 +63,8 @@ const translations = {
     remote_sync_desc: "Cloud-based SQL connection. Access your development logs across all devices instantly.",
     
     // Timeline & Blocks
+    current_status: "Current Status",
+    daily_report: "Daily Report",
     placeholder_code: "// write some code...",
     placeholder_markdown: "# Heading...",
     placeholder_text: "Write something...",
@@ -187,6 +189,8 @@ const translations = {
     remote_sync_desc: "クラウドベースのSQL接続設定。デバイス間で開発ログを即座に同期・アクセスできます。",
 
     // Timeline & Blocks
+    current_status: "現在の状況",
+    daily_report: "今日のまとめ",
     placeholder_code: "// コードを入力...",
     placeholder_markdown: "# 見出し...",
     placeholder_text: "何か書く...",

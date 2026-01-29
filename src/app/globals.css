@@ -17,8 +17,8 @@
   /* Semantic Theme Variables */
   --theme-primary: #37352f;
   --theme-primary-bg: rgba(55, 53, 47, 0.05);
-  --theme-accent: #2383e2;
-  --theme-accent-bg: rgba(35, 131, 226, 0.1);
+  --theme-accent: #787774;
+  --theme-accent-bg: rgba(120, 119, 116, 0.1);
   --theme-success: #0f7b46;
   --theme-success-bg: rgba(15, 123, 70, 0.1);
   --theme-warning: #dfab01;
@@ -28,8 +28,8 @@
 }
 
 html, body {
-  background-color: var(--background) !important;
-  color: var(--foreground) !important;
+  background-color: var(--background);
+  color: var(--foreground);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -96,3 +96,437 @@ html, body {
   color: #37352f !important;
   border: 1px solid var(--border-color);
 }
+
+/* Markdown Content Styling */
+.markdown-content {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--foreground);
+  opacity: 0.95;
+}
+
+.markdown-content p {
+  color: var(--foreground);
+  margin: 0.5em 0;
+}
+
+.markdown-content h1, .markdown-content h2, .markdown-content h3 {
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.markdown-content h1 { font-size: 1.8em; border-bottom: 1px solid var(--border-color); padding-bottom: 0.3em; }
+.markdown-content h2 { font-size: 1.5em; }
+.markdown-content h3 { font-size: 1.2em; }
+
+.markdown-content pre {
+  background-color: var(--hover-bg) !important;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 16px;
+  overflow-x: auto;
+  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+.markdown-content code {
+  background-color: var(--hover-bg);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+  font-size: 85%;
+  color: var(--theme-accent);
+  white-space: pre-wrap;
+}
+
+.markdown-content pre code {
+  background: none;
+  padding: 0;
+  color: var(--foreground);
+  white-space: pre;
+}
+
+.markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+}
+
+.markdown-content table th,
+.markdown-content table td {
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.markdown-content table th {
+  background-color: var(--hover-bg);
+  font-weight: 600;
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid var(--theme-primary);
+  padding-left: 1em;
+  margin: 1em 0;
+  color: var(--theme-accent);
+  font-style: italic;
+}
+
+.markdown-content ul, .markdown-content ol {
+  padding-left: 2em;
+  margin: 0.5em 0;
+}
+
+.markdown-content li {
+  margin: 0.25em 0;
+}
+
+.markdown-content a {
+  color: var(--theme-primary);
+  text-decoration: underline;
+}
+
+.markdown-content a:hover {
+  color: var(--theme-accent);
+}
+
+.markdown-content hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 2em 0;
+}
+
+/* VS Code Skin Overrides - Layout & Density Only */
+[data-skin="vscode"] body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-size: 13px !important;
+  letter-spacing: -0.01em;
+}
+
+[data-skin="vscode"] .notion-sidebar {
+  padding-top: 25px !important; /* Make space for traffic lights */
+  background-color: var(--sidebar-bg);
+  border-right-width: 1px !important;
+}
+
+[data-skin="vscode"] .notion-card {
+  border-radius: 0px !important;
+  padding: 8px !important;
+  font-size: 13px;
+  box-shadow: none !important;
+  /* Removed background/color overrides to respect theme */
+}
+
+[data-skin="vscode"] .notion-item {
+  padding: 2px 8px !important;
+  border-radius: 0 !important;
+  margin-bottom: 0 !important;
+  font-size: 13px;
+}
+
+[data-skin="vscode"] .notion-item.active {
+  font-weight: normal !important;
+  border-left: 2px solid var(--theme-primary); /* Use theme variable instead of fixed color */
+  /* Keep background active state but use opacity or theme vars if possible, 
+     but for now relying on theme's active definition might be safer. 
+     If we want 'dense' active style, we can enforce dimensions but let colors be. */
+}
+
+[data-skin="vscode"] .notion-text-subtle {
+  font-size: 11px;
+}
+
+[data-skin="vscode"] h1, [data-skin="vscode"] h2, [data-skin="vscode"] h3 {
+  margin-top: 1em !important;
+  margin-bottom: 0.5em !important;
+  font-weight: 600 !important;
+}
+
+[data-skin="vscode"] h1 { font-size: 1.3em !important; }
+[data-skin="vscode"] h2 { font-size: 1.1em !important; }
+
+/* VS Code Skin - Git Badge Overrides */
+[data-skin="vscode"] .font-mono span.bg-\(--theme-primary-bg\) {
+  background-color: transparent !important;
+  color: #007acc !important; /* VS Code Blue for hash */
+  border: none !important;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace !important;
+  font-weight: normal !important;
+  text-decoration: underline; /* Clickable look */
+}
+
+[data-skin="vscode"] .text-\[10px\].bg-\(--theme-primary\),
+[data-skin="vscode"] .text-\[10px\].bg-\(--theme-accent\) {
+  border-radius: 2px !important;
+  font-weight: normal !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  padding: 1px 6px !important;
+}
+
+[data-skin="vscode"] .text-\[10px\].notion-text-subtle.bg-\(--theme-primary-bg\) {
+  background: transparent !important;
+  border: none !important;
+  color: #858585 !important;
+  padding: 0 !important;
+  font-weight: normal !important;
+  letter-spacing: 0 !important;
+}
+
+/* VS Code Skin - Timeline Density */
+[data-skin="vscode"] .timeline-row {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  border-left: 1px solid var(--border-color); /* Gutter line */
+  margin-left: -12px !important;
+  padding-left: 12px !important;
+}
+
+[data-skin="vscode"] .timeline-row:hover {
+  background: rgba(128, 128, 128, 0.05) !important;
+}
+
+[data-skin="vscode"] .timeline-icon {
+  width: 16px !important;
+  height: 16px !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  opacity: 0.7;
+  transform: none !important; /* Disable hover scale */
+  /* Make it look like a gutter icon */
+}
+
+[data-skin="vscode"] .timeline-icon svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+[data-skin="vscode"] summary {
+  margin-bottom: 0 !important;
+  min-height: 0 !important;
+}
+
+/* Hide noisy labels in VS Code mode */
+[data-skin="vscode"] span.bg-\(--theme-accent\),
+[data-skin="vscode"] span.bg-\(--theme-primary\) {
+  display: none !important; /* Hide "Daily Summary", "Task Added" badges */
+}
+
+/* Make content font dense */
+[data-skin="vscode"] p, 
+[data-skin="vscode"] .markdown-content {
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+}
+
+/* VS Code Skin - ThemeLab & Settings Density */
+[data-skin="vscode"] .bg-neutral-50, 
+[data-skin="vscode"] .bg-white,
+[data-skin="vscode"] .rounded-2xl,
+[data-skin="vscode"] .rounded-xl,
+[data-skin="vscode"] .rounded-lg,
+[data-skin="vscode"] .rounded-md {
+  border-radius: 0 !important;
+}
+
+[data-skin="vscode"] .p-6, [data-skin="vscode"] .p-8 {
+  padding: 12px !important;
+}
+
+[data-skin="vscode"] .gap-6, [data-skin="vscode"] .gap-8 {
+  gap: 12px !important;
+}
+
+[data-skin="vscode"] button {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-weight: normal !important;
+}
+
+[data-skin="vscode"] .shadow-sm, [data-skin="vscode"] .shadow-lg, [data-skin="vscode"] .shadow-xl, [data-skin="vscode"] .shadow-2xl {
+  box-shadow: none !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* VS Code Skin - Strict Theme Compliance Overrides */
+/* VS Code Skin - Strict Theme Compliance Overrides */
+[data-skin="vscode"] input,
+[data-skin="vscode"] select,
+[data-skin="vscode"] textarea,
+[data-skin="vscode"] .bg-white,
+[data-skin="vscode"] .bg-neutral-50,
+[data-skin="vscode"] .bg-gray-50,
+[data-skin="vscode"] .bg-gray-100 {
+  background-color: var(--background);
+  color: var(--foreground) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Ensure no white background leaks in inputs/groups */
+[data-skin="vscode"] .group input {
+  background-color: var(--background);
+}
+
+/* Active states for timeline filters & buttons in VS Code skin */
+[data-skin="vscode"] .bg-\(--theme-primary\),
+[data-skin="vscode"] button.bg-\(--theme-primary\) {
+  background-color: var(--theme-primary);
+  color: var(--background) !important; /* Contrast text */
+  border: 1px solid var(--theme-primary) !important;
+}
+
+/* Inactive filter buttons */
+[data-skin="vscode"] button.bg-white {
+    background-color: var(--background);
+    border: 1px solid var(--border-color) !important;
+    color: var(--foreground) !important;
+    opacity: 0.8;
+}
+
+[data-skin="vscode"] .text-gray-500,
+[data-skin="vscode"] .text-gray-400,
+[data-skin="vscode"] .text-neutral-400 {
+  color: var(--foreground) !important;
+  opacity: 0.6;
+}
+
+[data-skin="vscode"] .border-gray-200,
+[data-skin="vscode"] .border-gray-100,
+[data-skin="vscode"] .border-neutral-200,
+[data-skin="vscode"] .border-neutral-100 {
+  border-color: var(--border-color) !important;
+}
+
+/* Calendar & Navigation Specifics for VS Code Skin */
+[data-skin="vscode"] .mini-calendar-day {
+  border: 1px solid var(--border-color) !important;
+  background: var(--background);
+  color: var(--foreground) !important;
+}
+
+[data-skin="vscode"] .mini-calendar-day:hover {
+  background: var(--theme-primary-bg);
+  color: var(--theme-primary) !important;
+}
+
+[data-skin="vscode"] .notion-item.active {
+  background: var(--theme-primary-bg) !important;
+  color: var(--foreground) !important;
+  border-left: 2px solid var(--theme-primary) !important;
+}
+
+/* Chat/Note Input Area */
+[data-skin="vscode"] .notion-editor-container {
+  border: 1px solid var(--border-color) !important;
+}
+
+/* Force dark header/steady areas to match theme if needed, or keep transparent */
+[data-skin="vscode"] header, 
+[data-skin="vscode"] .sticky {
+  background-color: var(--background); 
+  border-bottom: 1px solid var(--border-color) !important;
+  z-index: 40; /* Ensure it stays on top */
+}
+
+/* VS Code Skin - Menu & Overlay Consistency */
+[data-skin="vscode"] .absolute.bg-white,
+[data-skin="vscode"] .fixed.bg-white,
+[data-skin="vscode"] [role="dialog"],
+[data-skin="vscode"] .z-100, /* Icon Picker, etc */
+[data-skin="vscode"] .bg-white.shadow-xl, 
+[data-skin="vscode"] .bg-white.shadow-lg {
+  background-color: var(--card-bg);
+  color: var(--foreground) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important; /* Deeper shadow for popping elements */
+}
+
+/* Remove internal borders in Theme Lab preview cards for cleaner look */
+[data-skin="vscode"] .notion-card .notion-card {
+    border: 1px solid var(--border-color) !important;
+    box-shadow: none !important;
+}
+
+/* Force override inline styles if any */
+[data-skin="vscode"] *[style*="background-color: white"],
+[data-skin="vscode"] *[style*="background-color: rgb(255, 255, 255)"] {
+     background-color: var(--card-bg) !important;
+}
+
+/* ThemeLab - Force all UI elements to respect theme colors (both skins) */
+.bg-neutral-50,
+.bg-neutral-100 {
+  background-color: var(--card-bg) !important;
+}
+
+.border-neutral-100,
+.border-neutral-200 {
+  border-color: var(--border-color) !important;
+}
+
+.text-gray-800 {
+  color: var(--foreground) !important;
+}
+
+.text-neutral-400,
+.text-gray-400 {
+  color: var(--foreground) !important;
+  opacity: 0.6;
+}
+
+/* ThemeLab settings panels and cards */
+[data-skin="vscode"] .bg-neutral-50,
+[data-skin="vscode"] .bg-neutral-100 {
+  background-color: var(--card-bg) !important;
+}
+
+/* Original button in theme selector */
+button.bg-white {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* BlockNote Editor Theme Overrides */
+.bn-container {
+  background-color: var(--background) !important;
+}
+
+.bn-editor {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+.bn-block-outer {
+  background-color: transparent !important;
+}
+
+.bn-block-content {
+  color: var(--foreground) !important;
+}
+
+/* BlockNote placeholder text */
+.bn-block-content::before {
+  color: var(--foreground) !important;
+  opacity: 0.4 !important;
+}
+
+/* BlockNote menu and toolbar */
+.bn-menu-item,
+.bn-toolbar-item {
+  background-color: var(--card-bg) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border-color) !important;
+}
+
+.bn-menu-item:hover,
+.bn-toolbar-item:hover {
+  background-color: var(--hover-bg) !important;
+}
+

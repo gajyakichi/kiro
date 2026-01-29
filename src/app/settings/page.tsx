@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Vault, Theme } from '@/lib/types';
 import { getTranslation } from '@/lib/i18n';
 import { AVAILABLE_PLUGINS } from '@/lib/plugins';
+import { PromptVault } from '@/components/PromptVault';
 
 
 const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onVaultSwitch: () => void }) => {
@@ -85,35 +86,35 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
     }
   };
 
-  if (loading) return <div className="text-xs text-neutral-400 animate-pulse">{t.loading_vault}</div>;
+  if (loading) return <div className="text-xs text-(-foreground) animate-pulse">{t.loading_vault}</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm notion-text-subtle max-w-md leading-relaxed">
+        <p className="text-xs notion-text-subtle max-w-md leading-relaxed">
           {t.vault_manager_desc}
         </p>
         <div className="flex gap-2">
             <button 
               onClick={fetchVaults}
-              className="p-2 bg-neutral-100 text-neutral-500 rounded-xl hover:bg-neutral-200 transition-all shadow-sm"
+              className="p-2 bg-(-card-bg) text-(-foreground) rounded-xl hover:bg-(-hover-bg) transition-all shadow-sm"
               title="Refresh"
             >
-              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+              <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
             </button>
             <button 
               onClick={() => setIsAdding(!isAdding)}
-              className="flex items-center gap-2 px-4 py-2 bg-(--theme-primary) text-white rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-sm whitespace-nowrap"
+              className="flex items-center gap-2 px-4 py-2 bg-(-theme-primary) text-white rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-sm whitespace-nowrap"
             >
-              {isAdding ? <X size={14} /> : <Plus size={14} />}
+              {isAdding ? <X size={12} /> : <Plus size={12} />}
               {isAdding ? t.cancel : t.add_new_vault}
             </button>
         </div>
       </div>
 
       {isAdding && (
-        <div className="bg-(--theme-primary-bg) p-6 rounded-2xl border border-(--border-color) animate-in slide-in-from-top-2 duration-300">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="bg-(--theme-primary-bg) px-3 py-2 rounded-md border-(-border-color) animate-in slide-in-from-top-2 duration-300">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-(--theme-primary) uppercase tracking-widest opacity-60">{t.vault_name_label}</label>
               <input 
@@ -121,7 +122,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                 value={newVaultName}
                 onChange={(e) => setNewVaultName(e.target.value)}
                 placeholder={t.vault_name_placeholder}
-                className="w-full p-4 bg-white border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 transition-all font-medium"
+                className="w-full p-4 bg-(-card-bg) border border-(-border-color) rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 transition-all font-medium"
               />
             </div>
             <div className="space-y-2">
@@ -132,19 +133,19 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                   value={newVaultPath}
                   onChange={(e) => setNewVaultPath(e.target.value)}
                   placeholder={t.dir_path_placeholder}
-                  className="w-full p-4 bg-white border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 pr-12 transition-all font-mono"
+                  className="w-full p-4 bg-(-card-bg) border border-(-border-color) rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 pr-12 transition-all font-mono"
                 />
                 <button 
                   onClick={handleSelectDirectory}
                   className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-all ${
                     window.electron 
                     ? 'text-(--theme-primary) hover:bg-(--theme-primary-bg)' 
-                    : 'text-neutral-300 opacity-20 cursor-not-allowed'
+                    : 'text-(-foreground) opacity-20 cursor-not-allowed'
                   }`}
                   disabled={!window.electron}
                   title={window.electron ? t.select_folder_title : t.native_dialog_not_available}
                 >
-                  <Folder size={18} />
+                  <Folder size={14} />
                 </button>
               </div>
               {!window.electron && <p className="text-[9px] text-orange-500 font-medium">{t.native_desc_only_desktop}</p>}
@@ -152,7 +153,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
           </div>
           <button 
             onClick={handleAdd}
-            className="w-full py-3 bg-(--theme-primary) text-white rounded-xl text-xs font-black shadow-lg shadow-(--theme-primary)/10 hover:opacity-90 transition-all"
+            className="w-full py-3 bg-(-theme-primary) text-white rounded-lg text-xs font-black shadow-lg shadow-(--theme-primary)/10 hover:opacity-90 transition-all"
           >
             {t.confirm_add_vault}
           </button>
@@ -163,14 +164,14 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
         {vaults.map((vault) => (
           <div 
             key={vault.id} 
-            className={`group flex items-center justify-between p-5 rounded-2xl border-2 transition-all ${
+            className={`group flex items-center justify-between px-3 py-2 rounded-md border transition-all ${
               vault.active 
-                ? 'border-(--theme-primary) bg-white shadow-md' 
-                : 'border-(--border-color) hover:border-neutral-300 bg-white/50'
+                ? 'border-(--theme-primary) bg-(-card-bg) shadow-md' 
+                : 'border-(-border-color) hover:border-(-border-color) bg-(-card-bg)/50'
             }`}
           >
-            <div className="flex items-center gap-5">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${vault.active ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 group-hover:bg-neutral-200'}`}>
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${vault.active ? 'bg-(-theme-primary) text-white' : 'bg-(-card-bg) text-(-foreground) group-hover:bg-(-hover-bg)'}`}>
                 <ShieldCheck size={24} />
               </div>
               <div>
@@ -187,22 +188,22 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                 <>
                   <button 
                     onClick={() => handleSwitch(vault.id)}
-                    className="px-4 py-2 bg-neutral-100 text-(--theme-primary) hover:bg-(--theme-primary) hover:text-white rounded-xl text-[11px] font-black transition-all"
+                    className="px-4 py-2 bg-(-card-bg) text-(--theme-primary) hover:bg-(-theme-primary) hover:text-white rounded-xl text-[11px] font-black transition-all"
                   >
                     {t.select}
                   </button>
                   {vault.id !== 'default' && (
                     <button 
                       onClick={() => handleDelete(vault.id)}
-                      className="p-2 text-neutral-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                      className="p-2 text-(-foreground) hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                     >
-                      <X size={18} />
+                      <X size={14} />
                     </button>
                   )}
                 </>
               ) : (
                 <div className="p-2 text-(--theme-success)">
-                   <ShieldCheck size={20} />
+                   <ShieldCheck size={12} />
                 </div>
               )}
             </div>
@@ -223,6 +224,7 @@ export default function SettingsPage() {
     OLLAMA_BASE_URL: 'http://localhost:11434',
     VAULT_PATH: '',
     APP_LANG: 'en',
+    APP_SKIN: 'notion',
     ENABLED_PLUGINS: ''
   });
   const [themes, setThemes] = useState<Theme[]>([]);
@@ -388,78 +390,78 @@ export default function SettingsPage() {
   const t = getTranslation(config.APP_LANG);
 
   return (
-    <div className={`min-h-screen bg-(--background) text-(--foreground) font-sans ${activeTheme ? 'theme-active' : ''}`}>
-      <div className="max-w-3xl mx-auto py-16 px-6">
-        <header className="flex items-center justify-between mb-16">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="p-3 hover:bg-(--hover-bg) rounded-2xl transition-all shadow-sm bg-white border border-(--border-color)">
-              <ArrowLeft size={20} />
+    <div className={`min-h-screen font-sans bg-(--background) text-(--foreground) ${activeTheme ? 'theme-active' : ''}`} data-skin={config.APP_SKIN}>
+      <div className="max-w-4xl mx-auto py-6 px-4">
+        <header className="flex items-center justify-between mb-4 pb-4 border-b border-(-border-color)">
+          <div className="flex items-center gap-2">
+            <Link href="/" className="p-2 hover:bg-(-hover-bg) rounded-lg transition-all bg-(-card-bg) border border-(-border-color)">
+              <ArrowLeft size={12} />
             </Link>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-                <Settings className="text-(--theme-primary) opacity-40" size={28} />
+              <h1 className="text-base font-semibold tracking-tight flex items-center gap-2">
+                <Settings className="text-(--theme-primary) opacity-40" size={12} />
                 {t.environment_settings}
               </h1>
-              <p className="notion-text-subtle text-sm mt-1">{t.settings_desc}</p>
+              <p className="notion-text-subtle text-xs mt-0.5">{t.settings_desc}</p>
             </div>
           </div>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-3 bg-(--theme-primary) text-white rounded-2xl hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-(--theme-primary)/10 text-sm font-bold"
+            className="flex items-center gap-2 px-4 py-2 bg-(-theme-primary) text-white rounded-lg hover:opacity-90 disabled:opacity-50 transition-all text-xs font-bold"
           >
-            {saving ? <RotateCcw className="animate-spin" size={18} /> : <Save size={18} />}
+            {saving ? <RotateCcw className="animate-spin" size={12} /> : <Save size={12} />}
             {saving ? t.saving : t.save_config}
           </button>
         </header>
 
         {message && (
-          <div className={`mb-10 p-5 rounded-2xl flex items-center gap-4 border shadow-md animate-in slide-in-from-top-4 duration-500 ${
+          <div className={`mb-6 px-3 py-2 rounded-lg flex items-center gap-3 border text-xs animate-in slide-in-from-top-4 duration-500 ${
             message.type === 'success' 
               ? 'bg-(--theme-success-bg) border-(--theme-success)/10 text-(--theme-success)' 
               : 'bg-(--theme-error-bg) border-(--theme-error)/10 text-(--theme-error)'
           }`}>
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${message.type === 'success' ? 'bg-(--theme-success) text-white' : 'bg-(--theme-error) text-white'}`}>
-               {message.type === 'success' ? <ShieldCheck size={20} /> : <AlertTriangle size={20} />}
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${message.type === 'success' ? 'bg-(--theme-success) text-white' : 'bg-(--theme-error) text-white'}`}>
+               {message.type === 'success' ? <ShieldCheck size={12} /> : <AlertTriangle size={12} />}
             </div>
-            <span className="text-sm font-black uppercase tracking-wider">{message.text}</span>
+            <span className="font-bold uppercase tracking-wider">{message.text}</span>
           </div>
         )}
 
-        <div className="space-y-12 pb-32">
+        <div className="space-y-4 pb-16">
           {/* Section: Storage Mode */}
-          <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm">
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
-              <Server size={22} className="text-(--theme-primary) opacity-40" />
+          <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm">
+            <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
+              <Server size={12} className="text-(--theme-primary) opacity-40" />
               {t.storage_identity}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <button
                 onClick={() => setConfig({ ...config, STORAGE_MODE: 'local' })}
-                className={`flex flex-col p-6 rounded-2xl border-2 transition-all text-left group ${
+                className={`flex flex-col px-3 py-2 rounded-md border transition-all text-left group ${
                   config.STORAGE_MODE === 'local' 
                     ? 'border-(--theme-primary) bg-(--theme-primary-bg)' 
-                    : 'border-(--border-color) hover:border-neutral-300 bg-white'
+                    : 'border-(-border-color) hover:border-(-border-color) bg-(-card-bg)'
                 }`}
               >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'local' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'local' ? 'bg-(-theme-primary) text-white' : 'bg-(-card-bg) text-(-foreground) opacity-40'}`}>
                   <Database size={24} />
                 </div>
-                <span className="font-black text-sm uppercase tracking-widest">{t.local_vaults}</span>
+                <span className="font-black text-xs uppercase tracking-widest">{t.local_vaults}</span>
                 <span className="text-xs notion-text-subtle mt-2 leading-relaxed opacity-70">{t.local_vault_desc}</span>
               </button>
               <button
                 onClick={() => setConfig({ ...config, STORAGE_MODE: 'server' })}
-                className={`flex flex-col p-6 rounded-2xl border-2 transition-all text-left group ${
+                className={`flex flex-col px-3 py-2 rounded-md border transition-all text-left group ${
                   config.STORAGE_MODE === 'server' 
                     ? 'border-(--theme-primary) bg-(--theme-primary-bg)' 
-                    : 'border-(--border-color) hover:border-neutral-300 bg-white'
+                    : 'border-(-border-color) hover:border-(-border-color) bg-(-card-bg)'
                 }`}
               >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'server' ? 'bg-(--theme-primary) text-white' : 'bg-neutral-100 text-neutral-400 opacity-40'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-4 transition-colors ${config.STORAGE_MODE === 'server' ? 'bg-(-theme-primary) text-white' : 'bg-(-card-bg) text-(-foreground) opacity-40'}`}>
                   <Cloud size={24} />
                 </div>
-                <span className="font-black text-sm uppercase tracking-widest">{t.remote_sync}</span>
+                <span className="font-black text-xs uppercase tracking-widest">{t.remote_sync}</span>
                 <span className="text-xs notion-text-subtle mt-2 leading-relaxed opacity-70">{t.remote_sync_desc}</span>
               </button>
             </div>
@@ -467,10 +469,10 @@ export default function SettingsPage() {
 
           {/* Section: Vault Manager */}
           {config.STORAGE_MODE === 'local' && (
-            <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm animate-fade-in relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-1 h-full bg-(--theme-primary)"></div>
-              <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
-                <LayoutGrid size={22} className="text-(--theme-primary) opacity-40" />
+            <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm animate-fade-in relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-(-theme-primary)"></div>
+              <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
+                <LayoutGrid size={12} className="text-(--theme-primary) opacity-40" />
                 {t.vault_management}
               </h2>
               <VaultManager appLang={config.APP_LANG} onVaultSwitch={fetchSettings} />
@@ -478,20 +480,20 @@ export default function SettingsPage() {
           )}
 
           {config.STORAGE_MODE === 'server' && (
-            <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm animate-fade-in">
-              <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
-                <Database size={22} className="text-(--theme-primary) opacity-40" />
+            <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm animate-fade-in">
+              <h2 className="text-xs font-semibold mb-2 flex items-center gap-3">
+                <Database size={12} className="text-(--theme-primary) opacity-40" />
                 {t.sql_connection}
               </h2>
-              <div className="space-y-5">
-                <p className="text-sm notion-text-subtle leading-relaxed">
+              <div className="space-y-4">
+                <p className="text-xs notion-text-subtle leading-relaxed">
                   {t.sql_connection}
                 </p>
                 <input
                   type="text"
                   value={config.DATABASE_URL}
                   onChange={(e) => setConfig({ ...config, DATABASE_URL: e.target.value })}
-                  className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all"
+                  className="w-full p-3 bg-(-sidebar-bg) rounded-lg border border-(-border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all"
                   placeholder="postgresql://user:password@host:port/db"
                 />
               </div>
@@ -499,18 +501,18 @@ export default function SettingsPage() {
           )}
 
           {/* Section: Plugin Management */}
-          <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm">
+          <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold flex items-center gap-3">
-                <Package size={22} className="text-(--theme-primary) opacity-40" />
+              <h2 className="text-base font-semibold flex items-center gap-3">
+                <Package size={12} className="text-(--theme-primary) opacity-40" />
                 Plugins & Extensions
               </h2>
               <button 
                 onClick={handleImportPlugin}
-                className="flex items-center gap-2 px-3 py-1.5 bg-neutral-100 text-neutral-600 rounded-lg text-xs font-bold hover:bg-neutral-200 transition-all"
+                className="flex items-center gap-2 px-3 py-1.5 bg-(-card-bg) text-(-foreground) rounded-lg text-xs font-bold hover:bg-(-hover-bg) transition-all"
                 title="Import JSON from Clipboard"
               >
-                <Plus size={14} />
+                <Plus size={12} />
                 Import
               </button>
             </div>
@@ -521,19 +523,19 @@ export default function SettingsPage() {
                 const isSystem = AVAILABLE_PLUGINS.some(p => p.id === plugin.id);
 
                 return (
-                  <div key={plugin.id} className="group relative flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100 hover:border-neutral-200 transition-all">
-                    <div className="flex items-start gap-4 flex-1">
-                      <div className={`p-3 rounded-xl transition-colors ${isEnabled ? 'bg-(--theme-primary) text-white shadow-md shadow-(--theme-primary)/20' : 'bg-white text-neutral-300'}`}>
-                        <Blocks size={20} />
+                  <div key={plugin.id} className="group relative flex items-center justify-between p-3 bg-(-sidebar-bg) rounded-lg border border-(-border-color) hover:border-(-border-color) transition-all">
+                    <div className="flex items-start gap-2 flex-1">
+                      <div className={`p-2 rounded-lg transition-colors ${isEnabled ? 'bg-(-theme-primary) text-white shadow-md shadow-(--theme-primary)/20' : 'bg-(-card-bg) text-(-foreground)'}`}>
+                        <Blocks size={12} />
                       </div>
                       <div>
-                        <h3 className="font-bold text-sm flex items-center gap-2">
+                        <h3 className="font-bold text-xs flex items-center gap-2">
                           {plugin.name}
-                          <span className="text-[9px] bg-neutral-200 text-neutral-500 px-1.5 py-0.5 rounded font-mono">{plugin.version}</span>
+                          <span className="text-[9px] bg-(-hover-bg) text-(-foreground) px-1.5 py-0.5 rounded font-mono">{plugin.version}</span>
                           {!isSystem && <span className="text-[9px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded font-bold uppercase">Custom</span>}
                         </h3>
-                        <p className="text-xs text-neutral-500 mt-1 max-w-sm leading-relaxed">{plugin.description}</p>
-                        <p className="text-[10px] text-neutral-400 mt-1 font-mono opacity-60">ID: {plugin.id} • by {plugin.author}</p>
+                        <p className="text-xs text-(-foreground) mt-1 max-w-sm leading-relaxed">{plugin.description}</p>
+                        <p className="text-[10px] text-(-foreground) mt-1 font-mono opacity-60">ID: {plugin.id} • by {plugin.author}</p>
                       </div>
                     </div>
                     
@@ -541,27 +543,27 @@ export default function SettingsPage() {
                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button 
                                 onClick={() => handleExportPlugin(plugin)}
-                                className="p-2 text-neutral-400 hover:text-(--theme-primary) hover:bg-white rounded-lg transition-all"
+                                className="p-2 text-(-foreground) hover:text-(--theme-primary) hover:bg-(-card-bg) rounded-lg transition-all"
                                 title="Export JSON to Clipboard"
                             >
-                                <Cloud size={16} />
+                                <Cloud size={12} />
                             </button>
                             {!isSystem && (
                                 <button 
                                     onClick={() => handleDeletePlugin(plugin.id, plugin.name)}
-                                    className="p-2 text-neutral-400 hover:text-red-500 hover:bg-white rounded-lg transition-all"
+                                    className="p-2 text-(-foreground) hover:text-red-500 hover:bg-(-card-bg) rounded-lg transition-all"
                                     title="Delete Plugin"
                                 >
-                                    <X size={16} />
+                                    <X size={12} />
                                 </button>
                             )}
                          </div>
 
                         <button 
                           onClick={() => handlePluginToggle(plugin.id)}
-                          className={`relative w-12 h-7 rounded-full transition-colors ${isEnabled ? 'bg-(--theme-primary)' : 'bg-neutral-200'}`}
+                          className={`relative w-12 h-7 rounded-full transition-colors ${isEnabled ? 'bg-(-theme-primary)' : 'bg-(-hover-bg)'}`}
                         >
-                          <div className={`absolute top-1 left-1 bg-white w-5 h-5 rounded-full shadow-sm transition-transform ${isEnabled ? 'translate-x-5' : ''}`}></div>
+                          <div className={`absolute top-1 left-1 bg-(-card-bg) w-5 h-5 rounded-full shadow-sm transition-transform ${isEnabled ? 'translate-x-5' : ''}`}></div>
                         </button>
                     </div>
                   </div>
@@ -569,70 +571,70 @@ export default function SettingsPage() {
               })}
             </div>
             {(AVAILABLE_PLUGINS.length + customPlugins.length) === 0 && (
-                <p className="text-center text-xs text-neutral-400 mt-6 italic">No plugins available.</p>
+                <p className="text-center text-xs text-(-foreground) mt-6 italic">No plugins available.</p>
             )}
           </section>
 
           {/* Section: AI Configuration */}
-          <section className="bg-white p-8 rounded-3xl border border-(--border-color) shadow-sm">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-xl font-bold flex items-center gap-3">
-                <ShieldCheck size={22} className="text-(--theme-primary) opacity-40" />
+          <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-semibold flex items-center gap-3">
+                <ShieldCheck size={12} className="text-(--theme-primary) opacity-40" />
                 {t.intelligence_layer}
               </h2>
-              <div className="text-[9px] bg-neutral-100 text-neutral-400 px-3 py-1 rounded-full font-black uppercase tracking-widest">
+              <div className="text-[9px] bg-(-card-bg) text-(-foreground) px-3 py-1 rounded-full font-black uppercase tracking-widest">
                 {t.api_config}
               </div>
             </div>
-            <div className="space-y-10">
-              <div className="flex bg-neutral-100 p-1.5 rounded-2xl gap-1.5">
+            <div className="space-y-4">
+              <div className="flex bg-(-card-bg) p-1.5 rounded-lg gap-1.5">
                 <button
                   onClick={() => setConfig({ ...config, AI_PROVIDER: 'openai' })}
-                  className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-xs font-black transition-all ${
-                    config.AI_PROVIDER === 'openai' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                  className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-lg text-xs font-black transition-all ${
+                    config.AI_PROVIDER === 'openai' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
                   }`}
                 >
-                  <Cloud size={16} />
+                  <Cloud size={12} />
                   OPENAI (CLOUD)
                 </button>
                 <button
                   onClick={() => setConfig({ ...config, AI_PROVIDER: 'ollama' })}
-                  className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-xs font-black transition-all ${
-                    config.AI_PROVIDER === 'ollama' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                  className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-lg text-xs font-black transition-all ${
+                    config.AI_PROVIDER === 'ollama' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
                   }`}
                 >
-                  <Server size={16} />
+                  <Server size={12} />
                   {t.ollama_local}
                 </button>
               </div>
 
               <div className="space-y-4 animate-fade-in">
                  <div className="flex items-center gap-2 mb-2">
-                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">{t.language}</label>
+                    <label className="text-[10px] font-black text-(-foreground) uppercase tracking-widest px-1">{t.language}</label>
                  </div>
-                 <div className="flex bg-neutral-100 p-1.5 rounded-2xl gap-1.5">
+                 <div className="flex bg-(-card-bg) p-1.5 rounded-lg gap-1.5">
                     <button 
                       onClick={() => setConfig({ ...config, APP_LANG: 'en' })}
-                      className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${
-                        config.APP_LANG === 'en' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                      className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-black transition-all ${
+                        config.APP_LANG === 'en' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
                       }`}
                     >
-                      <Languages size={16} />
+                      <Languages size={12} />
                       {t.english}
                     </button>
                     {config.ENABLED_PLUGINS?.includes('plugin-jp') ? (
                       <button 
                         onClick={() => setConfig({ ...config, APP_LANG: 'ja' })}
-                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black transition-all ${
-                          config.APP_LANG === 'ja' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-neutral-400 hover:text-neutral-500'
+                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-black transition-all ${
+                          config.APP_LANG === 'ja' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
                         }`}
                       >
-                        <Languages size={16} />
+                        <Languages size={12} />
                         {t.japanese}
                       </button>
                     ) : (
-                      <div className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold text-neutral-300 bg-neutral-50 border border-transparent cursor-not-allowed group relative" title="Enable 'Japanese Language Support' plugin to unlock">
-                         <Languages size={14} />
+                      <div className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-bold text-(-foreground) bg-(-sidebar-bg) border border-transparent cursor-not-allowed group relative" title="Enable 'Japanese Language Support' plugin to unlock">
+                         <Languages size={12} />
                          {t.japanese}
                          <span className="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-neutral-800 text-white text-[9px] px-2 py-1 rounded shadow-lg whitespace-nowrap z-10">Plugin Required</span>
                       </div>
@@ -641,55 +643,55 @@ export default function SettingsPage() {
               </div>
 
               {config.AI_PROVIDER === 'openai' ? (
-                <div className="space-y-6 animate-fade-in">
+                <div className="space-y-4 animate-fade-in">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">OpenAI API Key</label>
+                    <label className="text-[10px] font-black text-(-foreground) uppercase tracking-widest px-1">OpenAI API Key</label>
                     <div className="relative group">
                       <input
                         type="password"
                         value={config.OPENAI_API_KEY}
                         autoComplete="off"
                         onChange={(e) => setConfig({ ...config, OPENAI_API_KEY: e.target.value })}
-                        className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all pr-12"
+                        className="w-full p-3 bg-(-sidebar-bg) rounded-lg border border-(-border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all pr-12"
                         placeholder="sk-proj-..."
                       />
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within:text-(--theme-primary) transition-colors">
-                        <ShieldCheck size={20} />
+                      <div className="absolute right-5 top-1/2 -translate-y-1/2 text-(-foreground) group-focus-within:text-(--theme-primary) transition-colors">
+                        <ShieldCheck size={12} />
                       </div>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">{t.target_model}</label>
+                    <label className="text-[10px] font-black text-(-foreground) uppercase tracking-widest px-1">{t.target_model}</label>
                     <div className="relative">
                       <select
                         value={config.AI_MODEL}
                         onChange={(e) => setConfig({ ...config, AI_MODEL: e.target.value })}
-                        className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
+                        className="w-full p-3 bg-(-sidebar-bg) rounded-lg border border-(-border-color) text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
                       >
                         <option value="gpt-4o-mini">GPT-4o mini (Recommended)</option>
                         <option value="gpt-4o">GPT-4o (High Intelligence)</option>
                         <option value="o1-mini">o1-mini (Reasoning)</option>
                       </select>
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400">
-                        <Plus size={16} className="rotate-45" />
+                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-(-foreground)">
+                        <Plus size={12} className="rotate-45" />
                       </div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-6 animate-fade-in">
+                <div className="space-y-4 animate-fade-in">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1">Ollama Base URL</label>
+                    <label className="text-[10px] font-black text-(-foreground) uppercase tracking-widest px-1">Ollama Base URL</label>
                     <input
                       type="text"
                       value={config.OLLAMA_BASE_URL}
                       onChange={(e) => setConfig({ ...config, OLLAMA_BASE_URL: e.target.value })}
-                      className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all"
+                      className="w-full p-3 bg-(-sidebar-bg) rounded-lg border border-(-border-color) font-mono text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all"
                       placeholder="http://localhost:11434"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest px-1 flex items-center justify-between">
+                    <label className="text-[10px] font-black text-(-foreground) uppercase tracking-widest px-1 flex items-center justify-between">
                       {t.active_model}
                       <button 
                         onClick={fetchOllamaModels}
@@ -705,7 +707,7 @@ export default function SettingsPage() {
                         <select
                           value={config.AI_MODEL}
                           onChange={(e) => setConfig({ ...config, AI_MODEL: e.target.value })}
-                          className="w-full p-5 bg-neutral-50 rounded-2xl border border-(--border-color) text-sm focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
+                          className="w-full p-3 bg-(-sidebar-bg) rounded-lg border border-(-border-color) text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 transition-all appearance-none cursor-pointer font-bold"
                         >
                           {!ollamaModels.includes(config.AI_MODEL) && (
                             <option value={config.AI_MODEL}>{config.AI_MODEL} (Custom)</option>
@@ -720,27 +722,32 @@ export default function SettingsPage() {
                             type="text"
                             value={config.AI_MODEL}
                             onChange={(e) => setConfig({ ...config, AI_MODEL: e.target.value })}
-                            className="w-full p-5 bg-red-50/30 rounded-2xl border border-red-100 text-(--theme-error) font-bold text-sm focus:outline-none"
+                            className="w-full p-3 bg-red-50/30 rounded-lg border border-red-100 text-(--theme-error) font-bold text-xs focus:outline-none"
                             placeholder="e.g. llama3"
                           />
                           <p className="text-[10px] text-(--theme-error) font-bold px-1">Could not detect any local Ollama models. Ensure Ollama is running.</p>
                         </div>
                       )}
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400">
-                        <Plus size={16} className="rotate-45" />
+                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-(-foreground)">
+                        <Plus size={12} className="rotate-45" />
                       </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              <div className="flex items-start gap-3 p-4 bg-(--theme-warning-bg) border border-(--theme-warning)/10 rounded-2xl text-(--theme-warning) text-xs">
-                <AlertTriangle size={18} className="shrink-0" />
+              <div className="flex items-start gap-3 p-3 bg-(--theme-warning-bg) border border-(--theme-warning)/10 rounded-lg text-(--theme-warning) text-xs">
+                <AlertTriangle size={14} className="shrink-0" />
                 <span className="font-bold leading-relaxed">
                    {t.restart_required}
                 </span>
               </div>
             </div>
+          </section>
+
+          {/* AI Prompt Vault */}
+          <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm">
+            <PromptVault language={config.APP_LANG || 'en'} />
           </section>
 
           <footer className="text-center notion-text-subtle text-[10px] font-black uppercase tracking-widest pt-12 opacity-30">
@@ -749,11 +756,9 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
-        ${activeTheme?.css || ''}
-        .theme-active body { background-color: var(--background) !important; color: var(--foreground) !important; }
-        .theme-active .notion-card { border-color: var(--border-color); }
-      `}} />
+      {activeTheme && (
+        <style key={activeTheme.id} dangerouslySetInnerHTML={{ __html: activeTheme.css }} />
+      )}
     </div>
   );
 }

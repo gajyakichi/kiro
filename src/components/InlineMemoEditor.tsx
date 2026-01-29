@@ -25,25 +25,25 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
   return (
     <div className="mt-4 relative animate-in slide-in-from-top-2 duration-200">
       {/* Connection Line */}
-      <div className="absolute -left-[42px] top-6 w-10 h-[2px] bg-linear-to-r from-green-500 to-teal-300 opacity-60"></div>
+      <div className="absolute -left-[42px] top-6 w-10 h-[2px] bg-(--border-color) opacity-60"></div>
       
-      <div className="ml-4 bg-white rounded-xl border-2 border-green-200 shadow-lg overflow-hidden">
+      <div className="ml-4 bg-(--background) rounded-xl border-2 border-(--border-color) shadow-lg overflow-hidden">
         {/* Header */}
-        <div className="p-3 bg-linear-to-r from-green-50 to-teal-50 border-b border-green-100 flex items-center justify-between">
+        <div className="p-3 bg-(--background) border-b border-(--border-color) flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <FileText size={14} className="text-green-600" />
-              <span className="text-xs font-bold text-gray-700">{title}</span>
+              <FileText size={14} className="text-(--theme-primary)" />
+              <span className="text-xs font-bold text-(--foreground)">{title}</span>
             </div>
             
             {/* Editor Type Toggle */}
-            <div className="flex gap-1 bg-white rounded-lg p-1 border border-green-200">
+            <div className="flex gap-1 bg-(--background) rounded-lg p-1 border border-(--border-color)">
               <button
                 onClick={() => setEditorType('markdown')}
                 className={`px-2 py-1 text-[10px] rounded transition-colors ${
                   editorType === 'markdown' 
-                    ? 'bg-green-500 text-white' 
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'bg-(--theme-primary) text-white' 
+                    : 'text-(--foreground) opacity-60 hover:bg-(--hover-bg)'
                 }`}
               >
                 Markdown
@@ -52,8 +52,8 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
                 onClick={() => setEditorType('block')}
                 className={`px-2 py-1 text-[10px] rounded transition-colors ${
                   editorType === 'block' 
-                    ? 'bg-green-500 text-white' 
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'bg-(--theme-primary) text-white' 
+                    : 'text-(--foreground) opacity-60 hover:bg-(--hover-bg)'
                 }`}
               >
                 Block
@@ -61,20 +61,20 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
             </div>
           </div>
           
-          <button onClick={onClose} className="p-1 hover:bg-white/50 rounded transition-colors">
-            <X size={14} className="text-gray-500" />
+          <button onClick={onClose} className="p-1 hover:bg-(--hover-bg) rounded transition-colors">
+            <X size={14} className="text-(--foreground) opacity-50" />
           </button>
         </div>
 
         {/* Editor Area */}
-        <div className="p-3">
+        <div className="p-3 bg-(--background)">
           {editorType === 'markdown' ? (
             <div className="space-y-2">
               {/* Markdown Toolbar */}
               <div className="flex gap-1 items-center">
                 <button
                   onClick={() => setIsPreview(!isPreview)}
-                  className="px-2 py-1 text-[10px] bg-gray-100 hover:bg-gray-200 rounded transition-colors flex items-center gap-1"
+                  className="px-2 py-1 text-[10px] bg-(--card-bg) hover:bg-(--theme-primary) hover:text-white rounded transition-colors flex items-center gap-1 text-(--foreground) border border-(--border-color)"
                 >
                   <Code size={12} />
                   {isPreview ? 'Edit' : 'Preview'}
@@ -82,7 +82,7 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
               </div>
               
               {isPreview ? (
-                <div className="min-h-[150px] max-h-[300px] overflow-y-auto p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="min-h-[150px] max-h-[300px] overflow-y-auto p-3 bg-(--background) rounded-lg border border-(--border-color)">
                   <div className="markdown-content prose prose-sm max-w-none">
                     <ReactMarkdown>{content || '*No content yet*'}</ReactMarkdown>
                   </div>
@@ -92,7 +92,7 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   placeholder="Write your memo in Markdown..."
-                  className="w-full min-h-[150px] max-h-[300px] px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all resize-none font-mono"
+                  className="w-full min-h-[150px] max-h-[300px] px-3 py-2 text-sm bg-(--background) border border-(--border-color) rounded-lg focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 focus:border-(--theme-primary) transition-all resize-none font-mono text-(--foreground)"
                 />
               )}
             </div>
@@ -110,14 +110,14 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
         </div>
 
         {/* Footer */}
-        <div className="p-2 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
-          <span className="text-[10px] text-gray-400">
+        <div className="p-2 bg-(--background) border-t border-(--border-color) flex justify-between items-center">
+          <span className="text-[10px] text-(--foreground) opacity-40">
             {editorType === 'markdown' ? 'Markdown' : 'Block'} Editor
           </span>
           <button
             onClick={handleSave}
             disabled={!content.trim()}
-            className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-30 transition-all text-xs flex items-center gap-1.5"
+            className="px-3 py-1.5 bg-(--theme-primary) text-(--background) rounded-lg hover:opacity-90 disabled:opacity-30 transition-all text-xs flex items-center gap-1.5"
           >
             <Save size={12} />
             Save Memo
