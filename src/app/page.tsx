@@ -23,7 +23,7 @@ const InlineMemoEditor = dynamic(() => import('@/components/InlineMemoEditor').t
 const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'), { ssr: false });
 const ConversationModal = dynamic(() => import('@/components/ConversationModal'), { ssr: false });
 
-import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search, MessageSquare, BookOpen } from 'lucide-react';
+import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search, MessageSquare, BookOpen, Download } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
 
 type TimelineEntry = {
@@ -629,6 +629,51 @@ export default function Home() {
     }
   };
 
+  const handleImportAntigravityConversations = async () => {
+    if (!activeProject) return;
+    
+    setDialogState({ open: true, title: "スキャン中...", message: "Antigravity Knowledge Itemsをスキャンしています...", type: 'loading' });
+    
+    try {
+      // Step 1: Scan for new conversations
+      const scanRes = await fetch(`/api/import-conversations?projectId=${activeProject.id}`);
+      const scanData = await scanRes.json();
+      
+      if (!scanRes.ok || !scanData.candidates || scanData.candidates.length === 0) {
+        setDialogState({ 
+          open: true, 
+          title: "完了", 
+          message: "インポートできる新しい会話はありませんでした", 
+          type: 'success' 
+        });
+        return;
+      }
+
+      // Step 2: Import all candidates
+      const importRes = await fetch('/api/import-conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectId: activeProject.id, candidates: scanData.candidates })
+      });
+
+      const importData = await importRes.json();
+
+      if (importRes.ok) {
+        await fetchConversationLogs(activeProject.id);
+        setDialogState({ 
+          open: true, 
+          title: t.success || "成功", 
+          message: `${importData.imported}件の会話をインポートしました`, 
+          type: 'success' 
+        });
+      } else {
+        throw new Error(importData.error || "インポートに失敗しました");
+      }
+    } catch (e) {
+      console.error("Import Antigravity Conversations Error:", e);
+      setDialogState({ open: true, title: "エラー", message: `エラー: ${(e as Error).message}`, type: 'error' });
+    }
+  };
 
   const handleUpdateSettings = async (newSettings: Partial<Record<string, string>>) => {
     // Optimistic state updates
@@ -1119,6 +1164,14 @@ export default function Home() {
                           </button>
                         </div>
                       )}
+                      <button
+                        onClick={handleImportAntigravityConversations}
+                        className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-(--theme-primary-bg) text-(--theme-primary) border border-(--theme-primary) hover:bg-(--theme-primary) hover:text-white"
+                        title="Antigravity Knowledge Itemsから会話をインポート"
+                      >
+                        <Download size={12} />
+                        Antigravityから取得
+                      </button>
                    </div>
                 </div>
 
