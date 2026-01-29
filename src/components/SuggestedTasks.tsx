@@ -114,7 +114,7 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
 
   return (
     <div className="relative space-y-6">
-      <div className="flex gap-6 border-b border-(--border-color) pb-0">
+      <div className="flex gap-6 border-b border-(--border-color) pb-0 -ml-6 pl-6">
           <button 
             onClick={() => setActiveTab('todo')}
             className={`flex items-center gap-2 pb-3 text-sm font-semibold transition-all border-b-2 ${activeTab === 'todo' ? 'text-(--theme-primary) border-(--theme-primary)' : 'text-(--foreground) opacity-60 border-transparent hover:opacity-100'}`}
