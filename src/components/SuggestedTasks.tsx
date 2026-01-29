@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SuggestedTask } from '@/lib/types';
-import { Lightbulb, Plus, X, Copy, CheckCircle, Sparkles } from 'lucide-react';
+import { Plus, X, Copy, CheckCircle, Sparkles } from 'lucide-react';
 
 interface SuggestedTasksProps {
   tasks: SuggestedTask[];
@@ -46,29 +46,36 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
     }
   }
 
-  /* Redesigned Task Row (Timeline Style with Circular Node) */
+  /* Task Row - Exact Current Status Style */
   const renderTaskRow = (task: SuggestedTask, isTodo: boolean = false, isCompleted: boolean = false) => (
-    <div key={task.id} className="relative">
-        {/* Circular Node on the left */}
-        <div className="absolute -left-10 top-3 w-6 h-6 rounded-full bg-(--card-bg) border-2 border-(--border-color) flex items-center justify-center z-10">
-            {(isTodo || isCompleted) ? (
-                isCompleted ? (
-                    <CheckCircle size={14} className="text-(--theme-primary) fill-(--card-bg)" />
-                ) : (
-                    <div className="w-3 h-3 rounded-full border-2 border-(--border-color) hover:border-(--theme-primary) transition-colors cursor-pointer" onClick={() => handleToggleComplete(task)} />
-                )
-            ) : (
-                <Lightbulb size={14} className="text-(--theme-accent)" />
+    <div key={task.id} className="group relative pl-6 border-l-2 border-(--border-color) hover:border-(--theme-primary) transition-colors mb-4">
+        {/* Circular Node */}
+        <button 
+            onClick={() => onOpenChat && onOpenChat(`task-${task.id}`, `Task: ${task.task}`, isTodo ? 'Todo AI Assistant' : 'Task AI Assistant')}
+            className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-(--card-bg) border-2 border-(--border-color) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center cursor-pointer hover:scale-110 z-10"
+            title="Ask AI about this task"
+        >
+            <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
+        </button>
+        
+        {/* Task Content */}
+        <div className="flex items-start justify-between gap-3 pb-3">
+            {/* Checkbox for Todo items */}
+            {(isTodo || isCompleted) && (
+                <div 
+                    className="mt-0.5 shrink-0 cursor-pointer"
+                    onClick={() => handleToggleComplete(task)}
+                >
+                    {isCompleted ? (
+                        <CheckCircle size={20} className="text-(--theme-primary) fill-(--card-bg)" />
+                    ) : (
+                        <div className="w-5 h-5 rounded-full border-2 border-(--border-color) hover:border-(--theme-primary) transition-colors" />
+                    )}
+                </div>
             )}
-        </div>
-        
-        {/* Horizontal Connector Line */}
-        <div className="absolute -left-7 top-[18px] w-7 h-[2px] bg-(--border-color) opacity-60"></div>
-        
-        {/* Task Content Card */}
-        <div className="group flex items-start justify-between py-3 border-b border-(--border-color) hover:bg-(--hover-bg) transition-colors px-2 -mx-2 rounded-lg">
-            {/* Content Area */}
-            <div className="flex-1 min-w-0 pr-3">
+            
+            {/* Task Text */}
+            <div className="flex-1 min-w-0">
                 <p className={`text-sm text-(--foreground) leading-snug ${isCompleted ? 'line-through opacity-50' : ''}`}>
                     {task.task}
                 </p>
@@ -86,7 +93,7 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
                     </button>
                 )}
                 
-                {/* AI Chat Button - for generating tasks via conversation */}
+                {/* AI Chat Button */}
                 {onOpenChat && (
                     <button 
                         onClick={() => onOpenChat(`task-${task.id}`, `Task: ${task.task}`, isTodo ? 'Todo AI Assistant' : 'Task AI Assistant')}
