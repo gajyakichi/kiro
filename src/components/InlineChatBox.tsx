@@ -140,10 +140,10 @@ export function InlineChatBox({ onClose, initialContext, title, onSaveMemo }: In
             >
               <div className={`max-w-[85%] rounded-lg px-3 py-2 text-xs shadow-sm ${
                 m.role === 'user' 
-                  ? 'bg-(--theme-primary) text-(--background)' 
-                  : 'bg-(--card-bg) border border-(--border-color) text-(--foreground)'
+                  ? 'bg-(--theme-primary) text-white' 
+                  : 'bg-(--card-bg) border border-(--border-color)'
               }`}>
-                <div className="markdown-content">
+                <div className={`markdown-content ${m.role === 'assistant' ? 'text-(--foreground)' : ''}`} style={m.role === 'assistant' ? { opacity: 1, color: 'var(--foreground)' } : {}}>
                   <ReactMarkdown>{m.content}</ReactMarkdown>
                 </div>
               </div>

@@ -101,6 +101,13 @@ html, body {
 .markdown-content {
   font-size: 14px;
   line-height: 1.7;
+  color: var(--foreground);
+  opacity: 0.95;
+}
+
+.markdown-content p {
+  color: var(--foreground);
+  margin: 0.5em 0;
 }
 
 .markdown-content h1, .markdown-content h2, .markdown-content h3 {
