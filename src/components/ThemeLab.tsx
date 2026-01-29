@@ -34,7 +34,7 @@ const PRESET_THEMES = [
     {
       name: "Solarized Light",
       isPreset: true,
-      css: `html, body { background: #fdf6e3 !important; color: #657b83 !important; font-weight: 450; --background: #fdf6e3; --foreground: #657b83; --card-bg: #fdf6e3; --sidebar-bg: #eee8d5; --hover-bg: rgba(0,0,0,0.05); --border-color: #dcd3ba; --theme-primary: #268bd2; --theme-primary-bg: rgba(38, 139, 210, 0.1); --theme-accent: #859900; }
+      css: `html, body { background: #fdf6e3 !important; color: #657b83 !important; --background: #fdf6e3; --foreground: #657b83; --card-bg: #fdf6e3; --sidebar-bg: #eee8d5; --hover-bg: rgba(0,0,0,0.05); --border-color: #dcd3ba; --theme-primary: #268bd2; --theme-primary-bg: rgba(38, 139, 210, 0.1); --theme-accent: #859900; }
 .notion-sidebar { background: #eee8d5 !important; }
 .notion-card { background: #fdf6e3 !important; border: 1px solid #dcd3ba !important; }
 .notion-item:hover, .notion-item.active { background: #eee8d5 !important; color: #268bd2 !important; }
@@ -44,7 +44,7 @@ h1, h2, h3 { color: #268bd2 !important; }
     {
       name: "Solarized Dark",
       isPreset: true,
-      css: `html, body { background: #002b36 !important; color: #839496 !important; font-weight: 450; --background: #002b36; --foreground: #839496; --card-bg: #002b36; --sidebar-bg: #073642; --hover-bg: rgba(255,255,255,0.1); --border-color: #073642; --theme-primary: #268bd2; --theme-primary-bg: rgba(38, 139, 210, 0.1); --theme-accent: #859900; }
+      css: `html, body { background: #002b36 !important; color: #839496 !important; --background: #002b36; --foreground: #839496; --card-bg: #002b36; --sidebar-bg: #073642; --hover-bg: rgba(255,255,255,0.1); --border-color: #073642; --theme-primary: #268bd2; --theme-primary-bg: rgba(38, 139, 210, 0.1); --theme-accent: #859900; }
 .notion-sidebar { background: #073642 !important; }
 .notion-card { background: #002b36 !important; border: 1px solid #073642 !important; color: #839496 !important; }
 .notion-item:hover, .notion-item.active { background: #073642 !important; color: #268bd2 !important; }
@@ -64,7 +64,7 @@ h1, h2, h3 { color: #cc7832 !important; }
     {
       name: "Synthwave '84",
       isPreset: true,
-      css: `html, body { background: #2b213a !important; color: #fff !important; font-weight: 450; background: linear-gradient(to bottom, #2b213a 0%, #241b35 100%) fixed !important; --background: #2b213a; --foreground: #fff; --card-bg: #2b213a; --sidebar-bg: #241b35; --hover-bg: rgba(255,255,255,0.1); --border-color: rgba(255,255,255,0.13); --theme-primary: #ff7edb; --theme-primary-bg: rgba(255, 126, 219, 0.2); --theme-accent: #36f9f6; --theme-accent-bg: rgba(54, 249, 246, 0.2); }
+      css: `html, body { background: #2b213a !important; color: #fff !important; background: linear-gradient(to bottom, #2b213a 0%, #241b35 100%) fixed !important; --background: #2b213a; --foreground: #fff; --card-bg: #2b213a; --sidebar-bg: #241b35; --hover-bg: rgba(255,255,255,0.1); --border-color: rgba(255,255,255,0.13); --theme-primary: #ff7edb; --theme-primary-bg: rgba(255, 126, 219, 0.2); --theme-accent: #36f9f6; --theme-accent-bg: rgba(54, 249, 246, 0.2); }
 .notion-sidebar { background: #241b35 !important; border-right: 1px solid #fff2 !important; }
 .notion-card { background: #2b213a !important; border: 1px solid #ff7edb !important; box-shadow: 0 0 10px rgba(255, 126, 219, 0.2) !important; color: #fff !important; }
 .notion-item:hover, .notion-item.active { background: #34294f !important; color: #f97e72 !important; text-shadow: 0 0 5px rgba(249, 126, 114, 0.6); }
