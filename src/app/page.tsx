@@ -322,15 +322,24 @@ export default function Home() {
 
   const fetchData = useCallback(async (projectId: number) => {
     try {
-      await fetch('/api/sync', { 
+      const syncRes = await fetch('/api/sync', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ projectId })
       });
       
+      if (!syncRes.ok) {
+        console.warn('Sync POST failed:', await syncRes.text());
+      }
+      
       const dbLogsRes = await fetch(`/api/sync?projectId=${projectId}`);
-      const logsData = await dbLogsRes.json();
-      setDbLogs(logsData);
+      if (dbLogsRes.ok) {
+        const logsData = await dbLogsRes.json();
+        setDbLogs(logsData);
+      } else {
+        console.warn('Sync GET failed:', await dbLogsRes.text());
+        setDbLogs([]);
+      }
 
       const progRes = await fetch(`/api/progress?projectId=${projectId}`); 
       const progData = await progRes.json();
