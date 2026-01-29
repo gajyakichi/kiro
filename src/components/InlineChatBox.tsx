@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Send, Sparkles } from 'lucide-react';
+import { X, Send, Sparkles, Save } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 type Message = {
@@ -11,14 +11,16 @@ interface InlineChatBoxProps {
   onClose: () => void;
   initialContext: string;
   title: string;
+  onSaveMemo?: (content: string) => Promise<void>;
 }
 
-export function InlineChatBox({ onClose, initialContext, title }: InlineChatBoxProps) {
+export function InlineChatBox({ onClose, initialContext, title, onSaveMemo }: InlineChatBoxProps) {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'system', content: `Context:\n${initialContext}\n\nYou are a helpful AI assistant. Answer questions based on the context above.` }
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,6 +28,33 @@ export function InlineChatBox({ onClose, initialContext, title }: InlineChatBoxP
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  const handleSaveConversation = async () => {
+    if (!onSaveMemo || messages.filter(m => m.role !== 'system').length === 0) return;
+    
+    setIsSaving(true);
+    try {
+      // Format conversation as markdown
+      const conversationMarkdown = messages
+        .filter(m => m.role !== 'system')
+        .map(m => {
+          const role = m.role === 'user' ? '**You**' : '**AI**';
+          return `${role}:\n${m.content}\n`;
+        })
+        .join('\n---\n\n');
+      
+      const fullContent = `# ${title}\n\n${conversationMarkdown}`;
+      await onSaveMemo(fullContent);
+      
+      // Show success feedback (could enhance with toast notification)
+      alert('Conversation saved as memo!');
+    } catch (error) {
+      console.error('Failed to save conversation:', error);
+      alert('Failed to save conversation');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -77,9 +106,21 @@ export function InlineChatBox({ onClose, initialContext, title }: InlineChatBoxP
             </div>
             <span className="text-xs font-bold text-(--theme-primary)">{title}</span>
           </div>
-          <button onClick={onClose} className="p-1 hover:bg-(--hover-bg) rounded transition-colors">
-            <X size={14} className="text-(--theme-primary) opacity-70 hover:opacity-100" />
-          </button>
+          <div className="flex items-center gap-1">
+            {onSaveMemo && messages.filter(m => m.role !== 'system').length > 0 && (
+              <button 
+                onClick={handleSaveConversation}
+                disabled={isSaving}
+                className="p-1.5 hover:bg-(--hover-bg) rounded transition-colors disabled:opacity-50"
+                title="Save conversation as memo"
+              >
+                <Save size={14} className="text-(--theme-primary) opacity-70 hover:opacity-100" />
+              </button>
+            )}
+            <button onClick={onClose} className="p-1 hover:bg-(--hover-bg) rounded transition-colors">
+              <X size={14} className="text-(--theme-primary) opacity-70 hover:opacity-100" />
+            </button>
+          </div>
         </div>
 
         {/* Chat Messages */}

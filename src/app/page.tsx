@@ -1088,6 +1088,7 @@ export default function Home() {
                           onClose={() => setChatState(prev => ({ ...prev, open: false, targetId: null, mode: 'menu' }))}
                           initialContext={chatState.context}
                           title={chatState.title}
+                          onSaveMemo={async (content) => await handleSaveMemo(content, 'markdown')}
                         />
                       )}
                       {chatState.mode === 'memo' && (
@@ -1424,6 +1425,7 @@ export default function Home() {
                                       onClose={() => setChatState(prev => ({ ...prev, open: false, targetId: null, mode: 'menu' }))}
                                       initialContext={chatState.context}
                                       title={chatState.title}
+                                      onSaveMemo={async (content) => await handleSaveMemo(content, 'markdown')}
                                     />
                                   )}
                                   {chatState.mode === 'memo' && (
