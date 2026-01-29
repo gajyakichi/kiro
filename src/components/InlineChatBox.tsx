@@ -34,14 +34,15 @@ export function InlineChatBox({ onClose, initialContext, title, onSaveMemo }: In
     
     setIsSaving(true);
     try {
-      // Format conversation as markdown
+      // Format conversation as readable markdown with proper line breaks
       const conversationMarkdown = messages
         .filter(m => m.role !== 'system')
         .map(m => {
           const role = m.role === 'user' ? '**You**' : '**AI**';
-          return `${role}:\n${m.content}\n`;
+          // Add double line breaks for better readability
+          return `${role}:\n\n${m.content}`;
         })
-        .join('\n---\n\n');
+        .join('\n\n---\n\n');
       
       const fullContent = `# ${title}\n\n${conversationMarkdown}`;
       await onSaveMemo(fullContent);
