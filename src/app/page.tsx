@@ -49,6 +49,13 @@ interface Metadata {
   [key: string]: any;
 }
 
+// Helper function to clean HTML tags from markdown content
+function cleanMarkdownContent(content: string): string {
+  return content
+    .replace(/<br\s*\/?>/gi, '\n')  // Convert <br> tags to newlines
+    .replace(/<[^>]+>/g, '');        // Remove all other HTML tags
+}
+
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
@@ -1249,7 +1256,7 @@ export default function Home() {
                                    </span>
                                  </summary>
                                  <div className="mt-4 markdown-content pl-2 border-l-2 border-(--theme-accent)/30 animate-in slide-in-from-top-2 duration-300">
-                                    <ReactMarkdown>{content}</ReactMarkdown>
+                                    <ReactMarkdown>{cleanMarkdownContent(content)}</ReactMarkdown>
                                  </div>
                                </details>
                              ) : (
@@ -1390,7 +1397,7 @@ export default function Home() {
                                                      <ChevronRight size={10} className="group-open/memo:rotate-90 transition-transform text-gray-400" />
                                                    </summary>
                                                    <div className="mt-2 markdown-content pl-3 border-l-2 border-green-500/30 animate-in slide-in-from-top-2 duration-300">
-                                                     <ReactMarkdown>{content}</ReactMarkdown>
+                                                     <ReactMarkdown>{cleanMarkdownContent(content)}</ReactMarkdown>
                                                    </div>
                                                  </details>
                                                );
@@ -1398,14 +1405,14 @@ export default function Home() {
                                                // Expanded display for standalone memos
                                                return (
                                                  <div className="markdown-content">
-                                                   <ReactMarkdown>{content}</ReactMarkdown>
+                                                   <ReactMarkdown>{cleanMarkdownContent(content)}</ReactMarkdown>
                                                  </div>
                                                );
                                              }
                                            })()
                                        ) : (
                                            <div className="markdown-content">
-                                           <ReactMarkdown>{content}</ReactMarkdown>
+                                           <ReactMarkdown>{cleanMarkdownContent(content)}</ReactMarkdown>
                                            </div>
                                        )}
                                       </div>
