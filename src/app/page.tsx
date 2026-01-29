@@ -1086,12 +1086,12 @@ export default function Home() {
                 </div>
 
                 {/* 2. Search & Filter Bar */}
-                {/* 2. Search & Filter Bar */}
                 <div 
-                  className="flex flex-col md:flex-row gap-4 items-center justify-between sticky top-0 py-4 z-20 border-b border-(--border-color)"
+                  className="flex flex-col gap-3 sticky top-0 py-4 z-20 border-b border-(--border-color)"
                   style={{ backgroundColor: 'var(--background)' }}
                 >
-                   <div className="relative w-full md:w-auto md:min-w-[300px]">
+                   {/* Row 1: Search */}
+                   <div className="relative w-full">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-(--foreground) opacity-40" size={14} />
                       <input 
                         type="text" 
@@ -1101,7 +1101,9 @@ export default function Home() {
                         className="w-full pl-9 pr-4 py-2 bg-(--card-bg) border border-(--border-color) rounded-lg text-sm text-(--foreground) focus:outline-none focus:border-(--theme-primary) focus:ring-1 focus:ring-(--theme-primary) placeholder:text-(--foreground) placeholder:opacity-40 transition-all"
                       />
                    </div>
-                   <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto no-scrollbar pb-1">
+                   
+                   {/* Row 2: Filters */}
+                   <div className="flex items-center gap-2 overflow-x-auto w-full no-scrollbar pb-1">
                       {[
                         { id: 'all', label: 'All', icon: null },
                         { id: 'log', label: 'Git', icon: 'Code' },
