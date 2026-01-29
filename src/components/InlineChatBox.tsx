@@ -68,7 +68,7 @@ export function InlineChatBox({ onClose, initialContext, title }: InlineChatBoxP
       {/* Connection Line */}
       <div className="absolute -left-[42px] top-6 w-10 h-[2px] bg-(--border-color) opacity-60"></div>
       
-      <div className="ml-4 bg-(--card-bg) rounded-xl border border-(--border-color) shadow-lg overflow-hidden">
+      <div className="ml-4 bg-(--background) rounded-xl border border-(--border-color) shadow-lg overflow-hidden">
         {/* Header */}
         <div className="p-3 bg-(--background) border-b border-(--border-color) flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -120,7 +120,7 @@ export function InlineChatBox({ onClose, initialContext, title }: InlineChatBoxP
         </div>
 
         {/* Input */}
-        <div className="p-2 bg-(--card-bg) border-t border-(--border-color)">
+        <div className="p-2 bg-(--background) border-t border-(--border-color)">
           <div className="relative flex gap-2">
             <input
               type="text"
