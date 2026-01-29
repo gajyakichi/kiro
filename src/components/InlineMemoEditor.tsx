@@ -29,7 +29,7 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
       
       <div className="ml-4 bg-(--card-bg) rounded-xl border-2 border-(--border-color) shadow-lg overflow-hidden">
         {/* Header */}
-        <div className="p-3 bg-(--theme-primary-bg) border-b border-(--border-color) flex items-center justify-between">
+        <div className="p-3 bg-(--background) border-b border-(--border-color) flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <FileText size={14} className="text-(--theme-primary)" />
@@ -110,7 +110,7 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
         </div>
 
         {/* Footer */}
-        <div className="p-2 bg-(--sidebar-bg) border-t border-(--border-color) flex justify-between items-center">
+        <div className="p-2 bg-(--background) border-t border-(--border-color) flex justify-between items-center">
           <span className="text-[10px] text-(--foreground) opacity-40">
             {editorType === 'markdown' ? 'Markdown' : 'Block'} Editor
           </span>
