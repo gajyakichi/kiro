@@ -1,6 +1,18 @@
 {
   "name": "kiro",
-  "version": "0.1.0",
+  "version": "0.2.0",
+  "description": "Track your development trajectory effortlessly - An all-in-one dashboard for Git commits, notes, and AI-powered task management",
+  "keywords": ["developer-tools", "git", "dashboard", "productivity", "ai", "notion-like", "electron"],
+  "author": "Kiro Development Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourorg/kiro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourorg/kiro/issues"
+  },
+  "homepage": "https://github.com/yourorg/kiro#readme",
   "private": true,
   "main": "electron/main.js",
   "scripts": {
@@ -29,10 +41,13 @@
     "prisma": "^7.3.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-markdown": "^10.1.0"
+    "react-markdown": "^10.1.0",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.1.4",
+    "@playwright/test": "^1.58.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -50,6 +65,7 @@
     "eslint-config-next": "16.1.4",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
+    "playwright": "^1.58.0",
     "tailwindcss": "^4",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",

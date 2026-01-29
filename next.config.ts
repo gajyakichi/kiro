@@ -15,7 +15,15 @@ const nextConfig: NextConfig = {
   experimental: {
     // If we wanted to really push it:
     // optimizePackageImports: ['lucide-react', '@mantine/core'],
-    optimizePackageImports: ['lucide-react', '@blocknote/mantine', '@blocknote/react', '@blocknote/core'],
+    optimizePackageImports: [
+      'lucide-react', 
+      '@blocknote/mantine', 
+      '@blocknote/react', 
+      '@blocknote/core',
+      '@mantine/core',
+      '@mantine/hooks',
+      '@phosphor-icons/react',
+    ],
   },
 };
 

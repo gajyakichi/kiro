@@ -1,32 +1,39 @@
 import { NextResponse } from "next/server";
+import db from "@/lib/db";
 import fs from "fs/promises";
 import path from "path";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    // This is the artifact directory path provided in the conversation
-    const artifactDir = "/Users/satoshiyamaguchi/.gemini/antigravity/brain/8f0e638e-1b68-416b-a5f5-b9e5d648bf14";
+    const { searchParams } = new URL(request.url);
+    const projectId = searchParams.get('projectId');
     
-    const taskPath = path.join(artifactDir, "task.md");
-    const walkthroughPath = path.join(artifactDir, "walkthrough.md");
+    if (!projectId) {
+      return NextResponse.json({ error: "projectId is required" }, { status: 400 });
+    }
+    
+    // Get project path from database
+    const project = await db.project.findUnique({
+      where: { id: parseInt(projectId) }
+    });
 
-    let taskContent = "";
-    let walkthroughContent = "";
-
-    try {
-      taskContent = await fs.readFile(taskPath, "utf-8");
-    } catch {
-      taskContent = "task.md not found";
+    if (!project) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
+    // Read walkthrough.md for overall project status
+    const walkthroughPath = path.join(project.git_path || '', 'docs', 'walkthrough.md');
+    let walkthroughContent = "";
+    
     try {
-      walkthroughContent = await fs.readFile(walkthroughPath, "utf-8");
+      walkthroughContent = await fs.readFile(walkthroughPath, 'utf-8');
     } catch {
-      walkthroughContent = "walkthrough.md not found";
+      console.log('No walkthrough.md found, using default message');
+      walkthroughContent = "プロジェクトの概要はまだありません。「文脈を解析」ボタンをクリックして生成してください。";
     }
 
     return NextResponse.json({
-      task: taskContent,
+      task: walkthroughContent,
       walkthrough: walkthroughContent
     });
   } catch (error) {

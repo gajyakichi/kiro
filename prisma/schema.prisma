@@ -7,15 +7,16 @@ datasource db {
 }
 
 model Project {
-  id             Int             @id @default(autoincrement())
-  name           String
-  icon           String?
-  git_path       String?
-  artifact_path  String?
-  comments       Comment[]
-  dailyNotes     DailyNote[]
-  logs           Log[]
-  suggestedTasks SuggestedTask[]
+  id               Int               @id @default(autoincrement())
+  name             String
+  icon             String?
+  git_path         String?
+  artifact_path    String?
+  comments         Comment[]
+  dailyNotes       DailyNote[]
+  logs             Log[]
+  suggestedTasks   SuggestedTask[]
+  conversationLogs ConversationLog[]
 }
 
 model Log {
@@ -66,6 +67,18 @@ model SuggestedTask {
   project_id Int
   task       String
   status     String   @default("proposed")
+  timestamp  DateTime @default(now())
+  project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+}
+
+model ConversationLog {
+  id         Int      @id @default(autoincrement())
+  project_id Int
+  date       String
+  agent      String
+  summary    String
+  full_text  String?
+  metadata   String?  // JSON string for storing KI path and other metadata
   timestamp  DateTime @default(now())
   project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
 }

@@ -16,6 +16,7 @@ export async function GET() {
       VAULT_PATH: "",
       APP_LANG: "en",
       APP_ICON_SET: "lucide",
+      APP_SKIN: "notion",
       ENABLED_PLUGINS: "",
     };
 
@@ -49,7 +50,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { STORAGE_MODE, DATABASE_URL, OPENAI_API_KEY, AI_MODEL, VAULT_PATH, AI_PROVIDER, OLLAMA_BASE_URL, APP_LANG, APP_ICON_SET, ENABLED_PLUGINS } = await request.json();
+    const { STORAGE_MODE, DATABASE_URL, OPENAI_API_KEY, AI_MODEL, VAULT_PATH, AI_PROVIDER, OLLAMA_BASE_URL, APP_LANG, APP_ICON_SET, APP_SKIN, ENABLED_PLUGINS } = await request.json();
     
     // Read current .env
     let envContent = "";
@@ -94,6 +95,9 @@ export async function POST(request: Request) {
       } else if (line.startsWith("ENABLED_PLUGINS=")) {
         newLines.push(`ENABLED_PLUGINS="${ENABLED_PLUGINS || ''}"`);
         keysHandled.add("ENABLED_PLUGINS");
+      } else if (line.startsWith("APP_SKIN=")) {
+        newLines.push(`APP_SKIN="${APP_SKIN}"`);
+        keysHandled.add("APP_SKIN");
       } else {
         newLines.push(line);
       }
@@ -125,6 +129,9 @@ export async function POST(request: Request) {
     }
     if (!keysHandled.has("APP_ICON_SET")) {
       newLines.push(`APP_ICON_SET="${APP_ICON_SET}"`);
+    }
+    if (!keysHandled.has("APP_SKIN")) {
+      newLines.push(`APP_SKIN="${APP_SKIN}"`);
     }
     if (!keysHandled.has("ENABLED_PLUGINS")) {
       newLines.push(`ENABLED_PLUGINS="${ENABLED_PLUGINS || ''}"`);
