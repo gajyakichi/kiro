@@ -421,7 +421,17 @@ export default function Home() {
           const searchLower = timelineSearch.toLowerCase();
           const content = item.content || "";
           const meta = item.metadata || "";
-          return content.toLowerCase().includes(searchLower) || meta.toLowerCase().includes(searchLower);
+          const combinedText = (content + " " + meta).toLowerCase();
+          
+          // Fuzzy search: check if all characters in search term appear in order
+          let searchIndex = 0;
+          for (let i = 0; i < combinedText.length && searchIndex < searchLower.length; i++) {
+            if (combinedText[i] === searchLower[searchIndex]) {
+              searchIndex++;
+            }
+          }
+          // Match if all characters were found in order
+          return searchIndex === searchLower.length;
         }
         return true;
       })
