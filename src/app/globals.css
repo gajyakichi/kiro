@@ -493,3 +493,40 @@ button.bg-white {
   border-color: var(--border-color) !important;
 }
 
+/* BlockNote Editor Theme Overrides */
+.bn-container {
+  background-color: var(--background) !important;
+}
+
+.bn-editor {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+.bn-block-outer {
+  background-color: transparent !important;
+}
+
+.bn-block-content {
+  color: var(--foreground) !important;
+}
+
+/* BlockNote placeholder text */
+.bn-block-content::before {
+  color: var(--foreground) !important;
+  opacity: 0.4 !important;
+}
+
+/* BlockNote menu and toolbar */
+.bn-menu-item,
+.bn-toolbar-item {
+  background-color: var(--card-bg) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border-color) !important;
+}
+
+.bn-menu-item:hover,
+.bn-toolbar-item:hover {
+  background-color: var(--hover-bg) !important;
+}
+
