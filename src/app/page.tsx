@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 import { IconRenderer } from '@/components/IconRenderer';
 import dynamic from 'next/dynamic';
 
@@ -1029,13 +1030,14 @@ export default function Home() {
                   </div>
                   
                   <div className="notion-card p-6 rounded-xl border border-(--border-color) shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: 'var(--card-bg)' }}>
-                    <article className="prose prose-slate max-w-none text-(--foreground) leading-relaxed text-sm">
-                        <div className="markdown-content">
-                          <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                            {progressLang === 'ja' ? (progressTranslated || "翻訳中...") : (progress?.task || t.loading_progress)}
-                          </ReactMarkdown>
-                        </div>
-                    </article>
+                    <div className="markdown-content">
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeRaw]}
+                      >
+                        {progressLang === 'ja' ? (progressTranslated || "翻訳中...") : (progress?.task || t.loading_progress)}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                   
                   {/* Inline Annotation for Current Status */}
@@ -1095,13 +1097,14 @@ export default function Home() {
                     </div>
                     
                     <div className="notion-card p-6 rounded-xl border border-(--border-color) shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: 'var(--card-bg)' }}>
-                      <article className="prose prose-slate max-w-none text-(--foreground) leading-relaxed text-sm">
-                        <div className="markdown-content">
-                          <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-                            {dailyNotes[0]?.content || "No daily report available yet."}
-                          </ReactMarkdown>
-                        </div>
-                      </article>
+                      <div className="markdown-content">
+                        <ReactMarkdown 
+                          remarkPlugins={[remarkGfm]}
+                          rehypePlugins={[rehypeRaw]}
+                        >
+                          {dailyNotes[0]?.content || "No daily report available yet."}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                   </div>
                 )}
