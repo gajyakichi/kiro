@@ -27,7 +27,7 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
       {/* Connection Line */}
       <div className="absolute -left-[42px] top-6 w-10 h-[2px] bg-(--border-color) opacity-60"></div>
       
-      <div className="ml-4 bg-(--card-bg) rounded-xl border-2 border-(--border-color) shadow-lg overflow-hidden">
+      <div className="ml-4 bg-(--background) rounded-xl border-2 border-(--border-color) shadow-lg overflow-hidden">
         {/* Header */}
         <div className="p-3 bg-(--background) border-b border-(--border-color) flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -67,7 +67,7 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
         </div>
 
         {/* Editor Area */}
-        <div className="p-3 bg-(--card-bg)">
+        <div className="p-3 bg-(--background)">
           {editorType === 'markdown' ? (
             <div className="space-y-2">
               {/* Markdown Toolbar */}
