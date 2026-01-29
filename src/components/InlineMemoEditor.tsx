@@ -42,7 +42,7 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
                 onClick={() => setEditorType('markdown')}
                 className={`px-2 py-1 text-[10px] rounded transition-colors ${
                   editorType === 'markdown' 
-                    ? 'bg-(--theme-primary) text-(--background)' 
+                    ? 'bg-(--theme-primary) text-white' 
                     : 'text-(--foreground) opacity-60 hover:bg-(--hover-bg)'
                 }`}
               >
@@ -52,7 +52,7 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
                 onClick={() => setEditorType('block')}
                 className={`px-2 py-1 text-[10px] rounded transition-colors ${
                   editorType === 'block' 
-                    ? 'bg-(--theme-primary) text-(--background)' 
+                    ? 'bg-(--theme-primary) text-white' 
                     : 'text-(--foreground) opacity-60 hover:bg-(--hover-bg)'
                 }`}
               >

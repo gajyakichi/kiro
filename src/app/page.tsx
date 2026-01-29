@@ -440,6 +440,18 @@ export default function Home() {
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }, [dbLogs, comments, dailyNotes, suggestedTasks, conversationLogs, timelineFilter, timelineSearch, selectedDate]);
 
+  // Get daily note for selected date or today
+  const selectedDailyNote = useMemo(() => {
+    const targetDate = selectedDate || new Date();
+    const dateString = targetDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    return dailyNotes.find(note => {
+      const noteDate = new Date(note.date);
+      const noteDateString = noteDate.toISOString().split('T')[0];
+      return noteDateString === dateString;
+    });
+  }, [dailyNotes, selectedDate]);
+
   useEffect(() => {
     setMounted(true);
     fetchVaults();
@@ -1027,12 +1039,12 @@ export default function Home() {
                 </div>
 
                 {/* 1.3. Daily Report */}
-                {dailyNotes.length > 0 && (
+                {selectedDailyNote && (
                   <div className="group relative pl-6 border-l-2 border-(--border-color) hover:border-(--theme-primary) transition-colors">
                     <button 
                       onClick={() => handleOpenChat(
                         'daily-report',
-                        `Daily Report:\n${dailyNotes[0]?.content || 'No report yet'}`,
+                        `Daily Report:\n${selectedDailyNote.content || 'No report yet'}`,
                         "Daily Report AI"
                       )}
                       className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-(--card-bg) border-2 border-(--border-color) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center cursor-pointer hover:scale-110 z-10"
@@ -1045,7 +1057,7 @@ export default function Home() {
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">{t.daily_report}</span>
                         <span className="text-xs text-(--foreground) opacity-40">
-                          {new Date(dailyNotes[0]?.timestamp || new Date()).toLocaleDateString(appLang, { month: 'short', day: 'numeric' })}
+                          {new Date(selectedDailyNote.timestamp || new Date()).toLocaleDateString(appLang, { month: 'short', day: 'numeric' })}
                         </span>
                       </div>
                     </div>
@@ -1056,7 +1068,7 @@ export default function Home() {
                           remarkPlugins={[remarkGfm]}
                           rehypePlugins={[rehypeRaw]}
                         >
-                          {dailyNotes[0]?.content || "No daily report available yet."}
+                          {selectedDailyNote.content || "No daily report available yet."}
                         </ReactMarkdown>
                       </div>
                     </div>
