@@ -23,7 +23,7 @@ const InlineMemoEditor = dynamic(() => import('@/components/InlineMemoEditor').t
 const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'), { ssr: false });
 const ConversationModal = dynamic(() => import('@/components/ConversationModal'), { ssr: false });
 
-import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search, MessageSquare } from 'lucide-react';
+import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search, MessageSquare, BookOpen } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
 
 type TimelineEntry = {
@@ -312,9 +312,10 @@ export default function Home() {
         cache: 'no-store'
       });
       const data = await res.json();
-      setConversationLogs(data || []);
+      setConversationLogs(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error("Conversation Logs Fetch Error:", e);
+      setConversationLogs([]); // Ensure it's always an array on error
     }
   }, []);
 
@@ -387,14 +388,14 @@ export default function Home() {
           timestamp: t.timestamp ? new Date(t.timestamp).toISOString() : new Date().toISOString(),
           status: t.status
       })),
-      ...conversationLogs.map(conv => ({
+      ...(Array.isArray(conversationLogs) ? conversationLogs.map(conv => ({
         id: conv.id,
         entryType: 'conversation' as const,
         timestamp: new Date(conv.timestamp).toISOString(),
         content: conv.summary,
         agent: conv.agent,
         metadata: conv.full_text || undefined
-      }))
+      })) : [])
     ];
 
     return raw
