@@ -64,6 +64,16 @@ export interface SuggestedTask {
   timestamp: string;
 }
 
+export interface ConversationLog {
+  id: number;
+  project_id: number;
+  date: string;
+  agent: string;
+  summary: string;
+  full_text?: string | null;
+  timestamp: string;
+}
+
 export interface Vault {
   id: string;
   name: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { Progress, Comment, DbLog, Project, Theme, DailyNote, SuggestedTask, Vault } from "@/lib/types";
+import { Progress, Comment, DbLog, Project, Theme, DailyNote, SuggestedTask, Vault, ConversationLog } from "@/lib/types";
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
@@ -21,21 +21,23 @@ const InlineChatBox = dynamic(() => import('@/components/InlineChatBox').then(mo
 const AnnotationMenu = dynamic(() => import('@/components/AnnotationMenu').then(mod => mod.AnnotationMenu), { ssr: false });
 const InlineMemoEditor = dynamic(() => import('@/components/InlineMemoEditor').then(mod => mod.InlineMemoEditor), { ssr: false });
 const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'), { ssr: false });
+const ConversationModal = dynamic(() => import('@/components/ConversationModal'), { ssr: false });
 
-import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search } from 'lucide-react';
+import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search, MessageSquare } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
 
 type TimelineEntry = {
   id: number;
-  entryType: 'log' | 'comment' | 'task' | 'daily_note';
+  entryType: 'log' | 'comment' | 'task' | 'daily_note' | 'conversation';
   timestamp: string;
   content: string;
   metadata?: string;
   status?: string;
-  type?: string; 
+  type?: string;
+  agent?: string; // For conversation entries
 };
 
-type TimelineFilter = 'all' | 'log' | 'comment' | 'task' | 'daily_note';
+type TimelineFilter = 'all' | 'log' | 'comment' | 'task' | 'daily_note' | 'conversation';
 
 interface Metadata {
   hash?: string;
@@ -133,6 +135,8 @@ export default function Home() {
   const [dailyNotes, setDailyNotes] = useState<DailyNote[]>([]);
   const [suggestedTasks, setSuggestedTasks] = useState<SuggestedTask[]>([]);
   const [isAbsorbing, setIsAbsorbing] = useState(false);
+  const [conversationLogs, setConversationLogs] = useState<ConversationLog[]>([]);
+  const [isConversationModalOpen, setIsConversationModalOpen] = useState(false);
   
   const [vaults, setVaults] = useState<Vault[]>([]);
   const [isVaultLoading, setIsVaultLoading] = useState(true);
@@ -302,6 +306,19 @@ export default function Home() {
     }
   }, []);
 
+  const fetchConversationLogs = useCallback(async (projectId: number) => {
+    try {
+      const res = await fetch(`/api/conversations?projectId=${projectId}`, {
+        cache: 'no-store'
+      });
+      const data = await res.json();
+      setConversationLogs(data || []);
+    } catch (e) {
+      console.error("Conversation Logs Fetch Error:", e);
+    }
+  }, []);
+
+
   const fetchData = useCallback(async (projectId: number) => {
     try {
       await fetch('/api/sync', { 
@@ -314,7 +331,7 @@ export default function Home() {
       const logsData = await dbLogsRes.json();
       setDbLogs(logsData);
 
-      const progRes = await fetch('/api/progress'); 
+      const progRes = await fetch(`/api/progress?projectId=${projectId}`); 
       const progData = await progRes.json();
       setProgress(progData);
 
@@ -323,10 +340,11 @@ export default function Home() {
       setComments(commentData);
 
       fetchAbsorbData(projectId);
+      fetchConversationLogs(projectId);
     } catch (e) {
       console.error("Fetch Error:", e);
     }
-  }, [fetchAbsorbData]);
+  }, [fetchAbsorbData, fetchConversationLogs]);
 
   const fetchThemes = useCallback(async () => {
     try {
@@ -368,6 +386,14 @@ export default function Home() {
           type: 'task',
           timestamp: t.timestamp ? new Date(t.timestamp).toISOString() : new Date().toISOString(),
           status: t.status
+      })),
+      ...conversationLogs.map(conv => ({
+        id: conv.id,
+        entryType: 'conversation' as const,
+        timestamp: new Date(conv.timestamp).toISOString(),
+        content: conv.summary,
+        agent: conv.agent,
+        metadata: conv.full_text || undefined
       }))
     ];
 
@@ -390,7 +416,7 @@ export default function Home() {
         return true;
       })
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-  }, [dbLogs, comments, dailyNotes, suggestedTasks, timelineFilter, timelineSearch, selectedDate]);
+  }, [dbLogs, comments, dailyNotes, suggestedTasks, conversationLogs, timelineFilter, timelineSearch, selectedDate]);
 
   useEffect(() => {
     setMounted(true);
@@ -527,6 +553,10 @@ export default function Home() {
       });
       if (res.ok) {
         await fetchAbsorbData(activeProject.id);
+        // Also refresh progress data to update Current Status section
+        const progRes = await fetch(`/api/progress?projectId=${activeProject.id}`); 
+        const progData = await progRes.json();
+        setProgress(progData);
       } else {
         throw new Error("Absorbに失敗しました");
       }
@@ -541,6 +571,46 @@ export default function Home() {
     }
     setIsAbsorbing(false);
   };
+
+  const handleSaveConversation = async (data: { agent: string; summary: string; fullText?: string }) => {
+    if (!activeProject) return;
+
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const res = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId: activeProject.id,
+          date: today,
+          agent: data.agent,
+          summary: data.summary,
+          fullText: data.fullText
+        })
+      });
+
+      if (res.ok) {
+        await fetchConversationLogs(activeProject.id);
+        setDialogState({
+          open: true,
+          title: t.success || "成功",
+          message: "会話を記録しました",
+          type: 'success'
+        });
+      } else {
+        throw new Error("会話の保存に失敗しました");
+      }
+    } catch (e) {
+      console.error("Save Conversation Error:", e);
+      setDialogState({
+        open: true,
+        title: "エラー",
+        message: `エラー: ${(e as Error).message}`,
+        type: 'error'
+      });
+    }
+  };
+
 
   const handleUpdateSettings = async (newSettings: Partial<Record<string, string>>) => {
     // Optimistic state updates
@@ -853,19 +923,28 @@ export default function Home() {
             {activeProject && <span className="text-lg ml-4 opacity-30 font-normal text-(--foreground)">/ {activeProject.name}</span>}
             
             {activeProject && (
-              <button 
-                onClick={handleAbsorb}
-                disabled={isAbsorbing}
-                aria-busy={isAbsorbing}
-                className={`ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  isAbsorbing 
-                    ? 'bg-(--hover-bg) text-(--foreground) opacity-50 cursor-not-allowed border border-(--border-color)' 
-                    : 'bg-(--background) text-(--foreground) border border-(--border-color) hover:bg-(--hover-bg) shadow-xs'
-                }`}
-              >
-                <Sparkles size={14} className={isAbsorbing ? 'animate-spin' : 'text-(--theme-accent) transition-colors'} />
-                {isAbsorbing ? t.absorbing : t.absorb_context}
-              </button>
+              <>
+                <button 
+                  onClick={handleAbsorb}
+                  disabled={isAbsorbing}
+                  aria-busy={isAbsorbing}
+                  className={`ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    isAbsorbing 
+                      ? 'bg-(--hover-bg) text-(--foreground) opacity-50 cursor-not-allowed border border-(--border-color)' 
+                      : 'bg-(--background) text-(--foreground) border border-(--border-color) hover:bg-(--hover-bg) shadow-xs'
+                  }`}
+                >
+                  <Sparkles size={14} className={isAbsorbing ? 'animate-spin' : 'text-(--theme-accent) transition-colors'} />
+                  {isAbsorbing ? t.absorbing : t.absorb_context}
+                </button>
+                <button 
+                  onClick={() => setIsConversationModalOpen(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-(--background) text-(--foreground) border border-(--border-color) hover:bg-(--hover-bg) shadow-xs"
+                >
+                  <MessageSquare size={14} className="text-(--theme-primary)" />
+                  会話を記録
+                </button>
+              </>
             )}
           </h1>
           <p className="text-lg notion-text-subtle">
@@ -987,7 +1066,8 @@ export default function Home() {
                         { id: 'log', label: 'Git', icon: 'Code' },
                         { id: 'comment', label: 'Notes', icon: 'FileText' },
                         { id: 'daily_note', label: 'Daily', icon: 'Sparkles' },
-                        { id: 'task', label: 'Tasks', icon: 'CheckCircle' }
+                        { id: 'task', label: 'Tasks', icon: 'CheckCircle' },
+                        { id: 'conversation', label: 'Conversations', icon: 'MessageSquare' }
                       ].map(filter => (
                         <button
                           key={filter.id}
@@ -1063,7 +1143,10 @@ export default function Home() {
                       } else if (entryType === 'daily_note') {
                          icon = <IconRenderer icon="Sparkles" size={ICON_SIZE} className="text-(--theme-accent)" baseSet={appIconSet} />;
                          typeLabel = "Daily Summary";
-                      }
+                       } else if (entryType === 'conversation') {
+                         icon = <IconRenderer icon="MessageSquare" size={ICON_SIZE} className="text-(--theme-primary)" baseSet={appIconSet} />;
+                         typeLabel = `Conversation (${entry.agent || 'Unknown'})`;
+                       }
 
                       return (
                         <div key={`${entryType}-${entry.id}`} className="group relative">
@@ -1353,6 +1436,16 @@ export default function Home() {
             </div>
           </div>
         </div>
+      )}
+      
+      {/* Conversation Modal */}
+      {activeProject && (
+        <ConversationModal
+          isOpen={isConversationModalOpen}
+          onClose={() => setIsConversationModalOpen(false)}
+          onSave={handleSaveConversation}
+          projectId={activeProject.id}
+        />
       )}
       </main>
 

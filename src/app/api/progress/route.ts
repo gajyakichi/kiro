@@ -1,33 +1,39 @@
 import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import db from "@/lib/db";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    // This is the artifact directory path provided in the conversation
-    const artifactDir = "/Users/satoshiyamaguchi/.gemini/antigravity/brain/8f0e638e-1b68-416b-a5f5-b9e5d648bf14";
+    const { searchParams } = new URL(request.url);
+    const projectId = searchParams.get('projectId');
     
-    const taskPath = path.join(artifactDir, "task.md");
-    const walkthroughPath = path.join(artifactDir, "walkthrough.md");
+    if (!projectId) {
+      return NextResponse.json({ error: "projectId is required" }, { status: 400 });
+    }
+    
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Fetch today's daily note for the specific project
+    const todayNote = await db.dailyNote.findFirst({
+      where: {
+        project_id: parseInt(projectId),
+        date: today
+      },
+      orderBy: {
+        timestamp: 'desc'
+      }
+    });
 
-    let taskContent = "";
-    let walkthroughContent = "";
-
-    try {
-      taskContent = await fs.readFile(taskPath, "utf-8");
-    } catch {
-      taskContent = "task.md not found";
+    if (todayNote) {
+      return NextResponse.json({
+        task: todayNote.content,
+        walkthrough: "" // TODO: Restore walkthrough functionality
+      });
     }
 
-    try {
-      walkthroughContent = await fs.readFile(walkthroughPath, "utf-8");
-    } catch {
-      walkthroughContent = "walkthrough.md not found";
-    }
-
+    // Fallback: if no daily note exists for today, return a default message
     return NextResponse.json({
-      task: taskContent,
-      walkthrough: walkthroughContent
+      task: "本日の要約はまだありません。「文脈を解析」ボタンをクリックして生成してください。",
+      walkthrough: ""
     });
   } catch (error) {
     console.error("Progress API Error:", error);
