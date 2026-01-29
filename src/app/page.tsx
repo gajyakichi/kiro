@@ -559,7 +559,8 @@ export default function Home() {
         const progData = await progRes.json();
         setProgress(progData);
       } else {
-        throw new Error("Absorbに失敗しました");
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Absorbに失敗しました");
       }
     } catch (e) {
       console.error("Absorb Error:", e);

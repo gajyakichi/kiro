@@ -74,11 +74,11 @@ export async function POST(req: NextRequest) {
 
     const contextString = `
 GIT LOGS:
-${contextData.recentLogs.map(l => `${l.date} [${l.hash}] ${l.message} (${l.author})`).join('\n')}
+${contextData.recentLogs.map((l: { date: string; hash: string; message: string; author: string }) => `${l.date} [${l.hash}] ${l.message} (${l.author})`).join('\n')}
 
 CONVERSATION LOGS (AI Agent Discussions):
 ${conversationLogs.length > 0 
-  ? conversationLogs.map(c => `[${c.agent}] ${c.summary}${c.full_text ? '\nDetails: ' + c.full_text : ''}`).join('\n\n')
+  ? conversationLogs.map((c: { agent: string; summary: string; full_text: string | null }) => `[${c.agent}] ${c.summary}${c.full_text ? '\nDetails: ' + c.full_text : ''}`).join('\n\n')
   : 'No conversations recorded today.'}
 
 WALKTHROUGH:
