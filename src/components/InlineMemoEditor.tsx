@@ -74,7 +74,7 @@ export function InlineMemoEditor({ onClose, onSave, title }: InlineMemoEditorPro
               <div className="flex gap-1 items-center">
                 <button
                   onClick={() => setIsPreview(!isPreview)}
-                  className="px-2 py-1 text-[10px] bg-(--sidebar-bg) hover:bg-(--hover-bg) rounded transition-colors flex items-center gap-1 text-(--foreground)"
+                  className="px-2 py-1 text-[10px] bg-(--card-bg) hover:bg-(--theme-primary) hover:text-white rounded transition-colors flex items-center gap-1 text-(--foreground) border border-(--border-color)"
                 >
                   <Code size={12} />
                   {isPreview ? 'Edit' : 'Preview'}
