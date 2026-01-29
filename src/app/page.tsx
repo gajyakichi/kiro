@@ -443,11 +443,19 @@ export default function Home() {
   // Get daily note for selected date or today
   const selectedDailyNote = useMemo(() => {
     const targetDate = selectedDate || new Date();
-    const dateString = targetDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    // Format as YYYY-MM-DD in local timezone
+    const year = targetDate.getFullYear();
+    const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+    const day = String(targetDate.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
     
     return dailyNotes.find(note => {
       const noteDate = new Date(note.date);
-      const noteDateString = noteDate.toISOString().split('T')[0];
+      const noteYear = noteDate.getFullYear();
+      const noteMonth = String(noteDate.getMonth() + 1).padStart(2, '0');
+      const noteDay = String(noteDate.getDate()).padStart(2, '0');
+      const noteDateString = `${noteYear}-${noteMonth}-${noteDay}`;
       return noteDateString === dateString;
     });
   }, [dailyNotes, selectedDate]);
