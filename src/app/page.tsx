@@ -1069,6 +1069,42 @@ export default function Home() {
                   )}
                 </div>
 
+                {/* 1.3. Daily Report */}
+                {dailyNotes.length > 0 && (
+                  <div className="group relative pl-6 border-l-2 border-(--border-color) hover:border-(--theme-primary) transition-colors">
+                    <button 
+                      onClick={() => handleOpenChat(
+                        'daily-report',
+                        `Daily Report:\n${dailyNotes[0]?.content || 'No report yet'}`,
+                        "Daily Report AI"
+                      )}
+                      className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-(--card-bg) border-2 border-(--border-color) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center cursor-pointer hover:scale-110 z-10"
+                      title="Ask AI about daily report"
+                    >
+                      <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
+                    </button>
+                    
+                    <div className="mb-2 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">Daily Report</span>
+                        <span className="text-xs text-(--foreground) opacity-40">
+                          {new Date(dailyNotes[0]?.timestamp || new Date()).toLocaleDateString(appLang, { month: 'short', day: 'numeric' })}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="notion-card p-6 rounded-xl border border-(--border-color) shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: 'var(--card-bg)' }}>
+                      <article className="prose prose-slate max-w-none text-(--foreground) leading-relaxed text-sm">
+                        <div className="markdown-content">
+                          <ReactMarkdown>
+                            {dailyNotes[0]?.content || "No daily report available yet."}
+                          </ReactMarkdown>
+                        </div>
+                      </article>
+                    </div>
+                  </div>
+                )}
+
                 {/* 1.5. Suggestions & Tasks - Timeline Style */}
                 <div className="group relative pl-6 border-l-2 border-(--border-color) hover:border-(--theme-primary) transition-colors">
                    {/* Timeline Node */}
