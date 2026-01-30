@@ -19,6 +19,21 @@ type Prompt = {
 export async function GET() {
   try {
     const db = new Database(DB_PATH);
+    
+    // Ensure table exists
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS prompts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        description TEXT,
+        system_prompt TEXT NOT NULL,
+        is_active INTEGER DEFAULT 0,
+        is_default INTEGER DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     const prompts = db.prepare('SELECT * FROM prompts ORDER BY is_default DESC, name ASC').all() as Prompt[];
     db.close();
     
