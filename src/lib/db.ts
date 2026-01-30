@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
@@ -67,15 +66,21 @@ const getAbsoluteDbPath = (mode: string, vaultPath: string, dbUrl: string) => {
 };
 
 const createPrismaClient = (mode: string, vaultPath: string, dbUrl: string) => {
+  let url = dbUrl;
   if (mode === 'local') {
     const absolutePath = getAbsoluteDbPath(mode, vaultPath, dbUrl);
-    const adapter = new PrismaBetterSqlite3({ url: `file:${absolutePath}` });
-    console.log(`📡 Storage: Local SQLite (${absolutePath})`);
-    return new PrismaClient({ adapter });
+    if (absolutePath) {
+      url = `file:${absolutePath}`;
+      console.log(`📡 Storage: Local SQLite (${absolutePath})`);
+    }
   } else {
-    console.log(`🌐 Storage: Remote Database (${dbUrl})`);
-    return new PrismaClient();
+    console.log(`🌐 Storage: Remote Database (${url})`);
   }
+
+  // Use environment variable for connection
+  process.env.DATABASE_URL = url;
+  
+  return new PrismaClient();
 };
 
 const prismaInstance = globalForPrisma.prisma ?? createPrismaClient(STORAGE_MODE, VAULT_PATH, DATABASE_URL);
@@ -87,6 +92,8 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prismaInstan
  */
 export const reconfigureDb = (config: { STORAGE_MODE: string, VAULT_PATH?: string, DATABASE_URL?: string }) => {
   console.log(`🔄 Reconfiguring Database... Mode: ${config.STORAGE_MODE}, Vault: ${config.VAULT_PATH}`);
+  
+  // Update instance
   const newPrisma = createPrismaClient(
     config.STORAGE_MODE, 
     config.VAULT_PATH || '', 
