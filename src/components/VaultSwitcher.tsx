@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Database, ShieldCheck, ChevronRight, Check, AlertTriangle, Plus, Settings, Edit2 } from 'lucide-react';
+import { Database, ShieldCheck, ChevronRight, Check, AlertTriangle, Plus, Settings, Edit2, X } from 'lucide-react';
 import { Vault } from '@/lib/types';
 import { getTranslation } from '@/lib/i18n';
 
@@ -14,6 +14,12 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [targetVault, setTargetVault] = useState<Vault | null>(null);
+
+  // New States for Custom Modal
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createType, setCreateType] = useState<'internal' | 'external'>('internal');
+  const [newName, setNewName] = useState('');
+  const [newPath, setNewPath] = useState('');
 
   const t = getTranslation(appLang);
 
@@ -49,57 +55,65 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
     }
   };
 
-  const handleAddVault = async () => {
-    let path = "";
-    let name = "";
-    let type = "external";
+  const handleCreateSubmit = async () => {
+    if (!newName.trim()) {
+        alert(t.vault_name_placeholder || "Please enter a vault name");
+        return;
+    }
+    
+    if (createType === 'external' && !newPath) {
+        alert(t.dir_path_placeholder || "Please select a folder path");
+        return;
+    }
 
     try {
-        // Offer choice between Internal (App-managed) and External (User-folder)
-        const useInternal = window.confirm("Create a new Internal Vault?\n\nOK: Create inside app (Portable)\nCancel: Select external folder (Existing)");
-        
-        if (useInternal) {
-            type = "internal";
-            name = prompt(t.vault_name_placeholder || "Enter vault name:", "My Vault") || "";
-            if (!name) return; // Cancelled
+        const res = await fetch('/api/vaults', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: newName,
+                type: createType,
+                path: createType === 'external' ? newPath : undefined
+            })
+        });
+
+        if (res.ok) {
+            const newVault = await res.json();
+            setVaults(prev => [...prev, newVault]);
+            fetchVaults();
+            
+            setShowCreateModal(false);
+            setNewName('');
+            setNewPath('');
+            setIsOpen(false);
+            
+            alert(`Vault "${newVault.name}" created!`);
         } else {
-            // External Vault Logic
-            if (typeof window !== 'undefined' && window.electron && typeof window.electron.selectDirectory === 'function') {
-                const selected = await window.electron.selectDirectory();
-                if (selected) {
-                    path = selected;
-                    name = path.split(/[/\\]/).pop() || "New Vault";
-                }
-            } else {
-                console.warn("Electron API unavailable, falling back to prompt");
-                const defaultPath = "/Users/satoshiyamaguchi/Developer/kaihatsunote/vault";
-                const input = prompt(t.dir_path_placeholder || "Enter absolute path to vault:", defaultPath);
-                if (input) {
-                    path = input;
-                    name = prompt(t.vault_name_placeholder || "Enter vault name:", "Kaihatsunote Workspace") || "New Vault";
-                }
-            }
-        }
-
-        if ((type === 'internal' && name) || (path && name)) {
-            const res = await fetch('/api/vaults', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, path, type })
-            });
-
-            if (res.ok) {
-                alert(`Vault "${name}" added successfully!`);
-                fetchVaults();
-                setIsOpen(false);
-            } else {
-                throw new Error("Failed to register");
-            }
+            throw new Error("Failed to create vault");
         }
     } catch (e) {
-        alert("Failed to add vault. Please try adding it from the Settings page.");
         console.error(e);
+        alert("Failed to create vault.");
     }
+  };
+
+  const handleSelectFolder = async () => {
+    if (typeof window !== 'undefined' && window.electron?.selectDirectory) {
+        const selected = await window.electron.selectDirectory();
+        if (selected) {
+            setNewPath(selected);
+            if (!newName) {
+                setNewName(selected.split(/[/\\]/).pop() || "New Vault");
+            }
+        }
+    } else {
+        const input = prompt("Enter absolute path for vault:", "/Users/satoshiyamaguchi/Developer/kaihatsunote/vault");
+        if (input) setNewPath(input);
+    }
+  };
+
+  const handleAddVault = () => {
+      setShowCreateModal(true);
   };
 
   const handleUpdateVaultPath = async (vault: Vault) => {
@@ -264,6 +278,91 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
                     </div>
                 </div>
             </div>
+        </div>
+      )}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-9999 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+             <div className="bg-(--card-bg) rounded-2xl shadow-2xl max-w-sm w-full border border-(--border-color) overflow-hidden animate-in zoom-in-95 duration-200">
+                <div className="p-4 border-b border-(--border-color) flex justify-between items-center">
+                    <h3 className="text-sm font-bold">Create New Vault</h3>
+                    <button onClick={() => setShowCreateModal(false)} className="text-(--foreground) opacity-50 hover:opacity-100"><X size={16} /></button>
+                </div>
+                <div className="p-4 space-y-4">
+                    {/* Vault Name */}
+                    <div>
+                        <label className="text-[10px] font-bold notion-text-subtle uppercase block mb-1">Vault Name</label>
+                        <input 
+                            type="text" 
+                            className="w-full bg-(--bg-secondary) border border-(--border-color) rounded-md px-3 py-2 text-sm focus:outline-none focus:border-(--theme-primary)"
+                            placeholder="My Notes"
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                        />
+                    </div>
+
+                    {/* Storage Type */}
+                    <div>
+                        <label className="text-[10px] font-bold notion-text-subtle uppercase block mb-2">Storage Type</label>
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={() => setCreateType('internal')}
+                                className={`flex-1 py-2 rounded-lg text-xs font-bold border ${createType === 'internal' ? 'border-(--theme-primary) bg-(--theme-primary)/10 text-(--theme-primary)' : 'border-(--border-color) hover:bg-(--hover-bg)'}`}
+                            >
+                                Internal (App)
+                            </button>
+                            <button 
+                                onClick={() => setCreateType('external')}
+                                className={`flex-1 py-2 rounded-lg text-xs font-bold border ${createType === 'external' ? 'border-(--theme-primary) bg-(--theme-primary)/10 text-(--theme-primary)' : 'border-(--border-color) hover:bg-(--hover-bg)'}`}
+                            >
+                                External (Folder)
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* External Path Selection */}
+                    {createType === 'external' && (
+                        <div>
+                             <label className="text-[10px] font-bold notion-text-subtle uppercase block mb-1">Location</label>
+                             <div className="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    className="flex-1 bg-(--bg-secondary) border border-(--border-color) rounded-md px-3 py-2 text-xs truncate opacity-50 cursor-not-allowed"
+                                    value={newPath}
+                                    readOnly
+                                    placeholder="Select a folder..."
+                                />
+                                <button 
+                                    onClick={handleSelectFolder}
+                                    className="px-3 py-2 bg-(--hover-bg) border border-(--border-color) rounded-md text-xs font-bold hover:bg-(--border-color) transition-colors"
+                                >
+                                    Select
+                                </button>
+                             </div>
+                        </div>
+                    )}
+                    
+                    <div className="text-[10px] notion-text-subtle">
+                        {createType === 'internal' 
+                             ? "Vault will be created inside the application. Easy to move and backup." 
+                             : "Vault will be created in an external folder on your computer."}
+                    </div>
+                </div>
+
+                <div className="p-4 border-t border-(--border-color) bg-(--hover-bg) flex gap-3">
+                    <button 
+                        onClick={() => setShowCreateModal(false)}
+                        className="flex-1 py-2 text-xs font-bold hover:bg-(--border-color)/50 rounded-lg transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        onClick={handleCreateSubmit}
+                        className="flex-1 py-2 bg-(--theme-primary) text-(--background) text-xs font-bold rounded-lg hover:opacity-90 shadow-lg shadow-(--theme-primary)/20 transition-all"
+                    >
+                        Create Vault
+                    </button>
+                </div>
+             </div>
         </div>
       )}
     </div>

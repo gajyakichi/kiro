@@ -11,8 +11,13 @@ import { PromptVault } from '@/components/PromptVault';
 
 const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onVaultSwitch: () => void }) => {
   const [vaults, setVaults] = useState<Vault[]>([]);
-
   const [loading, setLoading] = useState(true);
+  
+  // Create Modal States
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createType, setCreateType] = useState<'internal' | 'external'>('internal');
+  const [newName, setNewName] = useState('');
+  const [newPath, setNewPath] = useState('');
 
   const t = getTranslation(appLang);
 
@@ -33,9 +38,6 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
     }
   };
 
-
-
-
   const handleSwitch = async (id: string) => {
     try {
       const res = await fetch('/api/vaults', {
@@ -44,13 +46,10 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
         body: JSON.stringify({ id })
       });
       
-      if (!res.ok) {
-        throw new Error("Failed to switch vault");
-      }
+      if (!res.ok) throw new Error("Failed to switch vault");
 
       fetchVaults();
       onVaultSwitch();
-      // Reload is often simpler to reset all states across the app
       window.location.reload();
     } catch (e) {
       console.error("Failed to switch vault", e);
@@ -58,6 +57,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm(t.confirm_delete || "Delete this vault setting?")) return;
     try {
       await fetch(`/api/vaults?id=${id}`, { method: 'DELETE' });
       fetchVaults();
@@ -66,9 +66,54 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
     }
   };
 
+  const handleCreateSubmit = async () => {
+      if (!newName.trim()) return alert("Please enter a vault name");
+      if (createType === 'external' && !newPath) return alert("Please select a folder path");
 
+      try {
+          const res = await fetch('/api/vaults', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                  name: newName,
+                  type: createType,
+                  path: createType === 'external' ? newPath : undefined
+              })
+          });
 
-  if (loading) return <div className="text-xs text-(-foreground) animate-pulse">{t.loading_vault}</div>;
+          if (res.ok) {
+              const newVault = await res.json();
+              setVaults(prev => [...prev, newVault]); // Optimistic
+              fetchVaults();
+              setShowCreateModal(false);
+              setNewName('');
+              setNewPath('');
+              alert(`Vault "${newVault.name}" created!`);
+          } else {
+              throw new Error("Failed to create");
+          }
+      } catch (e) {
+          alert("Failed to create vault");
+          console.error(e);
+      }
+  };
+  
+  const handleSelectFolder = async () => {
+      // @ts-ignore
+      if (typeof window !== 'undefined' && window.electron?.selectDirectory) {
+          // @ts-ignore
+          const selected = await window.electron.selectDirectory();
+          if (selected) {
+              setNewPath(selected);
+              if (!newName) setNewName(selected.split(/[/\\]/).pop() || "New Vault");
+          }
+      } else {
+          const input = prompt("Enter absolute path:");
+          if (input) setNewPath(input);
+      }
+  };
+
+  if (loading && vaults.length === 0) return <div className="text-xs text-(--foreground) animate-pulse">{t.loading_vault}</div>;
 
   return (
     <div className="space-y-4">
@@ -78,19 +123,36 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
         </p>
         <div className="flex gap-2">
             <button 
+               onClick={() => setShowCreateModal(true)}
+               className="flex items-center gap-2 px-3 py-1.5 bg-(--theme-primary) text-(--background) rounded-lg hover:opacity-90 transition-all text-xs font-bold shadow-sm"
+            >
+               <Plus size={12} />
+               {t.add_new_vault || "New Vault"}
+            </button>
+            <button 
               onClick={fetchVaults}
               className="p-2 bg-(--card-bg) text-(--foreground) rounded-xl hover:bg-(--hover-bg) transition-all shadow-sm"
               title="Refresh"
             >
               <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
             </button>
-
         </div>
       </div>
 
-
-
       <div className="grid grid-cols-1 gap-3">
+        {vaults.length === 0 && !loading && (
+            <div className="text-center p-8 border-2 border-dashed border-(--border-color) rounded-xl bg-(--card-bg)/30">
+                <Database className="mx-auto mb-3 text-(--foreground) opacity-20" size={32} />
+                <p className="text-xs font-bold text-(--foreground) opacity-50 mb-4">No vaults found.</p>
+                <button 
+                   onClick={() => setShowCreateModal(true)}
+                   className="text-xs font-bold text-(--theme-primary) hover:underline"
+                >
+                    Create your first vault
+                </button>
+            </div>
+        )}
+        
         {vaults.map((vault) => (
           <div 
             key={vault.id} 
@@ -109,7 +171,10 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                   {vault.name}
                   {vault.active && <span className="text-[9px] bg-(--theme-success-bg) text-(--theme-success) px-2 py-0.5 rounded-full uppercase font-black tracking-tighter">{t.current_active}</span>}
                 </div>
-                <div className="text-[11px] notion-text-subtle font-mono mt-1 opacity-60">{vault.path || t.internal}</div>
+                <div className="text-[11px] notion-text-subtle font-mono mt-1 opacity-60">
+                    {vault.path || t.internal} 
+                    {vault.path && vault.path.includes('/vaults/') && <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-100 text-blue-700">INTERNAL</span>}
+                </div>
               </div>
             </div>
             
@@ -118,14 +183,14 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
                 <>
                   <button 
                     onClick={() => handleSwitch(vault.id)}
-                    className="px-4 py-2 bg-(-card-bg) text-(--theme-primary) hover:bg-(-theme-primary) hover:text-white rounded-xl text-[11px] font-black transition-all"
+                    className="px-4 py-2 bg-(--card-bg) text-(--theme-primary) hover:bg-(--theme-primary) hover:text-white rounded-xl text-[11px] font-black transition-all border border-(--theme-primary)/20"
                   >
                     {t.select}
                   </button>
                   {vault.id !== 'default' && (
                     <button 
                       onClick={() => handleDelete(vault.id)}
-                      className="p-2 text-(-foreground) hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                      className="p-2 text-(--foreground) hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                     >
                       <X size={14} />
                     </button>
@@ -140,6 +205,62 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
           </div>
         ))}
       </div>
+
+      {/* CREATE MODAL */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
+             <div className="bg-(--card-bg) rounded-2xl shadow-2xl max-w-sm w-full border border-(--border-color) overflow-hidden animate-in zoom-in-95">
+                <div className="p-4 border-b border-(--border-color) flex justify-between items-center text-(--foreground)">
+                    <h3 className="text-sm font-bold">Create New Vault</h3>
+                    <button onClick={() => setShowCreateModal(false)}><X size={16} /></button>
+                </div>
+                <div className="p-4 space-y-4">
+                    <div>
+                        <label className="text-[10px] font-bold notion-text-subtle uppercase block mb-1">Vault Name</label>
+                        <input 
+                            type="text" 
+                            className="w-full bg-(--bg-secondary) border border-(--border-color) rounded-md px-3 py-2 text-sm text-(--foreground)"
+                            placeholder="My Notes"
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-bold notion-text-subtle uppercase block mb-2">Storage Type</label>
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={() => setCreateType('internal')}
+                                className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all ${createType === 'internal' ? 'border-(--theme-primary) bg-(--theme-primary)/10 text-(--theme-primary)' : 'border-(--border-color) text-(--foreground)'}`}
+                            >
+                                Internal (App)
+                            </button>
+                            <button 
+                                onClick={() => setCreateType('external')}
+                                className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all ${createType === 'external' ? 'border-(--theme-primary) bg-(--theme-primary)/10 text-(--theme-primary)' : 'border-(--border-color) text-(--foreground)'}`}
+                            >
+                                External (Folder)
+                            </button>
+                        </div>
+                    </div>
+                    {createType === 'external' && (
+                        <div>
+                             <label className="text-[10px] font-bold notion-text-subtle uppercase block mb-1">Path</label>
+                             <div className="flex gap-2">
+                                <input type="text" className="flex-1 bg-(--bg-secondary) border border-(--border-color) rounded-md px-3 py-2 text-xs text-(--foreground)" value={newPath} readOnly />
+                                <button onClick={handleSelectFolder} className="px-3 py-2 bg-(--hover-bg) border border-(--border-color) rounded-md text-xs font-bold text-(--foreground)">Select</button>
+                             </div>
+                        </div>
+                    )}
+                    <button 
+                        onClick={handleCreateSubmit}
+                        className="w-full py-2 bg-(--theme-primary) text-(--background) text-xs font-bold rounded-lg hover:opacity-90 shadow-lg mt-2"
+                    >
+                        Create Vault
+                    </button>
+                </div>
+             </div>
+        </div>
+      )}
     </div>
   );
 };
