@@ -19,13 +19,14 @@ const ThemeLab = dynamic(() => import('@/components/ThemeLab').then(mod => mod.T
 });
 const IconPicker = dynamic(() => import('@/components/IconPicker').then(mod => mod.IconPicker), { ssr: false });
 const VaultSwitcher = dynamic(() => import('@/components/VaultSwitcher').then(mod => mod.VaultSwitcher), { ssr: false });
+const ProjectSwitcher = dynamic(() => import('@/components/ProjectSwitcher').then(mod => mod.ProjectSwitcher), { ssr: false });
 const InlineChatBox = dynamic(() => import('@/components/InlineChatBox').then(mod => mod.InlineChatBox), { ssr: false });
 const AnnotationMenu = dynamic(() => import('@/components/AnnotationMenu').then(mod => mod.AnnotationMenu), { ssr: false });
 const InlineMemoEditor = dynamic(() => import('@/components/InlineMemoEditor').then(mod => mod.InlineMemoEditor), { ssr: false });
 const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'), { ssr: false });
 
 
-import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search } from 'lucide-react';
+import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, FolderGit2, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
 
 type TimelineEntry = {
@@ -157,11 +158,7 @@ export default function Home() {
   const [appSkin, setAppSkin] = useState("notion");
   const [settings, setSettings] = useState<Record<string, string | undefined> | null>(null); // To store full settings object if needed
 
-  // New Workspace State
-  const [isAddingWorkspace, setIsAddingWorkspace] = useState(false);
-  const [newWName, setNewWName] = useState("");
-  const [newWPath, setNewWPath] = useState("");
-  const [isCreatingW, setIsCreatingW] = useState(false);
+
 
   // Dialog State
   const [dialogState, setDialogState] = useState<{
@@ -653,44 +650,7 @@ export default function Home() {
     }
   };
 
-  const handleAddWorkspace = async () => {
-    if (!newWName || !newWPath) return;
-    setIsCreatingW(true);
-    try {
-      const res = await fetch('/api/projects', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: newWName,
-          git_path: newWPath,
-          artifact_path: newWPath, // Defaulting same as git_path for simplicity
-          icon: 'lucide:Folder'
-        })
-      });
-      if (res.ok) {
-        await res.json();
-        setNewWName("");
-        setNewWPath("");
-        setIsAddingWorkspace(false);
-        fetchProjects();
-        // Option: automatically select new project
-        // setActiveProject({ id: result.id, ... }); 
-      }
-    } catch (e) {
-      console.error("Workspace Creation Error:", e);
-    } finally {
-      setIsCreatingW(false);
-    }
-  };
 
-  const handleSelectWDir = async () => {
-    if (window.electron?.selectDirectory) {
-      const path = await window.electron.selectDirectory();
-      if (path) {
-          setNewWPath(path);
-      }
-    }
-  };
 
   const handleAbsorb = async () => {
     if (!activeProject) return;
@@ -739,6 +699,12 @@ export default function Home() {
   };
 
 
+
+  const handleToggleAppLang = () => {
+    const newLang = appLang === 'en' ? 'ja' : 'en';
+    setAppLang(newLang);
+    handleUpdateSettings({ APP_LANG: newLang });
+  };
 
   const handleUpdateSettings = async (newSettings: Partial<Record<string, string>>) => {
     // Optimistic state updates
@@ -894,85 +860,52 @@ export default function Home() {
       )}
 
       {/* Notion Sidebar */}
-      <aside className="w-80 notion-sidebar flex flex-col pt-8 pb-4 px-3 sticky top-0 h-screen overflow-y-auto bg-(--sidebar-bg) border-r border-(--border-color)">
-        <div className="mb-6">
+      <aside className="w-80 notion-sidebar flex flex-col pt-8 pb-4 px-3 sticky top-0 h-screen bg-(--sidebar-bg) border-r border-(--border-color)">
+        <div className="mb-2 shrink-0 relative z-50">
           <div className="px-2 mt-4">
             <div className="flex items-center justify-between mb-2">
-                <div className="text-[11px] font-semibold notion-text-subtle uppercase">{t.workspace}</div>
-                <button 
-                    onClick={() => setIsAddingWorkspace(!isAddingWorkspace)}
-                    className="p-1 hover:bg-(--hover-bg) rounded transition-colors text-neutral-400 hover:text-neutral-600"
-                    title={t.add_workspace}
-                >
-                    <Plus size={14} />
-                </button>
+               {settings?.ENABLED_PLUGINS?.includes('plugin-jp') && (
+                   <button
+                     onClick={handleToggleAppLang}
+                     className="flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-(--foreground) opacity-40 hover:opacity-100 hover:bg-(--hover-bg) rounded transition-all"
+                     title={appLang === 'en' ? 'Switch to Japanese' : '英語に切り替え'}
+                   >
+                     <Languages size={14} />
+                     <span>{appLang === 'en' ? 'EN' : 'JA'}</span>
+                   </button>
+               )}
             </div>
-            
-            {isAddingWorkspace && (
-                <div className="mb-4 p-4 bg-(--card-bg) border border-(--border-color) rounded-2xl space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
-                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">{t.workspace_name}</label>
-                        <input 
-                            type="text"
-                            value={newWName}
-                            onChange={(e) => setNewWName(e.target.value)}
-                            className="w-full text-xs p-3 bg-(--card-bg) border border-(--border-color) rounded-xl focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 shadow-sm font-medium transition-all"
-                            placeholder="e.g. My Repo"
-                        />
-                    </div>
-                    <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
-                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">{t.workspace_path}</label>
-                        <div className="relative group">
-                            <input 
-                                type="text"
-                                value={newWPath}
-                                onChange={(e) => setNewWPath(e.target.value)}
-                                className="w-full text-[11px] p-3 pr-10 bg-(--card-bg)! border border-(--border-color) rounded-xl focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 shadow-sm font-mono transition-all"
-                                placeholder="/Users/..."
-                            />
-                            <button 
-                                onClick={handleSelectWDir}
-                                className="absolute right-1 top-1/2 -translate-y-1/2 p-2 hover:bg-(--hover-bg) rounded-lg text-neutral-400 hover:text-(--theme-primary) transition-all"
-                                title={t.select_folder_title}
-                            >
-                                <Folder size={14} />
-                            </button>
-                        </div>
-                    </div>
-                    <button 
-                        onClick={handleAddWorkspace}
-                        disabled={isCreatingW || !newWName || !newWPath}
-                        className="w-full py-2.5 bg-foreground text-background text-[11px] font-black rounded-xl hover:opacity-90 disabled:opacity-30 transition-all shadow-md shadow-neutral-100 uppercase tracking-wider"
-                    >
-                        {isCreatingW ? t.saving : t.confirm_add_workspace}
-                    </button>
-                </div>
-            )}
+          </div>
+          
+          {/* Vault & Project Management Zone */}
+          <div className="space-y-4 mt-2 mb-2">
+            {/* 1. Vault (Storage Root) */}
+            <div className="px-2">
+               <div className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest mb-1.5 opacity-60 flex items-center gap-1">
+                  <Folder size={10} />
+                  Vault
+               </div>
+               <VaultSwitcher />
+            </div>
 
-            <div className="relative">
-                <select 
-                value={activeProject?.id || ""}
-                onChange={(e) => {
-                    const p = projects.find(proj => proj.id === parseInt(e.target.value));
-                    if (p) setActiveProject(p);
-                }}
-                className="w-full bg-(--card-bg) border border-(--border-color) rounded px-2 py-1.5 pl-8 text-sm focus:outline-none appearance-none"
-                >
-                <option value="" disabled>{t.select_workspace}</option>
-                {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
-                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
-                    {activeProject ? (
-                        <IconRenderer icon={activeProject.icon} size={14} className="opacity-70" baseSet={appIconSet} />
-                    ) : (
-                        <span className="text-xs opacity-40">◦</span>
-                    )}
-                </div>
+            {/* 2. Project (Active Context) */}
+            <div className="px-2">
+               <div className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest mb-1.5 opacity-60 flex items-center gap-1">
+                  <FolderGit2 size={10} />
+                  Project
+               </div>
+               <ProjectSwitcher 
+                   activeProjectId={activeProject?.id || -1} 
+                   onSwitch={(id) => {
+                       const proj = projects.find(p => p.id === id);
+                       if (proj) setActiveProject(proj);
+                   }} 
+               />
             </div>
           </div>
         </div>
 
-        <nav className="flex-1 space-y-1" role="tablist">
+        <nav className="flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-1" role="tablist">
           <button 
             onClick={() => setActiveTab("timeline")}
             className={`w-full notion-item flex items-center gap-3 ${activeTab === "timeline" ? "active" : ""}`}
@@ -983,9 +916,7 @@ export default function Home() {
             <span>Timeline</span>
           </button>
 
-
-
-          <button 
+           <button 
             onClick={() => setActiveTab("themes")}
             className={`w-full notion-item flex items-center gap-3 ${activeTab === "themes" ? "active" : ""}`}
             role="tab"
@@ -995,24 +926,16 @@ export default function Home() {
             <span>{t.theme_lab}</span>
           </button>
 
-          <Link 
-            href="/settings"
-            className="notion-item flex items-center gap-3 no-underline text-inherit"
-          >
-            <IconRenderer icon="Settings" size={16} baseSet={appIconSet} />
-            <span>{t.settings}</span>
-          </Link>
+           <Link 
+             href="/settings"
+             className="notion-item flex items-center gap-3 no-underline text-inherit"
+           >
+             <IconRenderer icon="Settings" size={16} baseSet={appIconSet} />
+             <span>{t.settings}</span>
+           </Link>
         </nav>
 
         {renderMiniCalendar()}
-
-
-
-        {/* Vault Switcher Integration */}
-        <div className="mt-4 pt-4 border-t border-(--border-color)">
-          <div className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest px-2 mb-2">{t.active_storage}</div>
-          <VaultSwitcher appLang={appLang} onSwitch={fetchProjects} className="px-2" />
-        </div>
       </aside>
 
       <main className="flex-1 flex flex-col h-full overflow-hidden">
@@ -1241,6 +1164,8 @@ export default function Home() {
                    <div className="relative w-full">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-(--foreground) opacity-40" size={14} />
                       <input 
+                        id="timeline-search"
+                        name="timelineSearch"
                         type="text" 
                         placeholder="Search timeline..." 
                         value={timelineSearch}

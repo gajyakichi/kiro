@@ -138,6 +138,8 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({
               {onManualAdd && (
                 <div className="flex gap-2 mb-4">
                     <input 
+                        id="new-task-input"
+                        name="newTask"
                         type="text" 
                         value={newTaskInput}
                         onChange={(e) => setNewTaskInput(e.target.value)}

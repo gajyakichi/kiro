@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';import { Database, ShieldCheck, ChevronRight, Check, AlertTriangle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Database, ShieldCheck, ChevronRight, Check, AlertTriangle, Plus, Settings } from 'lucide-react';
 import { Vault } from '@/lib/types';
-
 import { getTranslation } from '@/lib/i18n';
 
 interface VaultSwitcherProps {
@@ -43,10 +43,52 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
       fetchVaults();
       setIsOpen(false);
       if (onSwitch) onSwitch();
-      // Reload page to refresh all data from new DB
       window.location.reload();
     } catch (e) {
       console.error("Failed to switch vault", e);
+    }
+  };
+
+  const handleAddVault = async () => {
+    let path = "";
+    let name = "";
+
+    try {
+        // Strict check for Electron API availability
+        if (typeof window !== 'undefined' && window.electron && typeof window.electron.selectDirectory === 'function') {
+            const selected = await window.electron.selectDirectory();
+            if (selected) {
+                path = selected;
+                name = path.split(/[/\\]/).pop() || "New Vault";
+            }
+        } else {
+            console.warn("Electron API unavailable, falling back to prompt");
+            const defaultPath = "/Users/satoshiyamaguchi/Developer/kaihatsunote/vault";
+            const input = prompt(t.dir_path_placeholder || "Enter absolute path to vault:", defaultPath);
+            if (input) {
+                path = input;
+                name = prompt(t.vault_name_placeholder || "Enter vault name:", "Kaihatsunote Workspace") || "New Vault";
+            }
+        }
+
+        if (path && name) {
+            const res = await fetch('/api/vaults', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, path })
+            });
+
+            if (res.ok) {
+                alert(`Vault "${name}" added successfully!`);
+                fetchVaults();
+                setIsOpen(false);
+            } else {
+                throw new Error("Failed to register");
+            }
+        }
+    } catch (e) {
+        alert("Failed to add vault. Please try adding it from the Settings page.");
+        console.error(e);
     }
   };
 
@@ -75,7 +117,7 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 bottom-full mb-2 w-64 bg-(--background) border border-(--border-color) rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
+        <div className="absolute left-0 top-full mt-2 w-64 bg-(--background) border border-(--border-color) rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="p-2 border-b border-(--border-color) bg-(--hover-bg)">
             <span className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest px-2">{t.storage_vaults}</span>
           </div>
@@ -108,12 +150,22 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
               </button>
             ))}
           </div>
-          <div className="p-2 border-t border-(--border-color) bg-(--hover-bg)">
+          
+          {/* Footer Actions */}
+          <div className="p-2 border-t border-(--border-color) bg-(--hover-bg) flex gap-2">
+            <button 
+               onClick={handleAddVault}
+               className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold text-(--theme-primary) bg-(--theme-primary)/10 rounded-lg hover:bg-(--theme-primary)/20 transition-colors"
+            >
+              <Plus size={12} />
+              {t.add_new_vault || "Add Vault"}
+            </button>
             <a 
               href="/settings" 
-              className="block w-full text-center py-2 text-[10px] font-bold notion-text-subtle hover:text-(--theme-primary) transition-colors"
+              className="shrink-0 flex items-center justify-center w-8 bg-(--card-bg) border border-(--border-color) rounded-lg hover:bg-(--hover-bg) hover:text-(--foreground) text-(--theme-primary) transition-all"
+              title={t.manage_vaults}
             >
-              {t.manage_vaults}
+              <Settings size={14} />
             </a>
           </div>
         </div>

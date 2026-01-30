@@ -36,6 +36,54 @@ export const ProjectSwitcher = ({ activeProjectId, onSwitch, className = "" }: P
     }
   };
 
+  const handleAddProject = async () => {
+    let path = "";
+    let name = "";
+    
+    // Electron Directory Selection
+    if (typeof window !== 'undefined' && window.electron && typeof window.electron.selectDirectory === 'function') {
+      const selected = await window.electron.selectDirectory();
+      if (selected) {
+        path = selected;
+        name = path.split(/[/\\]/).pop() || "New Project";
+      }
+    } else {
+      // Fallback
+      const input = prompt("Enter absolute path to project repository:");
+      if (input) {
+        path = input;
+        name = prompt("Enter project name:", "My Project") || "New Project";
+      }
+    }
+
+    if (path && name) {
+      try {
+        const res = await fetch('/api/projects', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                name, 
+                git_path: path,
+                artifact_path: path, // Default artifact path same as git path
+                icon: 'lucide:Folder' 
+            })
+        });
+        
+        if (res.ok) {
+            alert(`Project "${name}" added successfully!`);
+            fetchProjects();
+            setIsOpen(false);
+        } else {
+            const err = await res.json();
+            throw new Error(err.error || "Failed to add project");
+        }
+      } catch (e) {
+        alert(`Failed to add project: ${(e as Error).message}`);
+        console.error(e);
+      }
+    }
+  };
+
   const activeProject = projects.find(p => p.id === activeProjectId);
 
   if (loading) return <div className="text-[10px] notion-text-subtle animate-pulse">Loading projects...</div>;
@@ -79,14 +127,14 @@ export const ProjectSwitcher = ({ activeProjectId, onSwitch, className = "" }: P
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${project.id === activeProjectId ? 'bg-(--theme-primary) text-(--background)' : 'bg-(--hover-bg) text-(--foreground) opacity-50'}`}>
-                    {project.icon || <FolderGit2 size={16} />}
+                     <FolderGit2 size={16} />
                   </div>
                   <div>
                     <div className={`text-xs font-bold ${project.id === activeProjectId ? 'text-(--theme-primary)' : 'text-(--foreground)'}`}>
                       {project.name}
                     </div>
                     <div className="text-[10px] notion-text-subtle truncate max-w-[150px]">
-                      {project.git_path || 'No path'}
+                      {project.git_path && project.git_path.length > 20 ? '...'+project.git_path.slice(-20) : project.git_path || 'No path'}
                     </div>
                   </div>
                 </div>
@@ -95,13 +143,13 @@ export const ProjectSwitcher = ({ activeProjectId, onSwitch, className = "" }: P
             ))}
           </div>
           <div className="p-2 border-t border-(--border-color) bg-(--hover-bg)">
-            <a 
-              href="/settings" 
-              className="flex items-center justify-center gap-2 w-full py-2 text-[10px] font-bold notion-text-subtle hover:text-(--theme-primary) transition-colors"
+            <button 
+              onClick={handleAddProject}
+              className="flex items-center justify-center gap-2 w-full py-2 text-[10px] font-bold notion-text-subtle hover:text-(--theme-primary) transition-colors bg-(--theme-primary)/5 hover:bg-(--theme-primary)/10 rounded-lg"
             >
               <Plus size={12} />
-              Add New Project
-            </a>
+              Add Repository (Project)
+            </button>
           </div>
         </div>
       )}

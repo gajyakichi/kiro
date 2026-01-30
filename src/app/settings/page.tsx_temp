@@ -1,0 +1,25 @@
+  const handleAdd = async () => {
+    if (!newVaultName || !newVaultPath) return;
+    try {
+      const res = await fetch('/api/vaults', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newVaultName, path: newVaultPath })
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to register vault");
+      }
+
+      setNewVaultName("");
+      setNewVaultPath("");
+      setIsAdding(false);
+      fetchVaults();
+      alert(`Vault registered successfully: ${newVaultName}`);
+    } catch (e) {
+      console.error("Failed to add vault", e);
+      alert(`Registration failed: ${(e as Error).message}\n\nPlease verify the path exists and is writable.`);
+    }
+  };

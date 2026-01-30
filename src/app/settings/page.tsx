@@ -11,9 +11,7 @@ import { PromptVault } from '@/components/PromptVault';
 
 const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onVaultSwitch: () => void }) => {
   const [vaults, setVaults] = useState<Vault[]>([]);
-  const [isAdding, setIsAdding] = useState(false);
-  const [newVaultName, setNewVaultName] = useState("");
-  const [newVaultPath, setNewVaultPath] = useState("");
+
   const [loading, setLoading] = useState(true);
 
   const t = getTranslation(appLang);
@@ -35,30 +33,21 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
     }
   };
 
-  const handleAdd = async () => {
-    if (!newVaultName || !newVaultPath) return;
-    try {
-      await fetch('/api/vaults', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newVaultName, path: newVaultPath })
-      });
-      setNewVaultName("");
-      setNewVaultPath("");
-      setIsAdding(false);
-      fetchVaults();
-    } catch (e) {
-      console.error("Failed to add vault", e);
-    }
-  };
+
+
 
   const handleSwitch = async (id: string) => {
     try {
-      await fetch('/api/vaults', {
+      const res = await fetch('/api/vaults', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id })
       });
+      
+      if (!res.ok) {
+        throw new Error("Failed to switch vault");
+      }
+
       fetchVaults();
       onVaultSwitch();
       // Reload is often simpler to reset all states across the app
@@ -77,14 +66,7 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
     }
   };
 
-  const handleSelectDirectory = async () => {
-    if (window.electron?.selectDirectory) {
-      const path = await window.electron.selectDirectory();
-      if (path) {
-        setNewVaultPath(path);
-      }
-    }
-  };
+
 
   if (loading) return <div className="text-xs text-(-foreground) animate-pulse">{t.loading_vault}</div>;
 
@@ -97,68 +79,16 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
         <div className="flex gap-2">
             <button 
               onClick={fetchVaults}
-              className="p-2 bg-(-card-bg) text-(-foreground) rounded-xl hover:bg-(-hover-bg) transition-all shadow-sm"
+              className="p-2 bg-(--card-bg) text-(--foreground) rounded-xl hover:bg-(--hover-bg) transition-all shadow-sm"
               title="Refresh"
             >
               <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
             </button>
-            <button 
-              onClick={() => setIsAdding(!isAdding)}
-              className="flex items-center gap-2 px-4 py-2 bg-(-theme-primary) text-white rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-sm whitespace-nowrap"
-            >
-              {isAdding ? <X size={12} /> : <Plus size={12} />}
-              {isAdding ? t.cancel : t.add_new_vault}
-            </button>
+
         </div>
       </div>
 
-      {isAdding && (
-        <div className="bg-(--theme-primary-bg) px-3 py-2 rounded-md border-(-border-color) animate-in slide-in-from-top-2 duration-300">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-(--theme-primary) uppercase tracking-widest opacity-60">{t.vault_name_label}</label>
-              <input 
-                type="text" 
-                value={newVaultName}
-                onChange={(e) => setNewVaultName(e.target.value)}
-                placeholder={t.vault_name_placeholder}
-                className="w-full p-4 bg-(-card-bg) border border-(-border-color) rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 transition-all font-medium"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-(--theme-primary) uppercase tracking-widest opacity-60">{t.dir_path_label}</label>
-              <div className="relative group">
-                <input 
-                  type="text" 
-                  value={newVaultPath}
-                  onChange={(e) => setNewVaultPath(e.target.value)}
-                  placeholder={t.dir_path_placeholder}
-                  className="w-full p-4 bg-(-card-bg) border border-(-border-color) rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/20 pr-12 transition-all font-mono"
-                />
-                <button 
-                  onClick={handleSelectDirectory}
-                  className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-all ${
-                    window.electron 
-                    ? 'text-(--theme-primary) hover:bg-(--theme-primary-bg)' 
-                    : 'text-(-foreground) opacity-20 cursor-not-allowed'
-                  }`}
-                  disabled={!window.electron}
-                  title={window.electron ? t.select_folder_title : t.native_dialog_not_available}
-                >
-                  <Folder size={14} />
-                </button>
-              </div>
-              {!window.electron && <p className="text-[9px] text-orange-500 font-medium">{t.native_desc_only_desktop}</p>}
-            </div>
-          </div>
-          <button 
-            onClick={handleAdd}
-            className="w-full py-3 bg-(-theme-primary) text-white rounded-lg text-xs font-black shadow-lg shadow-(--theme-primary)/10 hover:opacity-90 transition-all"
-          >
-            {t.confirm_add_vault}
-          </button>
-        </div>
-      )}
+
 
       <div className="grid grid-cols-1 gap-3">
         {vaults.map((vault) => (
@@ -166,12 +96,12 @@ const VaultManager = ({ appLang = 'en', onVaultSwitch }: { appLang?: string, onV
             key={vault.id} 
             className={`group flex items-center justify-between px-3 py-2 rounded-md border transition-all ${
               vault.active 
-                ? 'border-(--theme-primary) bg-(-card-bg) shadow-md' 
-                : 'border-(-border-color) hover:border-(-border-color) bg-(-card-bg)/50'
+                ? 'border-(--theme-primary) bg-(--card-bg) shadow-md' 
+                : 'border-(--border-color) hover:border-(--border-color) bg-(--card-bg)/50'
             }`}
           >
             <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${vault.active ? 'bg-(-theme-primary) text-white' : 'bg-(-card-bg) text-(-foreground) group-hover:bg-(-hover-bg)'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${vault.active ? 'bg-(--theme-primary) text-white' : 'bg-(--card-bg) text-(--foreground) group-hover:bg-(--hover-bg)'}`}>
                 <ShieldCheck size={24} />
               </div>
               <div>
