@@ -40,47 +40,59 @@ export const ProjectSwitcher = ({ activeProjectId, onSwitch, className = "" }: P
     let path = "";
     let name = "";
     
-    // Electron Directory Selection
-    if (typeof window !== 'undefined' && window.electron && typeof window.electron.selectDirectory === 'function') {
-      const selected = await window.electron.selectDirectory();
-      if (selected) {
-        path = selected;
-        name = path.split(/[/\\]/).pop() || "New Project";
-      }
-    } else {
-      // Fallback
-      const input = prompt("Enter absolute path to project repository:");
-      if (input) {
-        path = input;
-        name = prompt("Enter project name:", "My Project") || "New Project";
-      }
-    }
-
-    if (path && name) {
-      try {
-        const res = await fetch('/api/projects', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                name, 
-                git_path: path,
-                artifact_path: path, // Default artifact path same as git path
-                icon: 'lucide:Folder' 
-            })
-        });
-        
-        if (res.ok) {
-            alert(`Project "${name}" added successfully!`);
-            fetchProjects();
-            setIsOpen(false);
+    try {
+        // Electron Directory Selection
+        if (typeof window !== 'undefined' && window.electron && typeof window.electron.selectDirectory === 'function') {
+          const selected = await window.electron.selectDirectory();
+          if (selected) {
+            path = String(selected); // Ensure string type
+            name = path.split(/[/\\]/).pop() || "New Project";
+          }
         } else {
-            const err = await res.json();
-            throw new Error(err.error || "Failed to add project");
+          // Fallback
+          const input = prompt("Enter absolute path to project repository:");
+          if (input) {
+            path = input;
+            name = prompt("Enter project name:", "My Project") || "New Project";
+          }
         }
-      } catch (e) {
-        alert(`Failed to add project: ${(e as Error).message}`);
-        console.error(e);
-      }
+    
+        if (path && name) {
+            const res = await fetch('/api/projects', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    name, 
+                    git_path: path,
+                    artifact_path: path, 
+                    icon: 'lucide:Folder' 
+                })
+            });
+            
+            if (res.ok) {
+                alert(`Project "${name}" added successfully!`);
+                fetchProjects();
+                setIsOpen(false);
+            } else {
+                let errorMsg = "Failed to add project";
+                try {
+                    const err = await res.json();
+                    if (err && err.error) {
+                        errorMsg = typeof err.error === 'string' ? err.error : JSON.stringify(err.error);
+                    } else if (err) {
+                        errorMsg = JSON.stringify(err);
+                    }
+                } catch (parseError) {
+                    console.warn("Failed to parse error response", parseError);
+                    errorMsg = await res.text();
+                }
+                throw new Error(errorMsg);
+            }
+        }
+    } catch (e) {
+        console.error("Add Project Error:", e);
+        const msg = e instanceof Error ? e.message : String(e);
+        alert(`Failed to add project: ${msg}`);
     }
   };
 

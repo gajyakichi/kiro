@@ -880,7 +880,7 @@ export default function Home() {
           {/* Vault & Project Management Zone */}
           <div className="space-y-4 mt-2 mb-2">
             {/* 1. Vault (Storage Root) */}
-            <div className="px-2">
+            <div className="px-2 relative z-[100]">
                <div className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest mb-1.5 opacity-60 flex items-center gap-1">
                   <Folder size={10} />
                   Vault
@@ -889,7 +889,7 @@ export default function Home() {
             </div>
 
             {/* 2. Project (Active Context) */}
-            <div className="px-2">
+            <div className="px-2 relative z-[50]">
                <div className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest mb-1.5 opacity-60 flex items-center gap-1">
                   <FolderGit2 size={10} />
                   Project
