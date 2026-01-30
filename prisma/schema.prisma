@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -17,43 +18,41 @@ model Project {
   logs             Log[]
   suggestedTasks   SuggestedTask[]
   conversationLogs ConversationLog[]
+  absorbCaches     AbsorbCache[]
 }
 
 model Log {
   id         Int      @id @default(autoincrement())
-  timestamp  DateTime @default(now())
-  type       String
+  project_id Int
   content    String
-  metadata   String?
-  project_id Int
-  project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
-}
-
-model Comment {
-  id         Int      @id @default(autoincrement())
   timestamp  DateTime @default(now())
-  text       String
-  type       String   @default("markdown")
-  metadata   String?
-  project_id Int
   project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
 }
 
-model Theme {
-  id        Int      @id @default(autoincrement())
-  name      String
-  css       String
-  iconSet   String   @default("lucide")
-  active    Boolean  @default(false)
-  isPreset  Boolean  @default(false)
-  timestamp DateTime @default(now())
+model SuggestedTask {
+  id              Int      @id @default(autoincrement())
+  project_id      Int
+  title           String
+  description     String?
+  status          String   @default("proposed")
+  created_at      DateTime @default(now())
+  project         Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+}
+
+model ConversationLog {
+  id              Int      @id @default(autoincrement())
+  project_id      Int
+  summary         String
+  detail          String?
+  created_at      DateTime @default(now())
+  project         Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
 }
 
 model DailyNote {
   id         Int      @id @default(autoincrement())
   project_id Int
   date       String
-  content    String
+  content    Json
   content_en String?
   content_ja String?
   timestamp  DateTime @default(now())
@@ -62,23 +61,25 @@ model DailyNote {
   @@unique([project_id, date])
 }
 
-model SuggestedTask {
-  id         Int      @id @default(autoincrement())
-  project_id Int
-  task       String
-  status     String   @default("proposed")
-  timestamp  DateTime @default(now())
-  project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+model Comment {
+  id              Int      @id @default(autoincrement())
+  project_id      Int
+  file_path       String
+  line_number     Int
+  content         String
+  resolved        Boolean  @default(false)
+  created_at      DateTime @default(now())
+  project         Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
 }
 
-model ConversationLog {
-  id         Int      @id @default(autoincrement())
-  project_id Int
-  date       String
-  agent      String
-  summary    String
-  full_text  String?
-  metadata   String?  // JSON string for storing KI path and other metadata
-  timestamp  DateTime @default(now())
-  project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+model AbsorbCache {
+  id              Int      @id @default(autoincrement())
+  project_id      Int
+  file_path       String
+  file_hash       String
+  summary_content String
+  updated_at      DateTime @default(now())
+  project         Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+
+  @@unique([project_id, file_path])
 }

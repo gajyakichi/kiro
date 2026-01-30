@@ -19,13 +19,14 @@ const ThemeLab = dynamic(() => import('@/components/ThemeLab').then(mod => mod.T
 });
 const IconPicker = dynamic(() => import('@/components/IconPicker').then(mod => mod.IconPicker), { ssr: false });
 const VaultSwitcher = dynamic(() => import('@/components/VaultSwitcher').then(mod => mod.VaultSwitcher), { ssr: false });
+const ProjectSwitcher = dynamic(() => import('@/components/ProjectSwitcher').then(mod => mod.ProjectSwitcher), { ssr: false });
 const InlineChatBox = dynamic(() => import('@/components/InlineChatBox').then(mod => mod.InlineChatBox), { ssr: false });
 const AnnotationMenu = dynamic(() => import('@/components/AnnotationMenu').then(mod => mod.AnnotationMenu), { ssr: false });
 const InlineMemoEditor = dynamic(() => import('@/components/InlineMemoEditor').then(mod => mod.InlineMemoEditor), { ssr: false });
 const SuggestedTasks = dynamic(() => import('@/components/SuggestedTasks'), { ssr: false });
 
 
-import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search } from 'lucide-react';
+import { Sparkles, ShieldAlert, PlusCircle, Plus, Folder, FolderGit2, ChevronRight, Edit2, Trash2, Languages, Loader2, Check, AlertTriangle, HelpCircle, Search } from 'lucide-react';
 import { getTranslation } from '@/lib/i18n';
 
 type TimelineEntry = {
@@ -96,6 +97,14 @@ export default function Home() {
         }
       } catch (e) {
         console.error(e);
+        setDialogState({
+          open: true,
+          title: appLang === 'ja' ? 'エラー' : 'Error',
+          message: appLang === 'ja' 
+            ? `コメントの削除に失敗しました: ${(e as Error).message}` 
+            : `Failed to delete comment: ${(e as Error).message}`,
+          type: 'error'
+        });
         // Revert on error - would need to re-fetch to restore
         if (activeProject) {
           const commentRes = await fetch(`/api/comments?projectId=${activeProject.id}`);
@@ -103,7 +112,6 @@ export default function Home() {
           setComments(commentData);
         }
       }
-    } else {
       // First click - show confirmation
       setDeletingCommentId(id);
     }
@@ -150,11 +158,7 @@ export default function Home() {
   const [appSkin, setAppSkin] = useState("notion");
   const [settings, setSettings] = useState<Record<string, string | undefined> | null>(null); // To store full settings object if needed
 
-  // New Workspace State
-  const [isAddingWorkspace, setIsAddingWorkspace] = useState(false);
-  const [newWName, setNewWName] = useState("");
-  const [newWPath, setNewWPath] = useState("");
-  const [isCreatingW, setIsCreatingW] = useState(false);
+
 
   // Dialog State
   const [dialogState, setDialogState] = useState<{
@@ -225,15 +229,41 @@ export default function Home() {
   // Heatmap State
 
 
-  // Progress Translation State
-  const [progressLang, setProgressLang] = useState<'en' | 'ja'>('en');
+  // Progress Translation State (with localStorage persistence)
+  const [progressLang, setProgressLang] = useState<'en' | 'ja'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('progressLang') as 'en' | 'ja') || 'en';
+    }
+    return 'en';
+  });
   const [progressTranslated, setProgressTranslated] = useState<string | null>(null);
   const [isTranslatingProgress, setIsTranslatingProgress] = useState(false);
+
+  // Tasks Translation State (Japanese Plugin Feature, with localStorage persistence)
+  const [tasksLang, setTasksLang] = useState<'en' | 'ja'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('tasksLang') as 'en' | 'ja') || 'en';
+    }
+    return 'en';
+  });
+  const [tasksTranslated, setTasksTranslated] = useState<{ [key: number]: string }>({});
+  const [isTranslatingTasks, setIsTranslatingTasks] = useState(false);
+
+  // Daily Report Translation State (Japanese Plugin Feature, with localStorage persistence)
+  const [dailyReportLang, setDailyReportLang] = useState<'en' | 'ja'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('dailyReportLang') as 'en' | 'ja') || 'en';
+    }
+    return 'en';
+  });
+  const [dailyReportTranslated, setDailyReportTranslated] = useState<string | null>(null);
+  const [isTranslatingDailyReport, setIsTranslatingDailyReport] = useState(false);
 
 
   const handleToggleProgressLang = async () => {
     if (progressLang === 'ja') {
         setProgressLang('en');
+        localStorage.setItem('progressLang', 'en');
     } else {
         if (!progressTranslated && progress?.task) {
             setIsTranslatingProgress(true);
@@ -247,6 +277,7 @@ export default function Home() {
                 if (data.translated) {
                     setProgressTranslated(data.translated);
                     setProgressLang('ja');
+                    localStorage.setItem('progressLang', 'ja');
                 }
             } catch (e) {
                 console.error(e);
@@ -255,6 +286,77 @@ export default function Home() {
             }
         } else if (progressTranslated) {
             setProgressLang('ja');
+            localStorage.setItem('progressLang', 'ja');
+        }
+    }
+  };
+
+  // Tasks Language Toggle Handler (Japanese Plugin Feature)
+  const handleToggleTasksLang = async () => {
+    if (tasksLang === 'ja') {
+        setTasksLang('en');
+        localStorage.setItem('tasksLang', 'en');
+    } else {
+        // Translate all active tasks that haven't been translated yet
+        const tasksToTranslate = suggestedTasks.filter(t => !tasksTranslated[t.id]);
+        if (tasksToTranslate.length > 0) {
+            setIsTranslatingTasks(true);
+            try {
+                const translations: { [key: number]: string } = { ...tasksTranslated };
+                for (const task of tasksToTranslate) {
+                    const res = await fetch('/api/translate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: task.task, targetLang: 'ja' })
+                    });
+                    const data = await res.json();
+                    if (data.translated) {
+                        translations[task.id] = data.translated;
+                    }
+                }
+                setTasksTranslated(translations);
+                setTasksLang('ja');
+                localStorage.setItem('tasksLang', 'ja');
+            } catch (e) {
+                console.error('Failed to translate tasks:', e);
+            } finally {
+                setIsTranslatingTasks(false);
+            }
+        } else {
+            setTasksLang('ja');
+            localStorage.setItem('tasksLang', 'ja');
+        }
+    }
+  };
+
+  // Daily Report Language Toggle Handler (Japanese Plugin Feature)
+  const handleToggleDailyReportLang = async () => {
+    if (dailyReportLang === 'ja') {
+        setDailyReportLang('en');
+        localStorage.setItem('dailyReportLang', 'en');
+    } else {
+        if (!dailyReportTranslated && selectedDailyNote?.content) {
+            setIsTranslatingDailyReport(true);
+            try {
+                const res = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: selectedDailyNote.content, targetLang: 'ja' })
+                });
+                const data = await res.json();
+                if (data.translated) {
+                    setDailyReportTranslated(data.translated);
+                    setDailyReportLang('ja');
+                    localStorage.setItem('dailyReportLang', 'ja');
+                }
+            } catch (e) {
+                console.error('Failed to translate daily report:', e);
+            } finally {
+                setIsTranslatingDailyReport(false);
+            }
+        } else if (dailyReportTranslated) {
+            setDailyReportLang('ja');
+            localStorage.setItem('dailyReportLang', 'ja');
         }
     }
   };
@@ -548,44 +650,7 @@ export default function Home() {
     }
   };
 
-  const handleAddWorkspace = async () => {
-    if (!newWName || !newWPath) return;
-    setIsCreatingW(true);
-    try {
-      const res = await fetch('/api/projects', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: newWName,
-          git_path: newWPath,
-          artifact_path: newWPath, // Defaulting same as git_path for simplicity
-          icon: 'lucide:Folder'
-        })
-      });
-      if (res.ok) {
-        await res.json();
-        setNewWName("");
-        setNewWPath("");
-        setIsAddingWorkspace(false);
-        fetchProjects();
-        // Option: automatically select new project
-        // setActiveProject({ id: result.id, ... }); 
-      }
-    } catch (e) {
-      console.error("Workspace Creation Error:", e);
-    } finally {
-      setIsCreatingW(false);
-    }
-  };
 
-  const handleSelectWDir = async () => {
-    if (window.electron?.selectDirectory) {
-      const path = await window.electron.selectDirectory();
-      if (path) {
-          setNewWPath(path);
-      }
-    }
-  };
 
   const handleAbsorb = async () => {
     if (!activeProject) return;
@@ -634,6 +699,12 @@ export default function Home() {
   };
 
 
+
+  const handleToggleAppLang = () => {
+    const newLang = appLang === 'en' ? 'ja' : 'en';
+    setAppLang(newLang);
+    handleUpdateSettings({ APP_LANG: newLang });
+  };
 
   const handleUpdateSettings = async (newSettings: Partial<Record<string, string>>) => {
     // Optimistic state updates
@@ -789,85 +860,52 @@ export default function Home() {
       )}
 
       {/* Notion Sidebar */}
-      <aside className="w-80 notion-sidebar flex flex-col pt-8 pb-4 px-3 sticky top-0 h-screen overflow-y-auto bg-(--sidebar-bg) border-r border-(--border-color)">
-        <div className="mb-6">
+      <aside className="w-80 notion-sidebar flex flex-col pt-8 pb-4 px-3 sticky top-0 h-screen bg-(--sidebar-bg) border-r border-(--border-color)">
+        <div className="mb-2 shrink-0 relative z-50">
           <div className="px-2 mt-4">
             <div className="flex items-center justify-between mb-2">
-                <div className="text-[11px] font-semibold notion-text-subtle uppercase">{t.workspace}</div>
-                <button 
-                    onClick={() => setIsAddingWorkspace(!isAddingWorkspace)}
-                    className="p-1 hover:bg-(--hover-bg) rounded transition-colors text-neutral-400 hover:text-neutral-600"
-                    title={t.add_workspace}
-                >
-                    <Plus size={14} />
-                </button>
+               {settings?.ENABLED_PLUGINS?.includes('plugin-jp') && (
+                   <button
+                     onClick={handleToggleAppLang}
+                     className="flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-(--foreground) opacity-40 hover:opacity-100 hover:bg-(--hover-bg) rounded transition-all"
+                     title={appLang === 'en' ? 'Switch to Japanese' : '英語に切り替え'}
+                   >
+                     <Languages size={14} />
+                     <span>{appLang === 'en' ? 'EN' : 'JA'}</span>
+                   </button>
+               )}
             </div>
-            
-            {isAddingWorkspace && (
-                <div className="mb-4 p-4 bg-(--card-bg) border border-(--border-color) rounded-2xl space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
-                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">{t.workspace_name}</label>
-                        <input 
-                            type="text"
-                            value={newWName}
-                            onChange={(e) => setNewWName(e.target.value)}
-                            className="w-full text-xs p-3 bg-(--card-bg) border border-(--border-color) rounded-xl focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 shadow-sm font-medium transition-all"
-                            placeholder="e.g. My Repo"
-                        />
-                    </div>
-                    <div className="space-y-1.5 focus-within:translate-x-1 transition-transform">
-                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest pl-1">{t.workspace_path}</label>
-                        <div className="relative group">
-                            <input 
-                                type="text"
-                                value={newWPath}
-                                onChange={(e) => setNewWPath(e.target.value)}
-                                className="w-full text-[11px] p-3 pr-10 bg-(--card-bg)! border border-(--border-color) rounded-xl focus:outline-none focus:ring-2 focus:ring-(--theme-primary)/10 shadow-sm font-mono transition-all"
-                                placeholder="/Users/..."
-                            />
-                            <button 
-                                onClick={handleSelectWDir}
-                                className="absolute right-1 top-1/2 -translate-y-1/2 p-2 hover:bg-(--hover-bg) rounded-lg text-neutral-400 hover:text-(--theme-primary) transition-all"
-                                title={t.select_folder_title}
-                            >
-                                <Folder size={14} />
-                            </button>
-                        </div>
-                    </div>
-                    <button 
-                        onClick={handleAddWorkspace}
-                        disabled={isCreatingW || !newWName || !newWPath}
-                        className="w-full py-2.5 bg-foreground text-background text-[11px] font-black rounded-xl hover:opacity-90 disabled:opacity-30 transition-all shadow-md shadow-neutral-100 uppercase tracking-wider"
-                    >
-                        {isCreatingW ? t.saving : t.confirm_add_workspace}
-                    </button>
-                </div>
-            )}
+          </div>
+          
+          {/* Vault & Project Management Zone */}
+          <div className="space-y-4 mt-2 mb-2">
+            {/* 1. Vault (Storage Root) */}
+            <div className="px-2 relative z-[100]">
+               <div className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest mb-1.5 opacity-60 flex items-center gap-1">
+                  <Folder size={10} />
+                  Vault
+               </div>
+               <VaultSwitcher />
+            </div>
 
-            <div className="relative">
-                <select 
-                value={activeProject?.id || ""}
-                onChange={(e) => {
-                    const p = projects.find(proj => proj.id === parseInt(e.target.value));
-                    if (p) setActiveProject(p);
-                }}
-                className="w-full bg-(--card-bg) border border-(--border-color) rounded px-2 py-1.5 pl-8 text-sm focus:outline-none appearance-none"
-                >
-                <option value="" disabled>{t.select_workspace}</option>
-                {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
-                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
-                    {activeProject ? (
-                        <IconRenderer icon={activeProject.icon} size={14} className="opacity-70" baseSet={appIconSet} />
-                    ) : (
-                        <span className="text-xs opacity-40">◦</span>
-                    )}
-                </div>
+            {/* 2. Project (Active Context) */}
+            <div className="px-2 relative z-[50]">
+               <div className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest mb-1.5 opacity-60 flex items-center gap-1">
+                  <FolderGit2 size={10} />
+                  Project
+               </div>
+               <ProjectSwitcher 
+                   activeProjectId={activeProject?.id || -1} 
+                   onSwitch={(id) => {
+                       const proj = projects.find(p => p.id === id);
+                       if (proj) setActiveProject(proj);
+                   }} 
+               />
             </div>
           </div>
         </div>
 
-        <nav className="flex-1 space-y-1" role="tablist">
+        <nav className="flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-1" role="tablist">
           <button 
             onClick={() => setActiveTab("timeline")}
             className={`w-full notion-item flex items-center gap-3 ${activeTab === "timeline" ? "active" : ""}`}
@@ -878,9 +916,7 @@ export default function Home() {
             <span>Timeline</span>
           </button>
 
-
-
-          <button 
+           <button 
             onClick={() => setActiveTab("themes")}
             className={`w-full notion-item flex items-center gap-3 ${activeTab === "themes" ? "active" : ""}`}
             role="tab"
@@ -890,24 +926,16 @@ export default function Home() {
             <span>{t.theme_lab}</span>
           </button>
 
-          <Link 
-            href="/settings"
-            className="notion-item flex items-center gap-3 no-underline text-inherit"
-          >
-            <IconRenderer icon="Settings" size={16} baseSet={appIconSet} />
-            <span>{t.settings}</span>
-          </Link>
+           <Link 
+             href="/settings"
+             className="notion-item flex items-center gap-3 no-underline text-inherit"
+           >
+             <IconRenderer icon="Settings" size={16} baseSet={appIconSet} />
+             <span>{t.settings}</span>
+           </Link>
         </nav>
 
         {renderMiniCalendar()}
-
-
-
-        {/* Vault Switcher Integration */}
-        <div className="mt-4 pt-4 border-t border-(--border-color)">
-          <div className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest px-2 mb-2">{t.active_storage}</div>
-          <VaultSwitcher appLang={appLang} onSwitch={fetchProjects} className="px-2" />
-        </div>
       </aside>
 
       <main className="flex-1 flex flex-col h-full overflow-hidden">
@@ -956,9 +984,26 @@ export default function Home() {
                       ? 'bg-(--hover-bg) text-(--foreground) opacity-50 cursor-not-allowed border border-(--border-color)' 
                       : 'bg-(--background) text-(--foreground) border border-(--border-color) hover:bg-(--hover-bg) shadow-xs'
                   }`}
+                  title={settings?.ABSORB_MODE === 'auto' 
+                    ? 'Auto mode (uses cache). Click to manually override and regenerate.' 
+                    : 'Manual mode - always regenerates analysis'}
                 >
                   <Sparkles size={14} className={isAbsorbing ? 'animate-spin' : 'text-(--theme-accent) transition-colors'} />
-                  {isAbsorbing ? t.absorbing : t.absorb_context}
+                  {isAbsorbing ? t.absorbing : (
+                    <>
+                      {t.absorb_context}
+                      {settings?.ABSORB_MODE === 'auto' && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-(--theme-primary-bg) text-(--theme-primary) font-bold">
+                          Auto
+                        </span>
+                      )}
+                      {settings?.ABSORB_MODE === 'manual' && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-orange-100 text-orange-600 font-bold">
+                          Manual
+                        </span>
+                      )}
+                    </>
+                  )}
                 </button>
 
               </>
@@ -976,32 +1021,20 @@ export default function Home() {
              <div className="relative animate-fade-in space-y-8">
                 
                 {/* 1. Current Progress (Pinned) */}
-                <div className="group relative pl-6 border-l-2 border-(--theme-primary-bg) hover:border-(--theme-primary) transition-colors">
-                    <button 
-                    onClick={() => handleOpenChat(
-                        'current-status',
-                        `Current Status Task:\n${progress?.task || 'No task set'}`,
-                        "Current Status AI"
-                    )}
-                    className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-(--card-bg) border-2 border-(--theme-primary-bg) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center cursor-pointer hover:scale-110 z-10"
-                    title="Ask AI about this status"
-                  >
-                    <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
-                  </button>
-                  
+                <div className="group relative">
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">{t.current_status}</span>
+                        <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">{progressLang === 'ja' ? '現在の状況' : 'Current Status'}</span>
                     </div>
                     {settings?.ENABLED_PLUGINS?.includes('plugin-jp') && (
                         <button
                           onClick={handleToggleProgressLang}
                           disabled={isTranslatingProgress}
                           className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium text-(--foreground) opacity-40 hover:text-(--theme-primary) hover:bg-(--theme-primary-bg) rounded transition-colors"
-                          title="Toggle Language"
+                          title={progressLang === 'en' ? 'Switch to Japanese (日本語)' : 'Switch to English (英語)'}
                         >
                           {isTranslatingProgress ? <Loader2 size={12} className="animate-spin" /> : <Languages size={12} />}
-                          {progressLang === 'en' ? 'EN' : 'JA'}
+                          {progressLang === 'en' ? 'JA' : 'EN'}
                         </button>
                     )}
                   </div>
@@ -1051,26 +1084,25 @@ export default function Home() {
 
                 {/* 1.3. Daily Report */}
                 {selectedDailyNote && (
-                  <div className="group relative pl-6 border-l-2 border-(--border-color) hover:border-(--theme-primary) transition-colors">
-                    <button 
-                      onClick={() => handleOpenChat(
-                        'daily-report',
-                        `Daily Report:\n${selectedDailyNote.content || 'No report yet'}`,
-                        "Daily Report AI"
-                      )}
-                      className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-(--card-bg) border-2 border-(--border-color) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center cursor-pointer hover:scale-110 z-10"
-                      title="Ask AI about daily report"
-                    >
-                      <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
-                    </button>
-                    
+                  <div className="group relative">
                     <div className="mb-2 flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">{t.daily_report}</span>
+                        <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">{dailyReportLang === 'ja' ? '日報' : 'Daily Report'}</span>
                         <span className="text-xs text-(--foreground) opacity-40">
                           {new Date(selectedDailyNote.timestamp || new Date()).toLocaleDateString(appLang, { month: 'short', day: 'numeric' })}
                         </span>
                       </div>
+                      {settings?.ENABLED_PLUGINS?.includes('plugin-jp') && (
+                          <button
+                            onClick={handleToggleDailyReportLang}
+                            disabled={isTranslatingDailyReport}
+                            className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium text-(--foreground) opacity-40 hover:text-(--theme-primary) hover:bg-(--theme-primary-bg) rounded transition-colors"
+                            title={dailyReportLang === 'en' ? 'Switch to Japanese (日本語)' : 'Switch to English (英語)'}
+                          >
+                            {isTranslatingDailyReport ? <Loader2 size={12} className="animate-spin" /> : <Languages size={12} />}
+                            {dailyReportLang === 'en' ? 'JA' : 'EN'}
+                          </button>
+                      )}
                     </div>
                     
                     <div className="notion-card p-6 rounded-xl border border-(--border-color) shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: 'var(--card-bg)' }}>
@@ -1079,28 +1111,32 @@ export default function Home() {
                           remarkPlugins={[remarkGfm]}
                           rehypePlugins={[rehypeRaw]}
                         >
-                          {selectedDailyNote.content || "No daily report available yet."}
+                          {dailyReportLang === 'ja' && dailyReportTranslated 
+                            ? dailyReportTranslated 
+                            : (selectedDailyNote.content || "No daily report available yet.")}
                         </ReactMarkdown>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* 1.5. Suggestions & Tasks - Timeline Style */}
-                <div className="group relative pl-6 border-l-2 border-(--border-color) hover:border-(--theme-primary) transition-colors">
-                   {/* Timeline Node */}
-                   <button 
-                      onClick={() => handleOpenChat('tasks', 'Task Management', 'Todo AI Assistant')}
-                      className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-(--card-bg) border-2 border-(--border-color) group-hover:border-(--theme-primary) transition-colors flex items-center justify-center cursor-pointer hover:scale-110 z-10"
-                      title="Ask AI about tasks"
-                   >
-                      <div className="w-1.5 h-1.5 rounded-full bg-(--theme-primary) opacity-30 group-hover:opacity-100 transition-opacity" />
-                   </button>
-                   
+                {/* 1.5. Suggestions & Tasks */}
+                <div className="group relative">
                    <div className="mb-2 flex items-center justify-between">
                      <div className="flex items-center gap-2">
-                       <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">Suggestions & Tasks</span>
+                       <span className="text-sm font-semibold text-(--foreground) opacity-60 uppercase tracking-widest">{tasksLang === 'ja' ? '提案とタスク' : 'Suggestions & Tasks'}</span>
                      </div>
+                     {settings?.ENABLED_PLUGINS?.includes('plugin-jp') && (
+                         <button
+                           onClick={handleToggleTasksLang}
+                           disabled={isTranslatingTasks}
+                           className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium text-(--foreground) opacity-40 hover:text-(--theme-primary) hover:bg-(--theme-primary-bg) rounded transition-colors"
+                            title={tasksLang === 'en' ? 'Switch to Japanese (日本語)' : 'Switch to English (英語)'}
+                         >
+                           {isTranslatingTasks ? <Loader2 size={12} className="animate-spin" /> : <Languages size={12} />}
+                            {tasksLang === 'en' ? 'JA' : 'EN'}
+                         </button>
+                     )}
                    </div>
                    
                    <div className="notion-card rounded-xl border border-(--border-color) shadow-sm p-6 relative group" style={{ backgroundColor: 'var(--card-bg)' }}>
@@ -1113,7 +1149,8 @@ export default function Home() {
                          onDismiss={(t) => handleTaskStatusUpdate(t, 'dismissed')}
                          onUpdateStatus={(t, s) => handleTaskStatusUpdate(t, s)}
                          onManualAdd={handleManualTaskAdd}
-                         onOpenChat={handleOpenChat}
+                         displayLang={tasksLang}
+                         translatedTasks={tasksTranslated}
                       />
                    </div>
                 </div>
@@ -1127,6 +1164,8 @@ export default function Home() {
                    <div className="relative w-full">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-(--foreground) opacity-40" size={14} />
                       <input 
+                        id="timeline-search"
+                        name="timelineSearch"
                         type="text" 
                         placeholder="Search timeline..." 
                         value={timelineSearch}
@@ -1362,7 +1401,7 @@ export default function Home() {
                                           <div>
                                           <p className="text-[15px] font-medium leading-relaxed">{content}</p>
                                           <div className="mt-2 flex items-center gap-2 text-[10px] notion-text-subtle font-mono">
-                                              <span className="bg-(--sidebar-bg) px-1.5 py-0.5 rounded border border-(--border-color)">
+                                              <span className="bg-(--hover-bg) px-1.5 py-0.5 rounded border border-(--border-color) opacity-80">
                                               {metadata.hash.substring(0, 7)}
                                               </span>
                                               <span>{metadata.author || 'Unknown'}</span>
@@ -1533,6 +1572,47 @@ export default function Home() {
         </div>
       )}
       
+
+      
+      {/* Floating Action Buttons - Always visible */}
+      {activeProject && (
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+          {/* Add Memo Button */}
+          <button
+            onClick={() => setChatState({ 
+              open: true, 
+              targetId: 'global-memo', 
+              context: activeProject.name, 
+              title: 'Quick Memo', 
+              mode: 'memo' 
+            })}
+            className="w-14 h-14 rounded-full bg-(--theme-primary) text-(--background) shadow-2xl hover:scale-110 transition-transform duration-200 flex items-center justify-center group"
+            title="Add Memo"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/>
+              <path d="M15 3v4a2 2 0 0 0 2 2h4"/>
+            </svg>
+          </button>
+
+          {/* AI Chat Button */}
+          <button
+            onClick={() => setChatState({ 
+              open: true, 
+              targetId: 'global-chat', 
+              context: activeProject.name, 
+              title: 'AI Chat', 
+              mode: 'ai' 
+            })}
+            className="w-14 h-14 rounded-full bg-(--theme-accent) text-(--background) shadow-2xl hover:scale-110 transition-transform duration-200 flex items-center justify-center group"
+            title="AI Chat"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </button>
+        </div>
+      )}
 
       </main>
 

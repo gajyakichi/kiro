@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';import { Database, ShieldCheck, ChevronRight, Check, AlertTriangle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Database, ShieldCheck, ChevronRight, Check, AlertTriangle, Plus, Settings, Edit2 } from 'lucide-react';
 import { Vault } from '@/lib/types';
-
 import { getTranslation } from '@/lib/i18n';
 
 interface VaultSwitcherProps {
@@ -43,10 +43,81 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
       fetchVaults();
       setIsOpen(false);
       if (onSwitch) onSwitch();
-      // Reload page to refresh all data from new DB
       window.location.reload();
     } catch (e) {
       console.error("Failed to switch vault", e);
+    }
+  };
+
+  const handleAddVault = async () => {
+    let path = "";
+    let name = "";
+
+    try {
+        // Strict check for Electron API availability
+        if (typeof window !== 'undefined' && window.electron && typeof window.electron.selectDirectory === 'function') {
+            const selected = await window.electron.selectDirectory();
+            if (selected) {
+                path = selected;
+                name = path.split(/[/\\]/).pop() || "New Vault";
+            }
+        } else {
+            console.warn("Electron API unavailable, falling back to prompt");
+            const defaultPath = "/Users/satoshiyamaguchi/Developer/kaihatsunote/vault";
+            const input = prompt(t.dir_path_placeholder || "Enter absolute path to vault:", defaultPath);
+            if (input) {
+                path = input;
+                name = prompt(t.vault_name_placeholder || "Enter vault name:", "Kaihatsunote Workspace") || "New Vault";
+            }
+        }
+
+        if (path && name) {
+            const res = await fetch('/api/vaults', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, path })
+            });
+
+            if (res.ok) {
+                alert(`Vault "${name}" added successfully!`);
+                fetchVaults();
+                setIsOpen(false);
+            } else {
+                throw new Error("Failed to register");
+            }
+        }
+    } catch (e) {
+        alert("Failed to add vault. Please try adding it from the Settings page.");
+        console.error(e);
+    }
+  };
+
+  const handleUpdateVaultPath = async (vault: Vault) => {
+    let newPath = "";
+    
+    if (typeof window !== 'undefined' && window.electron?.selectDirectory) {
+       const selected = await window.electron.selectDirectory();
+       if (selected) newPath = selected;
+    } else {
+       const input = prompt("Update vault path:", vault.path);
+       if (input) newPath = input;
+    }
+
+    if (newPath && newPath !== vault.path) {
+        try {
+            const res = await fetch('/api/vaults', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: vault.id, path: newPath })
+            });
+            if (res.ok) {
+                fetchVaults();
+                // If the updated vault was active, reload to apply changes
+                if (vault.active) window.location.reload();
+            }
+        } catch (e) {
+            console.error("Failed to update vault path", e);
+        }
     }
   };
 
@@ -75,28 +146,29 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 bottom-full mb-2 w-64 bg-(--card-bg) border border-(--border-color) rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <div className="p-2 border-b border-(--border-color) bg-(--theme-primary-bg)/50">
+        <div className="absolute left-0 top-full mt-2 w-64 bg-(--background) border border-(--border-color) rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="p-2 border-b border-(--border-color) bg-(--hover-bg)">
             <span className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest px-2">{t.storage_vaults}</span>
           </div>
           <div className="max-h-64 overflow-y-auto p-1">
             {vaults.map((vault) => (
-              <button
+              <div
                 key={vault.id}
                 onClick={() => {
                    if (vault.id === activeVault?.id) return;
                    setTargetVault(vault);
                 }}
-                className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors ${
-                  vault.active ? 'bg-(--theme-primary-bg) cursor-default' : 'hover:bg-(--hover-bg)'
+                className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors cursor-pointer ${
+                  vault.active ? 'bg-(--hover-bg)' : 'hover:bg-(--hover-bg)'
                 }`}
+                role="button"
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${vault.active ? 'bg-(--theme-primary) text-(--background)' : 'bg-(--hover-bg) text-(--foreground) opacity-50'}`}>
                     <ShieldCheck size={16} />
                   </div>
                   <div>
-                    <div className={`text-sm font-bold ${vault.active ? 'text-(--theme-primary)' : 'text-(--foreground)'}`}>
+                    <div className={`text-xs font-bold ${vault.active ? 'text-(--theme-primary)' : 'text-(--foreground)'}`}>
                       {vault.name}
                     </div>
                     <div className="text-[10px] notion-text-subtle truncate max-w-[120px]">
@@ -104,16 +176,38 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
                     </div>
                   </div>
                 </div>
-                {vault.active && <Check size={16} className="text-(--theme-primary)" />}
-              </button>
+                <div className="flex items-center gap-2">
+                   <button
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       handleUpdateVaultPath(vault);
+                     }}
+                     className="p-1.5 text-(--foreground) opacity-30 hover:opacity-100 hover:bg-(--hover-bg) rounded transition-all"
+                     title="Edit Vault Path"
+                   >
+                     <Edit2 size={12} />
+                   </button>
+                   {vault.active && <Check size={16} className="text-(--theme-primary)" />}
+                </div>
+              </div>
             ))}
           </div>
-          <div className="p-2 border-t border-(--border-color) bg-(--theme-primary-bg)/20">
+          
+          {/* Footer Actions */}
+          <div className="p-2 border-t border-(--border-color) bg-(--hover-bg) flex gap-2">
+            <button 
+               onClick={handleAddVault}
+               className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-bold text-(--theme-primary) bg-(--theme-primary)/10 rounded-lg hover:bg-(--theme-primary)/20 transition-colors"
+            >
+              <Plus size={12} />
+              {t.add_new_vault || "Add Vault"}
+            </button>
             <a 
               href="/settings" 
-              className="block w-full text-center py-2 text-[10px] font-bold notion-text-subtle hover:text-(--theme-primary) transition-colors"
+              className="shrink-0 flex items-center justify-center w-8 bg-(--card-bg) border border-(--border-color) rounded-lg hover:bg-(--hover-bg) hover:text-(--foreground) text-(--theme-primary) transition-all"
+              title={t.manage_vaults}
             >
-              {t.manage_vaults}
+              <Settings size={14} />
             </a>
           </div>
         </div>

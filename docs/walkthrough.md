@@ -1,299 +1,201 @@
-# Kiro – Project Walkthrough
+# Kiro – Comprehensive Project Walk‑Through
 
-> **Project name:** *Kiro* (formerly *KaihatsuNote*)  
-> **Repository:** `github.com/your-org/kiro`  
-> **License:** MIT
-
-> **Documentation version**: 2026‑01‑29  
-> **Author**: Kiro Core Team
-
-> **TL;DR** – Kiro is a modern, bilingual note‑taking & task‑management app that runs on the desktop via Electron, built on top of Next.js & TypeScript, with a live theme editor, local AI (Ollama) for smart suggestions, and a modular icon system. The project is continuously improving UI/UX, accessibility, and CI‑pipeline health.
+> **Project Name**: *Kiro* (formerly **kaihatsunote**)  
+> **Repository**: <https://github.com/your-org/kiro>  
+> **Docs**: <https://kiro.readthedocs.io/>  
+> **Current Release**: v0.2.0 (2026‑01‑30)
 
 ---
 
 ## 1. Project Overview
 
-| Item | Description |
-|------|-------------|
-| **Core idea** | A local, fast, and fully themeable note‑taking experience that automatically generates tasks from daily notes using AI. |
-| **Target platform** | Desktop (Electron) – works on Windows, macOS, Linux. |
-| **Primary languages** | English ↔ Japanese (bilingual UI & docs). |
-| **Tech stack** | Next.js 13 (app router, TypeScript), Electron, Tailwind CSS v4, React‑Query, Zustand, React‑Markdown, Jest + Playwright, GitHub Actions CI, Ollama (local LLM). |
-| **Key features** | • Unified Note Timeline <br>• Dynamic, live‑preview theme editor (Theme Lab) <br>• Global icon set independent of theme <br>• Workspace / vault persistence <br>• AI‑powered daily‑note absorption & task suggestions <br>• WCAG AA compliance & accessibility improvements <br>• Bilingual (EN/JA) UI & docs <br>• CI/CD with lint, test, build |
+Kiro is a cross‑platform desktop note‑taking application built on **Next.js**, **Electron**, and **React**.  
+It targets writers, developers, and knowledge workers who want:
 
+| Feature | Benefit |
+|---------|---------|
+| **Local AI** (Ollama) | Generates daily summaries, task suggestions, and inline chat without sending data to the cloud |
+| **Theme Lab** | Drag‑and‑drop CSS editing, live preview, preset import/export, and a global icon system |
+| **Japanese & English** UI & docs | Bilingual experience for a broader audience |
+| **Workspace & Vault Management** | Multi‑vault workflow with persistent settings |
+| **WCAG AA** compliant UI | Accessible for users with disabilities |
+| **Playwright E2E + Jest unit tests** | Robust, CI‑driven quality guarantees |
+| **Modular icon architecture** | Icons are decoupled from themes, making theme design simpler |
 
 ---
 
 ## 2. Architecture & Key Components
 
-Below is a high‑level diagram of the major modules and their interactions.
-
 ```
-+-------------------+          +----------------+          +-----------------+
-|   Electron Shell  | <------> |  Next.js App   | <------> |  Tailwind CSS   |
-|   (main & render) |   IPC    |  (React/TS)    |   SSR     |  (v4, JIT)      |
-+-------------------+          +----------------+          +-----------------+
-          |                               |                          |
-          | IPC / Context                 | Styled Components        |
-          v                               v                          v
-+-------------------+          +----------------+          +-----------------+
-|  Theme Lab        |          |  AI Module     |          |  Icon Manager   |
-|  (Live CSS editor) |          |  (Ollama)      |          |  (global set)   |
-+-------------------+          +----------------+          +-----------------+
-          |                               |                          |
-          | API / Event Bus               | LLM Call                 |
-          v                               v                          v
-+-------------------+          +----------------+          +-----------------+
-|  Workspace/ Vault |          |  Localization  |          |  Accessibility  |
-|  Persistence (LS) |          |  (i18n)        |          |  (WCAG AA)      |
-+-------------------+          +----------------+          +-----------------+
-          |                               |                          |
-          +-------------------------------+--------------------------+
-                              |                                  |
-                      +-----------------+                +-----------------+
-                      |  CI/CD Pipeline |                |   Documentation |
-                      |  (GitHub Actions)|                |  (EN/JA README) |
-                      +-----------------+                +-----------------+
+┌───────────────────────┐
+│   Electron Main        │
+│  (Node.js + Chromium)  │
+└─────────┬───────────────┘
+          │
+┌─────────▼──────────────────────────────────────────────┐
+│  Renderer: Next.js + React (TS) + Tailwind v4           │
+│  ├─ App Shell (Router, Layout, Theme Context)          │
+│  ├─ Feature Modules                                  │
+│  │  ├─ Theme Lab (CSS Editor, Live Preview, Presets) │
+│  │  ├─ AI (Ollama client, Cache, Chat UI)            │
+│  │  ├─ Editors (BlockNote, Markdown, Notion)         │
+│  │  ├─ Timeline & Calendar                           │
+│  │  ├─ Settings (Vaults, Workspace, Localization)   │
+│  │  ├─ Icon System (Global, Theme‑Independent)      │
+│  │  └─ Prompt Vault (Prompts, Tags, Import/Export)  │
+│  ├─ State Management (React Context + Zustand)      │
+│  ├─ Persistence (LocalStorage + JSON vault files)   │
+│  └─ Accessibility (ARIA, Semantic HTML, WCAG AA)    │
+└──────────────────────────────────────────────────────┘
 ```
 
-### 2.1 Core Modules
-
-| Module | Responsibility | Key Libraries / Files |
-|--------|----------------|-----------------------|
-| **Electron** | Desktop shell, IPC, system integration | `main.ts`, `preload.ts`, `electron/` |
-| **Next.js** | Web UI, routing, server‑side rendering | `app/`, `pages/`, `components/` |
-| **Theme Lab** | CSS editor, live preview, preset management | `components/theme-lab/` |
-| **Icon Manager** | Global icon set, dynamic switching | `lib/icons/`, `components/icons/` |
-| **AI Module** | Local LLM (Ollama) integration, caching, prompts | `lib/ai/`, `services/ai-cache.ts` |
-| **Workspace/Vault** | Multi‑vault support, persistence, sync | `lib/vault/`, `services/vault-storage.ts` |
-| **Localization** | Bilingual UI, date/time formatting | `i18n/`, `next-i18next` |
-| **Accessibility** | WCAG AA compliant markup, ARIA, contrast | `components/` + `styles/accessibility.css` |
-| **CI/CD** | GitHub Actions, lint, tests, build | `.github/workflows/` |
-| **Docs** | Bilingual README, LICENSE, changelog | `README.md`, `LICENSE`, `CHANGELOG.md` |
+* **Electron** hosts the app and exposes Node APIs (file system, environment).
+* **Next.js** powers the renderer, enabling SSR for performance and SEO (if needed).
+* **Tailwind v4** + **CSS variables** give us a low‑cost theming layer.
+* **React Context** + **Zustand** provide a lightweight, testable state layer.
+* **Zod / TypeScript** guard data schemas for persistence.
+* **Playwright** and **Jest** enforce code quality in CI.
 
 ---
 
 ## 3. Development Journey (Chronological)
 
-The logs below are extracted from the team’s daily reports and commit history. Each date lists the main achievements, significant commits, and any critical decisions.
+> The following timeline highlights the major milestones, technical shifts, and design decisions that shaped Kiro.
 
-### 2026‑01‑24
-*Initial consolidation and rebranding*  
+### 2026‑01‑24 – Foundations & Re‑Brand
 
-| Action | Commit |
-|--------|--------|
-| Decoupled icon set from theme; global icon sets in Theme Lab | `ffa89f3` |
-| Japanese localization & workspace management | `80fa10a` |
-| Unified Note Timeline blocks | `3afcc4d` |
-| Theme Lab redesign: CSS editor, real‑time preview, presets | `4a5d574` |
-| Mandatory vault selection & sidebar switcher | `d51db40` |
-| Rebranded to **Kiro**, added local AI (Ollama) & vault storage mode | `b3feb58` |
-| Readability & contrast improvements | `bbe5816` |
-| Added theme‑preview reliability | `b25a52b` |
-| Expanded theme presets | `8a0f9f4` – `99f77dd` |
-
-**Key take‑away:** The team focused on UI polish, theme flexibility, and the first AI integration. A rebrand to *Kiro* marked the public identity shift.
+| Item | Impact |
+|------|--------|
+| **Icon Management** – Decoupled icon set from theme. | Simplifies theme design; centralizes icon handling. |
+| **Japanese Localization** – Completed, added language toggle. | Expands user base; required new locale context. |
+| **Workspace & Vault Persistence** – Multi‑vault support, robust persistence. | Improves data integrity for professional users. |
+| **Unified Note Timeline** – New UI component. | Streamlines navigation. |
+| **Theme Lab** – CSS editor, preset list, real‑time preview. | Empowered users to customize appearance. |
+| **Rebranding to Kiro** – Updated assets, docs, repo name. | Clear positioning, brand consistency. |
+| **Local AI (Ollama)** – Added, with vault‑storage mode. | Smart project absorption, task suggestions. |
+| **Readability & Contrast** – Global UI adjustments. | Better accessibility. |
+| **Version Control Hygiene** – Ignored DB & backup files. | Clean history. |
 
 ---
 
-### 2026‑01‑25
-*Refactoring, lint fixes, AI module expansion*  
+### 2026‑01‑25 – Stabilization & Linting
 
-| Action | Commit |
-|--------|--------|
-| Linting errors fixed in Electron & Theme API | `ff421fa` |
-| Settings persistence via `.env` & theme hover UI improvement | `18df8f5` |
-| Refactor theme hover animations | `4565e44` |
-| Decoupled icon logic from themes | `7fdf000` |
-| Global icon sets in Theme Lab | `dbbf385` |
-| Japanese localization + vault persistence | `80fa10a` |
-| AI‑powered project absorption (daily notes & task suggestions) | `bbe5816` |
-| Global readability & contrast | `3d6b3e3` – `99f77dd` |
-
-**Key take‑away:** The codebase received major lint cleanup and the icon system was fully modularized. AI absorption logic was solidified.
+* **Lint fixes** across Electron, Theme API, and Page modules.  
+* **Settings persistence** refactor to read from `.env` directly.  
+* **Theme hover animations** and UI consistency updated.  
+* **Dynamic icon system** introduced: sidebar icons now consume global icon set.  
+* **Japanese locale + workspace** polished, vault selection became mandatory.  
+* **AI integration** – Project absorption and daily note suggestions now functional.  
+* **Theme Lab overhaul** – Real‑time CSS preview and branding updated.  
 
 ---
 
-### 2026‑01‑26
-*Legal, CI, accessibility, and AI cache*  
+### 2026‑01‑26 – Accessibility, CI, Tests
 
-| Action | Commit |
-|--------|--------|
-| MIT license added, README bilingual | — |
-| Calendar UI finished, AI cache introduced, system calendar design updated | — |
-| WCAG AA compliance + ARIA labels | — |
-| `page`, `Electron`, `Theme API` lint errors fixed | — |
-| Unit tests added for NotionEditor, SuggestedTasks, AI modules | — |
-| UI/UX improvements: new icons, timeline, task UI refactor | — |
-| Prompt vault, AI prompt copy feature | — |
-| CI pipeline via GitHub Actions (Lint, Test, Build) | — |
-| BlockNote (Memo) integration, AI language support | — |
-| Theme Lab updated with new presets and preview animations | — |
-| Sidebar icons moved to dynamic icon system | — |
-
-**Key take‑away:** The focus shifted to **quality** – tests, CI, accessibility, and AI caching were all introduced.
+* Added **MIT license** and bilingual README (English + Japanese).  
+* Completed **calendar UI**, **AI cache**, and **system‑calendar design**.  
+* Achieved **WCAG AA** compliance (semantic tags, ARIA labels).  
+* Fixed **page / Electron / Theme API linting**.  
+* Added **unit tests** for NotionEditor, SuggestedTasks, AI modules, and AI suggestions.  
+* Reworked **UI/UX**: new icons, timeline upgrade, task UI refactor, AI task check.  
+* **Internationalization**: daily summary toggling.  
+* Implemented **GitHub Actions** pipeline (Lint, Test, Build).  
+* Integrated **BlockNote** editor, improved AI prompt copy.
 
 ---
 
-### 2026‑01‑27
-*Timeline, AI inline chat, performance, documentation*  
+### 2026‑01‑27 – Performance & Feature Expansion
 
-| Action | Commit |
-|--------|--------|
-| Integrated search/filter into unified timeline | — |
-| Restored SuggestedTasks, fixed icons | — |
-| Updated AI cache, added inline AI chat to timeline | — |
-| Performance: heatmap split, dynamic import, Tailwind v4 migration | — |
-| Accessibility: WCAG‑AA, ARIA labels | — |
-| Calendar UI & icon redesign | — |
-| Theme import/export, ThemeLab, system calendar sync | — |
-| README bilingual, license added, app name Kiro | — |
-| Playwright E2E tests, unit tests for AI modules | — |
-| Bundle optimization, database updates | — |
-
-**Key take‑away:** Feature polish and performance tuning were emphasized, with a complete CI integration.
+* Introduced **search/filter** in the integrated timeline.  
+* Added **inline AI chat** within timeline items.  
+* Optimized **heatmap rendering** via code‑splitting, dynamic import, Tailwind v4 migration.  
+* Continued WCAG‑AA compliance.  
+* Completed **calendar UI**, **prompt vault** UX.  
+* Expanded **theme import/export** support in Theme Lab.  
+* E2E tests with **Playwright**, unit tests with **Jest**.  
+* Cleaned up bundle size, database URLs, icon redesign.
 
 ---
 
-### 2026‑01‑28
-*UI consistency, prompt vault UX, inline memo editor*  
+### 2026‑01‑28 – UI Consistency & Prompt Vault
 
-| Action | Commit |
-|--------|--------|
-| Fixed CSS injection issue on settings page | — |
-| Added CSS variables for Darcula theme | — |
-| Improved tab button contrast, removed blue ring effect | — |
-| Settings UI compacted to ThemeLab style | — |
-| Introduced Prompt Vault UX | — |
-| Reworked theme card design to VS Code style | — |
-| InlineMemoEditor color refactor to theme colors | — |
-| Lint warnings resolved, short‑form CSS vars | — |
-
-**Key take‑away:** UI polish and prompt vault UX were consolidated, ensuring a consistent look and feel.
+* Fixed **settings page theme background** and CSS injection issues.  
+* Unified CSS variables for Darcula theme (section borders, contrast).  
+* Adjusted tab button contrast, removed blue ring effect.  
+* Consolidated settings UI into compact “skin” design.  
+* Implemented **Prompt Vault** with a clear UX.  
+* Redesigned theme cards to be VS Code‑style, neutralized accent colors.  
+* Refactored **InlineMemoEditor** colors to align with theme.  
+* Cleaned lint warnings, shortened CSS variable syntax.
 
 ---
 
-### 2026‑01‑29
-*Daily Report feature, AI chat widget, performance, documentation*  
+### 2026‑01‑29 – Release & Documentation
 
-| Action | Commit |
-|--------|--------|
-| Removed Antigravity import button | — |
-| Added Daily Report section between Current Status & Todo | — |
-| Connected lines & inline AI chat widget to Todo | — |
-| Fuzzy search on timeline; separate search/filter rows | — |
-| Enabled ReactMarkdown HTML rendering for status reports | — |
-| Added Japanese translation for Current Status & Daily Report | — |
-| Removed `prose` class from walkthrough Markdown | — |
-| Refactored manual conversation recording UI | — |
-| Added error handling to `/api/sync` failures | — |
-| Automated walkthrough generation in Absorb | — |
-
-**Key take‑away:** The latest day added several UI/UX enhancements, improved AI integration, and laid groundwork for automated walkthroughs.
+* Bumped version to **v0.2.0**.  
+* Merged `feature/skin` into `develop`.  
+* Excluded `.ai-cache.json` and `vaults.json` from git.  
+* Fixed lint & type errors, added `remark-gfm`.  
+* UI/UX tweaks: removed unnecessary tags, improved preview button, unified backgrounds, inline delete confirmation.  
+* Adjusted date‑zone logic for daily notes.  
 
 ---
 
-## 4. Important Decisions & Discussions
+### 2026‑01‑30 – Final Release & Roadmap
 
-| Decision | Context | Outcome |
-|----------|---------|---------|
-| **Rebrand to Kiro** | Market positioning & branding consistency | Unified product name across UI, docs, and marketing |
-| **Decouple icon set from theme** | Reduce coupling, enable global icon switching | Simplified theme config; easier icon updates |
-| **Use local LLM (Ollama)** | Avoid external API costs & latency | Faster, privacy‑preserving AI suggestions |
-| **Bilingual UI (EN/JA)** | Target Japanese market & global audience | Increased accessibility and user base |
-| **WCAG AA compliance** | Accessibility best practice | Improved inclusivity; better UX |
-| **Theme Lab with live preview** | User‑centric theme editing | Empowers users to craft custom aesthetics |
-| **GitHub Actions CI** | Automate lint, test, build | Maintains code quality; rapid feedback |
-| **Prompt Vault UX** | Centralize AI prompt management | Enables sharing & reuse of prompts |
-| **Dynamic import + Tailwind v4** | Performance optimization | Faster load times, smaller bundles |
-| **AI Cache persistence** | Reduce repeated LLM calls | Better performance & offline usage |
-| **Markdown styling overhaul** | Clean docs & walkthrough | Consistent appearance across docs |
+* **v0.2.0** released: Theme Lab, Local AI, multi‑vault, WCAG AA, bilingual docs, CI/CD.  
+* Key tech changes: live CSS preview, theme import/export, icon system, AI cache & chat, Electron installers planned, WCAG AA compliance.  
+* **Open questions**: optimal caching strategy for Ollama, deletion UI feedback, plugin architecture.  
+
+---
+
+## 4. Highlighted Decisions & Discussions
+
+| Decision | Rationale | Impact |
+|----------|-----------|--------|
+| **Icon system decoupling** | Simplify theme design, reduce coupling. | Easier theme updates, reusable icons across themes. |
+| **Rebrand to Kiro** | Clear positioning; differentiate from original name. | Updated assets, documentation, community alignment. |
+| **Local AI via Ollama** | Privacy first; no data sent to the cloud. | Built-in AI features, small footprint, future‑proof. |
+| **WCAG AA compliance** | Accessibility and legal compliance. | Inclusive UI, improved contrast and semantics. |
+| **Bilingual UI & Docs** | Target Japanese and English users. | Broader reach, community growth. |
+| **GitHub Actions CI** | Automated quality checks. | Faster releases, reliable build pipeline. |
+| **Theme Lab live preview** | Empower users to customize theme in real time. | Higher user engagement, reduced support tickets. |
+| **Prompt Vault** | Manage reusable AI prompts. | Efficiency for power users. |
 
 ---
 
 ## 5. Next Steps & Future Considerations
 
-| Area | Planned Work | Notes |
-|------|--------------|-------|
-| **AI QA** | Validate daily‑note absorption & task suggestion accuracy | User testing & metrics |
-| **Performance profiling** | ThemeLab preview & AI cache | Identify bottlenecks, use `performance.now()` |
-| **Prompt Vault enhancements** | Tagging, sharing, export | Collaboration features |
-| **CI expansion** | Snapshot tests, coverage thresholds | Ensure regression safety |
-| **Version 2 Roadmap** | Real‑time sync, collaboration, multi‑user | Long‑term vision |
-| **Accessibility audit** | Full WCAG AA test | Continuous improvement |
-| **Internationalization** | Add more locales (e.g., Spanish, French) | Expand market reach |
-| **Electron security hardening** | CSP, context isolation | Protect against malicious content |
-| **Documentation** | Full API docs, developer guide | Encourage community contributions |
+| Item | Target Date | Notes |
+|------|-------------|-------|
+| **AI task suggestion validation** | 2026‑02‑15 | Manual QA + automated tests. |
+| **Theme Lab performance analysis** | 2026‑02‑01 | Lazy‑load presets, memoize CSS parsing. |
+| **Electron installers** (macOS, Windows, Linux) | 2026‑02‑20 | Use `electron-builder` or `electron-forge`. |
+| **Prompt Vault import/export & tagging** | 2026‑03‑01 | JSON schema, UI tags. |
+| **Additional languages** (Spanish, French) | 2026‑03‑15 | i18n file expansions. |
+| **Notion/BlockNote sync** | 2026‑04‑01 | OAuth, incremental sync. |
+| **WCAG audit** | 2026‑04‑15 | Manual review, automated tools. |
+| **Mobile preview (React Native)** | TBD | Research feasibility, decide on roadmap. |
+
+**Open Questions**
+
+- Optimal caching strategy for Ollama responses (LRU, TTL, persistence).  
+- User preference: inline confirmation vs. modal delete dialogs.  
+- Designing a **plugin architecture** for third‑party extensions (e.g., custom editors, integrations).  
 
 ---
 
-## 6. Quick Reference
+## 6. Resources
 
-### 6.1 Key Commands
-
-```bash
-# Install dependencies
-npm install
-
-# Development (Next.js dev server + Electron)
-npm run dev
-
-# Build for production
-npm run build
-
-# Test (Jest)
-npm test
-
-# E2E (Playwright)
-npm run test:e2e
-
-# Run CI locally (lint + test + build)
-npm run ci
-```
-
-### 6.2 Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `OLLAMA_HOST` | Ollama server endpoint | `http://localhost:11434` |
-| `VITE_APP_ENV` | App environment (`development`, `production`) | `development` |
-| `APP_NAME` | App display name | `Kiro` |
-
-### 6.3 File Structure Highlights
-
-```
-/src
-  /components   # React UI components
-  /lib          # Utility libraries (icons, AI, vault)
-  /services     # API & backend logic
-  /i18n         # Localization files
-  /theme-lab    # Theme editor
-  /assets       # Static assets, icons, images
-```
+| Type | URL |
+|------|-----|
+| **Source Repo** | <https://github.com/your-org/kiro> |
+| **Documentation** | <https://kiro.readthedocs.io/> |
+| **Issue Tracker** | <https://github.com/your-org/kiro/issues> |
+| **Contributing Guide** | <https://github.com/your-org/kiro/blob/main/CONTRIBUTING.md> |
+| **License** | <https://github.com/your-org/kiro/blob/main/LICENSE> |
 
 ---
 
-## 7. Contributing
-
-We welcome contributions! Please read the `CONTRIBUTING.md` for guidelines, code style, and issue reporting. Major areas needing help include:
-
-- AI prompt improvements
-- Accessibility audit
-- Documentation updates
-- Feature requests (e.g., real‑time collaboration)
-
----
-
-## 8. Acknowledgements
-
-- **Ollama** – local LLM runtime that powers Kiro’s AI features.
-- **Next.js** – foundation for server‑rendered React UI.
-- **Electron** – desktop shell enabling native capabilities.
-- **Tailwind CSS** – styling framework, now v4 for performance.
-- **GitHub Actions** – CI/CD that keeps the codebase healthy.
-
----
-
-### Happy hacking with **Kiro** 🚀
-
----
+> **Kiro** – The future of note‑taking is local, intelligent, and beautifully themed.  
+> Happy hacking! 🚀
