@@ -1,6 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
-import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
@@ -37,6 +35,11 @@ const expandPath = (p: string) => {
   return path.resolve(p);
 };
 
+const cleanUrl = (url: any) => {
+  if (!url || typeof url !== 'string') return '';
+  return url.replace('file:', '');
+};
+
 const getAbsoluteDbPath = (mode: string, vaultPath: string, dbUrl: string) => {
   const safeDbUrl = dbUrl || 'file:./prisma/dev.db';
 
@@ -54,7 +57,7 @@ const getAbsoluteDbPath = (mode: string, vaultPath: string, dbUrl: string) => {
     }
     
     // Fallback: Use the default DB path from env or relative to project
-    const dbPath = safeDbUrl.replace('file:', '');
+    const dbPath = cleanUrl(safeDbUrl);
     const absolutePath = path.isAbsolute(dbPath) ? dbPath : path.join(process.cwd(), dbPath);
     const dir = path.dirname(absolutePath);
     try {
@@ -80,36 +83,39 @@ const createPrismaClient = (mode: string, vaultPath: string, dbUrl: string) => {
       console.log(`📡 Storage: Local SQLite (${absolutePath})`);
     } else {
        // Fallback
-       dbPath = safeDbUrl.replace('file:', '');
-       console.log(`⚠️ Using Fallback DB: ${dbPath}`);
+       dbPath = cleanUrl(safeDbUrl);
     }
   } else {
-    console.log(`🌐 Storage: Remote Database (${safeDbUrl})`);
-    dbPath = (safeDbUrl || '').replace('file:', '');
+    // Remote
+    dbPath = cleanUrl(safeDbUrl);
     if (!dbPath) dbPath = './prisma/dev.db';
   }
+
+  // Ensure dbPath is valid
+  if (!dbPath) {
+      console.error("❌ Critical: DB Path could not be determined.");
+      dbPath = './prisma/dev.db';
+  }
+
+  console.log(`🔌 Initializing Prisma Client with path: ${dbPath}`);
 
   // Set environment variable to ensure Prisma internals use the correct path
   process.env.DATABASE_URL = `file:${dbPath}`;
 
   try {
-      // Use driver adapter for Prisma v7 stability
-      const db = new Database(dbPath);
-      const adapter = new PrismaBetterSqlite3(db as any);
-      return new PrismaClient({ adapter });
-  } catch (err) {
-      console.error("Failed to initialize Prisma Client with adapter:", err);
-      // Fallback to standard initialization if adapter fails
-      try {
-        return new PrismaClient({
-            datasources: {
-                db: { url: `file:${dbPath}` }
-            }
-        } as any);
-      } catch (e2) {
-         console.error("Critical DB Failure:", e2);
-         return new PrismaClient();
-      }
+      return new PrismaClient({
+          datasources: {
+              db: { url: `file:${dbPath}` }
+          }
+      } as any);
+  } catch (e) {
+      console.error("Failed to initialize Prisma Client:", e);
+      // Fallback explicitly to dev.db to avoid 'replace' error on query
+      return new PrismaClient({
+        datasources: {
+            db: { url: 'file:./prisma/dev.db' }
+        }
+      } as any);
   }
 };
 
