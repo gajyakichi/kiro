@@ -67,14 +67,35 @@ const getAbsoluteDbPath = (mode: string, vaultPath: string, dbUrl: string) => {
 };
 
 const createPrismaClient = (mode: string, vaultPath: string, dbUrl: string) => {
+  let dbPath = '';
+
   if (mode === 'local') {
     const absolutePath = getAbsoluteDbPath(mode, vaultPath, dbUrl);
-    const adapter = new PrismaBetterSqlite3({ url: `file:${absolutePath}` });
-    console.log(`📡 Storage: Local SQLite (${absolutePath})`);
-    return new PrismaClient({ adapter });
-  } else {
-    console.log(`🌐 Storage: Remote Database (${dbUrl})`);
-    return new PrismaClient();
+    if (absolutePath) {
+       dbPath = absolutePath;
+    }
+  }
+
+  // Fallback or Remote mode: use the provided DB URL or default
+  if (!dbPath) {
+    const cleanUrl = dbUrl ? dbUrl.replace(/^file:/, '') : '';
+    dbPath = cleanUrl || './prisma/dev.db';
+  }
+
+  // Ensure path is absolute for consistent logging and connection
+  const absolutePath = path.isAbsolute(dbPath) ? dbPath : path.resolve(process.cwd(), dbPath);
+
+  console.log(`🔌 Initializing Prisma Client with SQLite path: ${absolutePath}`);
+  
+  try {
+      // Always use the adapter for SQLite. 
+      // This circumvents the "datasource property url is no longer supported" issue in schema.prisma for v7.
+      const adapter = new PrismaBetterSqlite3({ url: `file:${absolutePath}` });
+      return new PrismaClient({ adapter });
+  } catch (e) {
+      console.error("Failed to initialize Prisma Client with adapter:", e);
+      // Last resort fallback (though likely to fail if schema has no url)
+      return new PrismaClient();
   }
 };
 
