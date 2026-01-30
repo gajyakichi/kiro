@@ -30,7 +30,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, id: project.id });
   } catch (error) {
     console.error("Project Create Error Detail:", error);
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    let message = "Failed to create project";
+    if (error instanceof Error) {
+        // Use only the first line of the error message to avoid sending huge Prisma logs to the client
+        // which might cause rendering issues or confusion
+        message = error.message.split('\n').filter(line => line.trim().length > 0).pop() || error.message; 
+        
+        // Basic translation mapping
+        if (message.includes("Unique constraint")) {
+            message = "A project with this name or path already exists.";
+        }
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

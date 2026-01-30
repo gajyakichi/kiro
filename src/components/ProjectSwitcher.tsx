@@ -86,7 +86,9 @@ export const ProjectSwitcher = ({ activeProjectId, onSwitch, className = "" }: P
                     console.warn("Failed to parse error response", parseError);
                     errorMsg = await res.text();
                 }
-                throw new Error(errorMsg);
+                // Avoid throwing error to prevent Next.js error overlay crashes with complex objects
+                console.error("Project addition failed:", errorMsg);
+                alert(`Failed to add project: ${errorMsg}`);
             }
         }
     } catch (e) {
