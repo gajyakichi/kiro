@@ -75,32 +75,54 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const { id } = await request.json();
+    const { id, name, path: newPath } = await request.json();
     const vaults = await readVaults();
     
-    const vault = vaults.find((v: Vault) => v.id === id);
-    if (!vault) {
+    const index = vaults.findIndex((v: Vault) => v.id === id);
+    if (index === -1) {
       return NextResponse.json({ error: "Vault not found" }, { status: 404 });
     }
 
-    // Switch active status
-    const updatedVaults = vaults.map((v: Vault) => ({
-      ...v,
-      active: v.id === id
-    }));
+    // Update Mode
+    if (name || newPath) {
+        if (name) vaults[index].name = name;
+        if (newPath) {
+            vaults[index].path = newPath;
+            // If active vault's path changed, reconfigure
+            if (vaults[index].active) {
+                await updateEnv(newPath);
+                reconfigureDb({
+                  STORAGE_MODE: "local",
+                  VAULT_PATH: newPath
+                });
+            }
+        }
+    } 
+    // Activate Mode (Default if no update fields)
+    else {
+        // Switch active status
+        const targetVault = vaults[index];
+        const updatedVaults = vaults.map((v: Vault) => ({
+          ...v,
+          active: v.id === id
+        }));
+        
+        await writeVaults(updatedVaults);
+        
+        // Update .env for persistence
+        await updateEnv(targetVault.path);
 
-    await writeVaults(updatedVaults);
-    
-    // Update .env for persistence
-    await updateEnv(vault.path);
+        // Dynamic Database Reconfiguration
+        reconfigureDb({
+          STORAGE_MODE: "local",
+          VAULT_PATH: targetVault.path
+        });
+        
+        return NextResponse.json({ success: true, vault: targetVault });
+    }
 
-    // Dynamic Database Reconfiguration
-    reconfigureDb({
-      STORAGE_MODE: "local",
-      VAULT_PATH: vault.path
-    });
-
-    return NextResponse.json({ success: true, vault });
+    await writeVaults(vaults);
+    return NextResponse.json({ success: true, vault: vaults[index] });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

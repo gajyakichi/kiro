@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Database, ShieldCheck, ChevronRight, Check, AlertTriangle, Plus, Settings } from 'lucide-react';
+import { Database, ShieldCheck, ChevronRight, Check, AlertTriangle, Plus, Settings, Edit2 } from 'lucide-react';
 import { Vault } from '@/lib/types';
 import { getTranslation } from '@/lib/i18n';
 
@@ -92,6 +92,35 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
     }
   };
 
+  const handleUpdateVaultPath = async (vault: Vault) => {
+    let newPath = "";
+    
+    if (typeof window !== 'undefined' && window.electron?.selectDirectory) {
+       const selected = await window.electron.selectDirectory();
+       if (selected) newPath = selected;
+    } else {
+       const input = prompt("Update vault path:", vault.path);
+       if (input) newPath = input;
+    }
+
+    if (newPath && newPath !== vault.path) {
+        try {
+            const res = await fetch('/api/vaults', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: vault.id, path: newPath })
+            });
+            if (res.ok) {
+                fetchVaults();
+                // If the updated vault was active, reload to apply changes
+                if (vault.active) window.location.reload();
+            }
+        } catch (e) {
+            console.error("Failed to update vault path", e);
+        }
+    }
+  };
+
   const activeVault = vaults.find(v => v.active);
 
   if (loading) return <div className="text-[10px] notion-text-subtle animate-pulse">{t.loading_vault}</div>;
@@ -123,15 +152,16 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
           </div>
           <div className="max-h-64 overflow-y-auto p-1">
             {vaults.map((vault) => (
-              <button
+              <div
                 key={vault.id}
                 onClick={() => {
                    if (vault.id === activeVault?.id) return;
                    setTargetVault(vault);
                 }}
-                className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors ${
+                className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors cursor-pointer ${
                   vault.active ? 'bg-(--hover-bg)' : 'hover:bg-(--hover-bg)'
                 }`}
+                role="button"
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${vault.active ? 'bg-(--theme-primary) text-(--background)' : 'bg-(--hover-bg) text-(--foreground) opacity-50'}`}>
@@ -146,8 +176,20 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
                     </div>
                   </div>
                 </div>
-                {vault.active && <Check size={16} className="text-(--theme-primary)" />}
-              </button>
+                <div className="flex items-center gap-2">
+                   <button
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       handleUpdateVaultPath(vault);
+                     }}
+                     className="p-1.5 text-(--foreground) opacity-30 hover:opacity-100 hover:bg-(--hover-bg) rounded transition-all"
+                     title="Edit Vault Path"
+                   >
+                     <Edit2 size={12} />
+                   </button>
+                   {vault.active && <Check size={16} className="text-(--theme-primary)" />}
+                </div>
+              </div>
             ))}
           </div>
           
