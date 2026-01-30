@@ -27,6 +27,39 @@ export async function POST(req: NextRequest) {
       project.git_path || '' // Pass project root for Kiro-generated walkthrough
     );
 
+    // 2.1 Check if we should use cache (auto mode)
+    const absorbMode = process.env.ABSORB_MODE || 'auto';
+    const latestGitHash = contextData.recentLogs[0]?.hash || '';
+    
+    if (absorbMode === 'auto' && latestGitHash) {
+      try {
+        // Check if we have cached data for this git state
+        const cachedAbsorb = await db.absorbCache.findFirst({
+          where: {
+            project_id: Number(projectId),
+            git_hash: latestGitHash
+          }
+        });
+
+        if (cachedAbsorb) {
+          // Return cached data immediately
+          console.log('Using cached Absorb data for hash:', latestGitHash);
+          return NextResponse.json({
+            success: true,
+            cached: true,
+            summary: cachedAbsorb.summary_content,
+            summary_en: cachedAbsorb.summary_en,
+            summary_ja: cachedAbsorb.summary_ja,
+            tasks: [], // Tasks are already in DB
+            completedTaskIds: []
+          });
+        }
+      } catch (cacheError) {
+        // Cache table might not exist yet or Prisma Client not regenerated
+        console.warn('Cache check failed, proceeding with fresh analysis:', cacheError);
+      }
+    }
+
     // Persist Git Logs to DB for Timeline/Calendar
     if (contextData.recentLogs.length > 0) {
       // Find existing logs to avoid duplicates
@@ -103,7 +136,9 @@ ${contextData.walkthrough || 'No walkthrough available.'}
 
     const { en: summaryEn, ja: summaryJa } = summaryObj;
     // Default content to English or APP_LANG preference
-    const defaultContent = process.env.APP_LANG === 'ja' ? summaryJa : summaryEn;
+    // Stringify the content object since DB schema uses String type
+    const rawContent = process.env.APP_LANG === 'ja' ? summaryJa : summaryEn;
+    const defaultContent = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent);
 
     const date = new Date().toISOString().split('T')[0];
 
@@ -165,6 +200,38 @@ ${contextData.walkthrough || 'No walkthrough available.'}
         });
       }
     });
+
+
+    // 5. Save Cache (auto mode only)
+    if (absorbMode === 'auto' && latestGitHash) {
+      try {
+        await db.absorbCache.upsert({
+          where: {
+            project_id_git_hash: {
+              project_id: Number(projectId),
+              git_hash: latestGitHash
+            }
+          },
+          update: {
+            summary_content: defaultContent,
+            summary_en: summaryEn,
+            summary_ja: summaryJa,
+            timestamp: new Date()
+          },
+          create: {
+            project_id: Number(projectId),
+            git_hash: latestGitHash,
+            summary_content: defaultContent,
+            summary_en: summaryEn,
+            summary_ja: summaryJa
+          }
+        });
+        console.log('Absorb cache saved for hash:', latestGitHash);
+      } catch (cacheError) {
+        // Don't fail the whole operation if cache save fails
+        console.warn('Failed to save cache:', cacheError);
+      }
+    }
 
     return NextResponse.json({ 
       success: true, 

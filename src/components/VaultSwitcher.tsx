@@ -75,8 +75,8 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 bottom-full mb-2 w-64 bg-(--card-bg) border border-(--border-color) rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <div className="p-2 border-b border-(--border-color) bg-(--theme-primary-bg)/50">
+        <div className="absolute left-0 bottom-full mb-2 w-64 bg-(--background) border border-(--border-color) rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="p-2 border-b border-(--border-color) bg-(--hover-bg)">
             <span className="text-[10px] font-bold notion-text-subtle uppercase tracking-widest px-2">{t.storage_vaults}</span>
           </div>
           <div className="max-h-64 overflow-y-auto p-1">
@@ -88,7 +88,7 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
                    setTargetVault(vault);
                 }}
                 className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors ${
-                  vault.active ? 'bg-(--theme-primary-bg) cursor-default' : 'hover:bg-(--hover-bg)'
+                  vault.active ? 'bg-(--hover-bg)' : 'hover:bg-(--hover-bg)'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -96,7 +96,7 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
                     <ShieldCheck size={16} />
                   </div>
                   <div>
-                    <div className={`text-sm font-bold ${vault.active ? 'text-(--theme-primary)' : 'text-(--foreground)'}`}>
+                    <div className={`text-xs font-bold ${vault.active ? 'text-(--theme-primary)' : 'text-(--foreground)'}`}>
                       {vault.name}
                     </div>
                     <div className="text-[10px] notion-text-subtle truncate max-w-[120px]">
@@ -108,7 +108,7 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
               </button>
             ))}
           </div>
-          <div className="p-2 border-t border-(--border-color) bg-(--theme-primary-bg)/20">
+          <div className="p-2 border-t border-(--border-color) bg-(--hover-bg)">
             <a 
               href="/settings" 
               className="block w-full text-center py-2 text-[10px] font-bold notion-text-subtle hover:text-(--theme-primary) transition-colors"

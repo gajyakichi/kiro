@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SuggestedTask } from '@/lib/types';
-import { Plus, X, Copy, CheckCircle, Sparkles } from 'lucide-react';
+import { Plus, X, Copy, CheckCircle } from 'lucide-react';
 
 interface SuggestedTasksProps {
   tasks: SuggestedTask[];
@@ -8,10 +8,19 @@ interface SuggestedTasksProps {
   onDismiss: (task: SuggestedTask) => void;
   onUpdateStatus?: (task: SuggestedTask, status: string) => void;
   onManualAdd?: (task: string) => void;
-  onOpenChat?: (id: string, context: string, title: string) => void;
+  displayLang?: 'en' | 'ja';  // Japanese plugin feature
+  translatedTasks?: { [key: number]: string };  // Japanese plugin feature
 }
 
-const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss, onUpdateStatus, onManualAdd, onOpenChat }) => {
+const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ 
+  tasks, 
+  onAdd, 
+  onDismiss, 
+  onUpdateStatus, 
+  onManualAdd,
+  displayLang = 'en',
+  translatedTasks = {}
+}) => {
   const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
   const [activeTab, setActiveTab] = useState<'todo' | 'suggestions'>('todo');
   const [newTaskInput, setNewTaskInput] = useState('');
@@ -66,7 +75,9 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
         {/* Task Text */}
         <div className="flex-1 min-w-0">
             <p className={`text-sm text-(--foreground) leading-snug ${isCompleted ? 'line-through opacity-50' : ''}`}>
-                {task.task}
+                {displayLang === 'ja' && translatedTasks[task.id] 
+                    ? translatedTasks[task.id] 
+                    : task.task}
             </p>
         </div>
 
@@ -82,16 +93,6 @@ const SuggestedTasks: React.FC<SuggestedTasksProps> = ({ tasks, onAdd, onDismiss
                 </button>
             )}
             
-            {/* AI Chat Button */}
-            {onOpenChat && (
-                <button 
-                    onClick={() => onOpenChat(`task-${task.id}`, `Task: ${task.task}`, isTodo ? 'Todo AI Assistant' : 'Task AI Assistant')}
-                    className="p-1.5 text-(--foreground) opacity-40 hover:opacity-100 hover:text-(--theme-primary) hover:bg-(--hover-bg) rounded text-xs transition-colors"
-                    title="Chat with AI about this task"
-                >
-                    <Sparkles size={16} className="text-(--theme-primary)" />
-                </button>
-            )}
             
             <button 
                 onClick={() => handleCopyPrompt(task.task)}

@@ -126,6 +126,16 @@ const translations = {
     less: "Less",
     more: "More",
     activity_level: "{count} contributions on {date}",
+    
+    // Absorb Mode
+    absorb_mode: "Absorb Mode",
+    absorb_mode_desc: "Control how Absorb analyzes your project. Auto mode uses intelligent caching for instant results when code hasn't changed. Manual mode always regenerates analysis.",
+    auto_mode: "AUTO",
+    auto_mode_desc: "Smart Cache (Fast)",
+    manual_mode: "MANUAL",
+    manual_mode_desc: "Always Regenerate",
+    auto_mode_benefit: "Auto mode compares Git commits to detect changes. If unchanged, cached results are returned instantly for lightning-fast performance.",
+    restart_server: "Restart Server",
   },
   ja: {
     // Sidebar
@@ -242,6 +252,16 @@ const translations = {
     select: "選択",
     loading_settings: "設定を読み込み中...",
 
+    
+    // Absorb Mode
+    absorb_mode: "Absorb モード",
+    absorb_mode_desc: "Absorbがプロジェクトを解析する方法を設定します。Autoモードはコードが変更されていない場合、キャッシュを使用して即座に結果を返します。Manualモードは常に再生成します。",
+    auto_mode: "自動",
+    auto_mode_desc: "スマートキャッシュ（高速）",
+    manual_mode: "手動",
+    manual_mode_desc: "常に再生成",
+    auto_mode_benefit: "Autoモードは Gitコミットを比較して変更を検出します。変更がない場合、キャッシュされた結果が即座に返され、超高速なパフォーマンスを実現します。",
+    restart_server: "サーバーを再起動",
     // Calendar & Months
     today: "今日",
     prev: "前へ",

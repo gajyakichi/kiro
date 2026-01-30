@@ -18,6 +18,7 @@ export async function GET() {
       APP_ICON_SET: "lucide",
       APP_SKIN: "notion",
       ENABLED_PLUGINS: "",
+      ABSORB_MODE: "auto", // auto (uses cache) or manual (always regenerate)
     };
 
     try {
@@ -40,6 +41,7 @@ export async function GET() {
 
     // Ensure defaults if keys missing in file but file exists
     if (!currentSettings.ENABLED_PLUGINS) currentSettings.ENABLED_PLUGINS = "";
+    if (!currentSettings.ABSORB_MODE) currentSettings.ABSORB_MODE = "auto";
 
 
     return NextResponse.json(currentSettings);
@@ -50,7 +52,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { STORAGE_MODE, DATABASE_URL, OPENAI_API_KEY, AI_MODEL, VAULT_PATH, AI_PROVIDER, OLLAMA_BASE_URL, APP_LANG, APP_ICON_SET, APP_SKIN, ENABLED_PLUGINS } = await request.json();
+    const { STORAGE_MODE, DATABASE_URL, OPENAI_API_KEY, AI_MODEL, VAULT_PATH, AI_PROVIDER, OLLAMA_BASE_URL, APP_LANG, APP_ICON_SET, APP_SKIN, ENABLED_PLUGINS, ABSORB_MODE } = await request.json();
     
     // Read current .env
     let envContent = "";
@@ -98,6 +100,9 @@ export async function POST(request: Request) {
       } else if (line.startsWith("APP_SKIN=")) {
         newLines.push(`APP_SKIN="${APP_SKIN}"`);
         keysHandled.add("APP_SKIN");
+      } else if (line.startsWith("ABSORB_MODE=")) {
+        newLines.push(`ABSORB_MODE="${ABSORB_MODE || 'auto'}"`);
+        keysHandled.add("ABSORB_MODE");
       } else {
         newLines.push(line);
       }
@@ -135,6 +140,9 @@ export async function POST(request: Request) {
     }
     if (!keysHandled.has("ENABLED_PLUGINS")) {
       newLines.push(`ENABLED_PLUGINS="${ENABLED_PLUGINS || ''}"`);
+    }
+    if (!keysHandled.has("ABSORB_MODE")) {
+      newLines.push(`ABSORB_MODE="${ABSORB_MODE || 'auto'}"`);
     }
 
     await fs.writeFile(ENV_FILE, newLines.join("\n"));

@@ -17,6 +17,7 @@ model Project {
   logs             Log[]
   suggestedTasks   SuggestedTask[]
   conversationLogs ConversationLog[]
+  absorbCaches     AbsorbCache[]
 }
 
 model Log {
@@ -81,4 +82,17 @@ model ConversationLog {
   metadata   String?  // JSON string for storing KI path and other metadata
   timestamp  DateTime @default(now())
   project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+}
+
+model AbsorbCache {
+  id              Int      @id @default(autoincrement())
+  project_id      Int
+  git_hash        String
+  summary_content String
+  summary_en      String?
+  summary_ja      String?
+  timestamp       DateTime @default(now())
+  project         Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+
+  @@unique([project_id, git_hash])
 }

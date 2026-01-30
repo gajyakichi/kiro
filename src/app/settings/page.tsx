@@ -225,7 +225,8 @@ export default function SettingsPage() {
     VAULT_PATH: '',
     APP_LANG: 'en',
     APP_SKIN: 'notion',
-    ENABLED_PLUGINS: ''
+    ENABLED_PLUGINS: '',
+    ABSORB_MODE: 'auto' // auto or manual
   });
   const [themes, setThemes] = useState<Theme[]>([]);
   const [ollamaModels, setOllamaModels] = useState<string[]>([]);
@@ -591,7 +592,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setConfig({ ...config, AI_PROVIDER: 'openai' })}
                   className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-lg text-xs font-black transition-all ${
-                    config.AI_PROVIDER === 'openai' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
+                    config.AI_PROVIDER === 'openai' ? 'bg-(--theme-primary) text-(--background) shadow-md' : 'text-(-foreground) hover:bg-(--hover-bg)'
                   }`}
                 >
                   <Cloud size={12} />
@@ -600,7 +601,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => setConfig({ ...config, AI_PROVIDER: 'ollama' })}
                   className={`flex-1 flex items-center justify-center gap-3 py-3 rounded-lg text-xs font-black transition-all ${
-                    config.AI_PROVIDER === 'ollama' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
+                    config.AI_PROVIDER === 'ollama' ? 'bg-(--theme-primary) text-(--background) shadow-md' : 'text-(-foreground) hover:bg-(--hover-bg)'
                   }`}
                 >
                   <Server size={12} />
@@ -616,7 +617,7 @@ export default function SettingsPage() {
                     <button 
                       onClick={() => setConfig({ ...config, APP_LANG: 'en' })}
                       className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-black transition-all ${
-                        config.APP_LANG === 'en' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
+                        config.APP_LANG === 'en' ? 'bg-(--theme-primary) text-(--background) shadow-md' : 'text-(-foreground) hover:bg-(--hover-bg)'
                       }`}
                     >
                       <Languages size={12} />
@@ -626,7 +627,7 @@ export default function SettingsPage() {
                       <button 
                         onClick={() => setConfig({ ...config, APP_LANG: 'ja' })}
                         className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-xs font-black transition-all ${
-                          config.APP_LANG === 'ja' ? 'bg-white shadow-md text-(--theme-primary)' : 'text-(-foreground) hover:text-(-foreground)'
+                          config.APP_LANG === 'ja' ? 'bg-(--theme-primary) text-(--background) shadow-md' : 'text-(-foreground) hover:bg-(--hover-bg)'
                         }`}
                       >
                         <Languages size={12} />
@@ -736,6 +737,31 @@ export default function SettingsPage() {
                 </div>
               )}
 
+
+              {/* Save & Restart Buttons for AI Settings */}
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  onClick={() => {
+                    if (confirm('サーバーを再起動しますか？\nAre you sure you want to restart the server?')) {
+                      fetch('/api/restart', { method: 'POST' });
+                      setTimeout(() => window.location.reload(), 2000);
+                    }
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-(--theme-accent) text-(--background) rounded-lg hover:opacity-90 transition-all text-xs font-bold shadow-lg"
+                >
+                  <RotateCcw size={14} />
+                  {t.restart_server || 'Restart Server'}
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="flex items-center gap-2 px-4 py-2 bg-(--theme-primary) text-(--background) rounded-lg hover:opacity-90 disabled:opacity-50 transition-all text-xs font-bold shadow-lg"
+                >
+                  {saving ? <RotateCcw className="animate-spin" size={14} /> : <Save size={14} />}
+                  {saving ? t.saving : t.save_config}
+                </button>
+              </div>
+
               <div className="flex items-start gap-3 p-3 bg-(--theme-warning-bg) border border-(--theme-warning)/10 rounded-lg text-(--theme-warning) text-xs">
                 <AlertTriangle size={14} className="shrink-0" />
                 <span className="font-bold leading-relaxed">
@@ -744,6 +770,56 @@ export default function SettingsPage() {
               </div>
             </div>
           </section>
+
+
+          {/* Section: Absorb Mode */}
+          <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm">
+            <h2 className="text-base font-semibold mb-4 flex items-center gap-3">
+              <RefreshCw size={12} className="text-(--theme-primary) opacity-40" />
+              {t.absorb_mode || 'Absorb Mode'}
+            </h2>
+            <div className="space-y-4">
+              <p className="text-xs notion-text-subtle leading-relaxed">
+                {t.absorb_mode_desc || 'Control how Absorb analyzes your project. Auto mode uses intelligent caching for instant results when code hasn\'t changed. Manual mode always regenerates analysis.'}
+              </p>
+              <div className="flex bg-(-card-bg) p-1.5 rounded-lg gap-1.5">
+                <button
+                  onClick={() => setConfig({ ...config, ABSORB_MODE: 'auto' })}
+                  className={`flex-1 flex flex-col items-center justify-center gap-2 py-4 rounded-lg text-xs font-black transition-all ${
+                    config.ABSORB_MODE === 'auto' ? 'bg-(--theme-primary) text-(--background) shadow-md' : 'text-(-foreground) hover:bg-(--hover-bg)'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    {t.auto_mode || 'AUTO'}
+                  </div>
+                  <span className="text-[10px] font-normal opacity-70">{t.auto_mode_desc || 'Smart Cache (Fast)'}</span>
+                </button>
+                <button
+                  onClick={() => setConfig({ ...config, ABSORB_MODE: 'manual' })}
+                  className={`flex-1 flex flex-col items-center justify-center gap-2 py-4 rounded-lg text-xs font-black transition-all ${
+                    config.ABSORB_MODE === 'manual' ? 'bg-(--theme-primary) text-(--background) shadow-md' : 'text-(-foreground) hover:bg-(--hover-bg)'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <RefreshCw size={16} />
+                    {t.manual_mode || 'MANUAL'}
+                  </div>
+                  <span className="text-[10px] font-normal opacity-70">{t.manual_mode_desc || 'Always Regenerate'}</span>
+                </button>
+              </div>
+
+              {config.ABSORB_MODE === 'auto' && (
+                <div className="flex items-start gap-3 p-3 bg-(--theme-success-bg) border border-(--theme-success)/10 rounded-lg text-(--theme-success) text-xs animate-fade-in">
+                  <ShieldCheck size={14} className="shrink-0" />
+                  <span className="font-bold leading-relaxed">
+                    {t.auto_mode_benefit || 'Auto mode compares Git commits to detect changes. If unchanged, cached results are returned instantly for lightning-fast performance.'}
+                  </span>
+                </div>
+              )}
+            </div>
+          </section>
+
 
           {/* AI Prompt Vault */}
           <section className="bg-(-card-bg) px-3 py-2 rounded-md border border-(-border-color) shadow-sm">
