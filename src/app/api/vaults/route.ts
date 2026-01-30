@@ -54,13 +54,25 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { name, path: vPath } = await request.json();
+    const { name, path: vPath, type } = await request.json(); // type: 'internal' | 'external'
     const vaults = await readVaults();
     
+    let finalPath = vPath;
+    
+    // Handle Internal Vault Creation
+    if (type === 'internal') {
+       const safeName = name.replace(/[^a-z0-9\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf]/gi, '_'); // Keep Japanese chars safe-ish or just simplistic sanitization
+       const internalDir = path.join(process.cwd(), 'vaults', safeName + '_' + Math.random().toString(36).substring(2, 6));
+       
+       // Create directory
+       await fs.mkdir(internalDir, { recursive: true });
+       finalPath = internalDir;
+    }
+
     const newVault = {
       id: Math.random().toString(36).substring(2, 9),
       name,
-      path: vPath,
+      path: finalPath,
       active: false
     };
 
@@ -69,6 +81,7 @@ export async function POST(request: Request) {
     
     return NextResponse.json(newVault);
   } catch (error) {
+    console.error("Vault creation failed:", error);
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }

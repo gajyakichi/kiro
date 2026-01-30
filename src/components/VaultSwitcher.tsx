@@ -52,30 +52,40 @@ export const VaultSwitcher = ({ appLang = 'en', onSwitch, className = "" }: Vaul
   const handleAddVault = async () => {
     let path = "";
     let name = "";
+    let type = "external";
 
     try {
-        // Strict check for Electron API availability
-        if (typeof window !== 'undefined' && window.electron && typeof window.electron.selectDirectory === 'function') {
-            const selected = await window.electron.selectDirectory();
-            if (selected) {
-                path = selected;
-                name = path.split(/[/\\]/).pop() || "New Vault";
-            }
+        // Offer choice between Internal (App-managed) and External (User-folder)
+        const useInternal = window.confirm("Create a new Internal Vault?\n\nOK: Create inside app (Portable)\nCancel: Select external folder (Existing)");
+        
+        if (useInternal) {
+            type = "internal";
+            name = prompt(t.vault_name_placeholder || "Enter vault name:", "My Vault") || "";
+            if (!name) return; // Cancelled
         } else {
-            console.warn("Electron API unavailable, falling back to prompt");
-            const defaultPath = "/Users/satoshiyamaguchi/Developer/kaihatsunote/vault";
-            const input = prompt(t.dir_path_placeholder || "Enter absolute path to vault:", defaultPath);
-            if (input) {
-                path = input;
-                name = prompt(t.vault_name_placeholder || "Enter vault name:", "Kaihatsunote Workspace") || "New Vault";
+            // External Vault Logic
+            if (typeof window !== 'undefined' && window.electron && typeof window.electron.selectDirectory === 'function') {
+                const selected = await window.electron.selectDirectory();
+                if (selected) {
+                    path = selected;
+                    name = path.split(/[/\\]/).pop() || "New Vault";
+                }
+            } else {
+                console.warn("Electron API unavailable, falling back to prompt");
+                const defaultPath = "/Users/satoshiyamaguchi/Developer/kaihatsunote/vault";
+                const input = prompt(t.dir_path_placeholder || "Enter absolute path to vault:", defaultPath);
+                if (input) {
+                    path = input;
+                    name = prompt(t.vault_name_placeholder || "Enter vault name:", "Kaihatsunote Workspace") || "New Vault";
+                }
             }
         }
 
-        if (path && name) {
+        if ((type === 'internal' && name) || (path && name)) {
             const res = await fetch('/api/vaults', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, path })
+                body: JSON.stringify({ name, path, type })
             });
 
             if (res.ok) {
